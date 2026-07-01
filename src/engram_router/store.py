@@ -12,6 +12,7 @@ import logging
 import re
 import sqlite3
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -215,6 +216,9 @@ class MemoryStore:
                 confidence REAL NOT NULL DEFAULT 1.0,
                 metadata TEXT NOT NULL DEFAULT '{}',
                 namespace TEXT NOT NULL DEFAULT 'default',
+                access_count INTEGER NOT NULL DEFAULT 0,
+                accessed_at TEXT,
+                forgotten INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -286,6 +290,19 @@ class MemoryStore:
                 name TEXT PRIMARY KEY,
                 next_val INTEGER NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS timed_events (
+                id TEXT PRIMARY KEY,
+                time_entity_id TEXT NOT NULL,
+                time_name TEXT NOT NULL,
+                sort_order INTEGER NOT NULL DEFAULT 50,
+                memory_id TEXT NOT NULL,
+                raw_text TEXT NOT NULL DEFAULT '',
+                person_name TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(time_entity_id) REFERENCES entities(id) ON DELETE CASCADE,
+                FOREIGN KEY(memory_id) REFERENCES memories(id) ON DELETE CASCADE
+            );
             """
         )
         self._migrate_schema()
@@ -317,6 +334,36 @@ class MemoryStore:
                 "ALTER TABLE memories ADD COLUMN namespace TEXT NOT NULL DEFAULT 'default'"
             )
 
+        # Phase 3: forgetting / decay columns.
+        if "access_count" not in mem_cols:
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN access_count INTEGER NOT NULL DEFAULT 0"
+            )
+        if "accessed_at" not in mem_cols:
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN accessed_at TEXT"
+            )
+        if "forgotten" not in mem_cols:
+            self.conn.execute(
+                "ALTER TABLE memories ADD COLUMN forgotten INTEGER NOT NULL DEFAULT 0"
+            )
+
+        # Phase 3: timed_events table for causal + timeline features.
+        self.conn.execute(
+            """CREATE TABLE IF NOT EXISTS timed_events (
+                id TEXT PRIMARY KEY,
+                time_entity_id TEXT NOT NULL,
+                time_name TEXT NOT NULL,
+                sort_order INTEGER NOT NULL DEFAULT 50,
+                memory_id TEXT NOT NULL,
+                raw_text TEXT NOT NULL DEFAULT '',
+                person_name TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(time_entity_id) REFERENCES entities(id) ON DELETE CASCADE,
+                FOREIGN KEY(memory_id) REFERENCES memories(id) ON DELETE CASCADE
+            )"""
+        )
+
     def _init_indices(self) -> None:
         """Indices for the hot recall paths (entity<->memory map, edge hops).
 
@@ -336,6 +383,10 @@ class MemoryStore:
                 ON memories(namespace, created_at DESC, id DESC);
             CREATE INDEX IF NOT EXISTS idx_evidence_memory ON evidence(memory_id);
             CREATE INDEX IF NOT EXISTS idx_distilled_memory ON distilled_memories(memory_id);
+            CREATE INDEX IF NOT EXISTS idx_timed_events_sort
+                ON timed_events(sort_order, created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_timed_events_person
+                ON timed_events(person_name);
             """
         )
 
@@ -407,6 +458,7 @@ class MemoryStore:
             (evidence_id, next_id, text, source),
         )
         self._index_entities(next_id, text)
+        self._populate_timed_events_for_memory(next_id)
         if self._fts_enabled:
             self.conn.execute(
                 "INSERT INTO memories_fts (memory_id, content) VALUES (?, ?)",
@@ -602,6 +654,68 @@ class MemoryStore:
             (entity_id, name, kind, salience_class),
         )
         return entity_id
+
+    def _populate_timed_events_for_memory(self, memory_id: str) -> None:
+        """Insert timed_events rows for any time-kind entities in this memory.
+
+        Called automatically after entity indexing on every :meth:`save`.
+        Extracts the first person entity (if any) from the same memory to
+        attach as ``person_name``.
+        """
+        from .causal import _resolve_sort_order
+
+        # Find time entities linked to this memory.
+        time_rows = self.conn.execute(
+            """SELECT e.id AS entity_id, e.name AS time_name, m.raw_text, m.created_at
+               FROM memory_entities me
+               JOIN entities e ON e.id = me.entity_id
+               JOIN memories m ON m.id = me.memory_id
+               WHERE me.memory_id = ? AND e.kind = 'time'""",
+            (memory_id,),
+        ).fetchall()
+
+        if not time_rows:
+            return
+
+        # First person entity in the same memory (if any).
+        person_row = self.conn.execute(
+            """SELECT e.name
+               FROM memory_entities me
+               JOIN entities e ON e.id = me.entity_id
+               WHERE me.memory_id = ? AND e.kind = 'person'
+               LIMIT 1""",
+            (memory_id,),
+        ).fetchone()
+        person_name = person_row["name"] if person_row else None
+
+        for tr in time_rows:
+            # Skip if already present.
+            existing = self.conn.execute(
+                "SELECT 1 FROM timed_events WHERE memory_id = ? AND time_entity_id = ?",
+                (memory_id, tr["entity_id"]),
+            ).fetchone()
+            if existing:
+                continue
+
+            sort_order = _resolve_sort_order(tr["time_name"])
+            event_id = f"tev_{memory_id}_{tr['entity_id']}"
+
+            self.conn.execute(
+                """INSERT INTO timed_events
+                   (id, time_entity_id, time_name, sort_order, memory_id,
+                    raw_text, person_name, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    event_id,
+                    tr["entity_id"],
+                    tr["time_name"],
+                    sort_order,
+                    memory_id,
+                    tr["raw_text"],
+                    person_name,
+                    tr["created_at"],
+                ),
+            )
 
     def close(self) -> None:
         self.conn.close()
@@ -836,6 +950,23 @@ class MemoryStore:
                 {"name": r["name"], "kind": r["kind"], "salience_class": r["salience_class"]}
             )
         return out
+
+    def _record_access(self, memory_ids: list[str]) -> None:
+        """Increment access_count and update accessed_at for recalled memories.
+
+        Called at the end of every successful recall so the forgetting engine
+        can see which memories have been recently accessed.
+        """
+        if not memory_ids:
+            return
+        now = datetime.now(timezone.utc).isoformat()
+        for mid in memory_ids:
+            self.conn.execute(
+                "UPDATE memories SET access_count = access_count + 1, "
+                "accessed_at = ? WHERE id = ?",
+                (now, mid),
+            )
+        self.conn.commit()
 
     def recall(self, query: str, top_k: int = 5,
                namespace: str = "default") -> list[MemoryRecord]:
@@ -1337,6 +1468,9 @@ class MemoryStore:
             except Exception as exc:
                 logger.debug("Vector search skipped: %s", exc)
 
+        # ── Phase 3: Record access for forgetting engine ──
+        self._record_access([r.id for r in records])
+
         return records
 
     def _batch_evidence_refs(self, memory_ids: list[str]) -> dict[str, list[str]]:
@@ -1665,6 +1799,11 @@ class MemoryStore:
             ]
         metadata = self._parse_metadata(row["metadata"])
         metadata.update({"source": row["source"], "created_at": row["created_at"]})
+        # Phase 3: surface access/forgetting columns for the forgetting engine.
+        if row["accessed_at"] is not None:
+            metadata["accessed_at"] = row["accessed_at"]
+        metadata["access_count"] = int(row["access_count"]) if row["access_count"] is not None else 0
+        metadata["forgotten"] = bool(row["forgotten"])
         return MemoryRecord(
             id=row["id"],
             raw_text=row["raw_text"],

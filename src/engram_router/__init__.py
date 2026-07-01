@@ -8,6 +8,13 @@ from .query_expansion import (
     ExpansionCache,
     ExpansionStats,
 )
+from .causal import (
+    CausalChain,
+    CausalEdge,
+    CausalPath,
+    Timeline,
+    TimedEvent,
+)
 
 __version__ = "0.1.0"
 
@@ -20,4 +27,9 @@ __all__ = [
     "SynonymTable",
     "ExpansionCache",
     "ExpansionStats",
+    "CausalChain",
+    "CausalEdge",
+    "CausalPath",
+    "Timeline",
+    "TimedEvent",
 ]
