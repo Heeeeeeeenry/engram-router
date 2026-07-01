@@ -1205,6 +1205,61 @@ class MemoryStore:
 
         return (score, reason)
 
+    def _recall_single(
+        self,
+        query: str,
+        terms: list[str],
+        query_entity_objs: list[dict[str, Any]],
+        namespace: str = "default",
+    ) -> list[MemoryRecord]:
+        """Run the standard recall pipeline for a single query variant.
+
+        This is a self-contained recall path that extracts entities,
+        performs FTS + edge expansion + scoring, and returns scored records.
+        Used by the multi-variant RRF fusion path in ``recall()``.
+        """
+        query_entities = {e["name"] for e in query_entity_objs}
+        query_topics = {e["name"] for e in query_entity_objs if e["kind"] == "topic"}
+        query_identity_subjects = self._identity_subjects(query_entity_objs)
+
+        if self._asks_identity(query) and not query_identity_subjects:
+            for r in self.conn.execute(
+                "SELECT name, kind FROM entities"
+            ).fetchall():
+                if r["name"] in query:
+                    query_identity_subjects.add(r["name"])
+            if not query_identity_subjects and len(query) <= 8:
+                _STOP_CJK = {"什么", "怎么", "这个", "那个", "哪个", "因为",
+                             "所以", "还是", "但是", "虽然", "如果", "可以",
+                             "没有", "不是", "时候", "几岁", "多大", "多少"}
+                for m in re.finditer(r"[\u4e00-\u9fff]{2,3}", query):
+                    w = m.group()
+                    if w not in _STOP_CJK:
+                        query_identity_subjects.add(w)
+
+        corrected_ids = self._get_corrected_ids()
+        fts_ids = self._fts_candidates(query, terms, namespace=namespace)
+        rows = self._memory_rows(fts_ids, namespace=namespace)
+        entity_map = self._entities_for_memories([r["id"] for r in rows])
+        edge_bonus = self._edge_expansion(query, terms, rows,
+                                          entity_map=entity_map, namespace=namespace)
+        missing_edge_ids = sorted(set(edge_bonus) - {r["id"] for r in rows})
+        if missing_edge_ids:
+            rows.extend(self._rows_by_ids(missing_edge_ids))
+            entity_map = self._entities_for_memories([r["id"] for r in rows])
+
+        scored = self._build_scored_candidates(
+            query=query, terms=terms, rows=rows,
+            entity_map=entity_map, edge_bonus=edge_bonus,
+            fts_ids=fts_ids, corrected_ids=corrected_ids,
+            query_entities=query_entities, query_topics=query_topics,
+            query_identity_subjects=query_identity_subjects,
+            query_entity_objs=query_entity_objs,
+        )
+        # Return a larger top-k for RRF to fuse; the final truncation happens
+        # after fusion in the caller.
+        return self._build_recall_response(scored, max(50, len(scored)), query)
+
     def _build_recall_response(
         self,
         scored: list[tuple[float, str, sqlite3.Row]],
