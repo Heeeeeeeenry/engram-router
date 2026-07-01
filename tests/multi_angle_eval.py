@@ -221,10 +221,18 @@ class QueryResult:
     details: str = ""
 
 
-def evaluate_scenario(scenario: TestCase) -> list[QueryResult]:
+def evaluate_scenario(
+    scenario: TestCase,
+    engine: Any = None,
+    vector_index: Any = None,
+) -> list[QueryResult]:
     """Evaluate one test scenario against engram-router."""
     d = tempfile.mkdtemp()
-    store = MemoryStore(path=Path(d) / "eval.db")
+    store = MemoryStore(
+        path=Path(d) / "eval.db",
+        embedding_engine=engine,
+        vector_index=vector_index,
+    )
 
     for turn in scenario.conversation:
         store.save(turn)
