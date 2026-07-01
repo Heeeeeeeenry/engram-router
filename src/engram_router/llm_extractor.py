@@ -169,11 +169,15 @@ class LLMClient:
             },
         )
 
-        # Create an SSL context that doesn't verify certificates.
-        # This is needed for internal/self-signed proxies like oneapi.
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
+        # SSL context — default to secure, allow opt-out for internal proxies.
+        if os.environ.get("ENGRAM_SSL_VERIFY", "1").lower() in ("0", "false", "no"):
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            logger.warning("SSL verification disabled (ENGRAM_SSL_VERIFY=0). "
+                          "API keys are transmitted over unverified connections!")
+        else:
+            ctx = ssl.create_default_context()
 
         try:
             with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:

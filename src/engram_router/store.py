@@ -895,49 +895,7 @@ class MemoryStore:
             query_identity_subjects=query_identity_subjects,
             query_entity_objs=query_entity_objs,
         )
-
-        # ── Phase 2: Vector search path ──
-        if self._vector_enabled and self.embedding_engine and self.vector_index:
-            try:
-                vec = self.embedding_engine.encode(query)
-                if vec is not None:
-                    vector_results = self.vector_index.search(vec, k=top_k * 4)
-                    # Map vector results to (memory_id, score) for RRF
-                    vector_list = [(mid, score) for mid, score in vector_results]
-                    # Get existing keyword results as (memory_id, rule_score)
-                    keyword_list = [(r.id, r.score) for r in scored if r.score > 0]
-                    # RRF fusion
-                    merged = reciprocal_rank_fusion(
-                        [keyword_list, vector_list],
-                        k=60,
-                        weights=[0.4, 0.6],
-                    )
-                    # Re-order scored list by merged RRF scores
-                    rrf_scores = dict(merged)
-                    for s in scored:
-                        s.score = rrf_scores.get(s.id, s.score)
-                    # Add vector-only results as new entries
-                    existing_ids = {s.id for s in scored}
-                    for mid, rrf_score in merged:
-                        if mid not in existing_ids:
-                            row = self._rows_by_ids([mid])
-                            if row:
-                                r = row[0]
-                                scored.append(MemoryRecord(
-                                    id=mid,
-                                    raw_text=r["raw_text"],
-                                    summary=r.get("summary", r["raw_text"][:160]),
-                                    confidence=r.get("confidence", 1.0),
-                                    metadata=self._parse_metadata(r.get("metadata")),
-                                    evidence_refs=[],
-                                    score=rrf_score,
-                                    match_reason="vector search (RRF fusion)",
-                                ))
-                    scored.sort(key=lambda x: x.score, reverse=True)
-            except Exception as exc:
-                logger.debug("Vector search skipped: %s", exc)
-
-        return self._build_recall_response(scored, top_k)
+        return self._build_recall_response(scored, top_k, query)
 
     def _build_scored_candidates(
         self,
@@ -1169,6 +1127,7 @@ class MemoryStore:
         self,
         scored: list[tuple[float, str, sqlite3.Row]],
         top_k: int,
+        query: str = "",
     ) -> list[MemoryRecord]:
         """Sort scored candidates, take top-k, and convert to MemoryRecords.
 
@@ -1197,6 +1156,50 @@ class MemoryStore:
                     raw_refs=raw_refs_map.get(mid, []),
                 )
             )
+
+        # ── Phase 2: Vector-search fusion ──
+        if query and self._vector_enabled and self.embedding_engine and self.vector_index:
+            try:
+                vec = self.embedding_engine.encode(query)
+                if vec is not None:
+                    vector_results = self.vector_index.search(vec, k=top_k * 4)
+                    vector_list = [(mid, score) for mid, score in vector_results]
+                    keyword_list = [(r.id, r.score) for r in records if r.score > 0]
+                    merged = reciprocal_rank_fusion(
+                        [keyword_list, vector_list],
+                        k=60,
+                        weights=[0.4, 0.6],
+                    )
+                    rrf_scores = dict(merged)
+                    # Build new list (MemoryRecord is frozen)
+                    new_records: list[MemoryRecord] = []
+                    existing_ids = {r.id for r in records}
+                    for r in records:
+                        new_score = rrf_scores.get(r.id, r.score)
+                        new_records.append(MemoryRecord(
+                            id=r.id, raw_text=r.raw_text, summary=r.summary,
+                            confidence=r.confidence, metadata=r.metadata,
+                            evidence_refs=r.evidence_refs,
+                            score=new_score, match_reason=r.match_reason,
+                        ))
+                    for mid, rrf_score in merged:
+                        if mid not in existing_ids:
+                            row = self._rows_by_ids([mid])
+                            if row:
+                                rw = row[0]
+                                new_records.append(MemoryRecord(
+                                    id=mid, raw_text=rw["raw_text"],
+                                    summary=rw.get("summary", rw["raw_text"][:160]),
+                                    confidence=rw.get("confidence", 1.0),
+                                    metadata=self._parse_metadata(rw.get("metadata")),
+                                    evidence_refs=[], score=rrf_score,
+                                    match_reason="vector search (RRF fusion)",
+                                ))
+                    new_records.sort(key=lambda x: x.score, reverse=True)
+                    records = new_records
+            except Exception as exc:
+                logger.debug("Vector search skipped: %s", exc)
+
         return records
 
     def _batch_evidence_refs(self, memory_ids: list[str]) -> dict[str, list[str]]:

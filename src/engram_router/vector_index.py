@@ -17,9 +17,9 @@ Dependencies:
 
 from __future__ import annotations
 
+import json
 import logging
 import os
-import pickle
 import threading
 from pathlib import Path
 from typing import Any
@@ -283,17 +283,17 @@ class VectorIndex:
         faiss_path = str(self._path.with_suffix(".faiss"))
         faiss.write_index(self._index, faiss_path)
 
-        # Save ID mapping
+        # Save ID mapping (JSON, not pickle)
         idmap_path = str(self._path.with_suffix(".idmap"))
         meta = {
-            "id_to_memory": self._id_to_memory,
-            "memory_to_id": self._memory_to_id,
+            "id_to_memory": {str(k): v for k, v in self._id_to_memory.items()},
+            "memory_to_id": {str(k): v for k, v in self._memory_to_id.items()},
             "next_id": self._next_id,
             "dim": self._dim,
             "nlist": self._nlist,
         }
-        with open(idmap_path, "wb") as f:
-            pickle.dump(meta, f)
+        with open(idmap_path, "w") as f:
+            json.dump(meta, f)
 
     def _load(self) -> bool:
         faiss_path = str(self._path.with_suffix(".faiss"))
@@ -304,9 +304,9 @@ class VectorIndex:
             import faiss
             self._index = faiss.read_index(faiss_path)
             self._trained = self._index.is_trained
-            with open(idmap_path, "rb") as f:
-                meta = pickle.load(f)
-            self._id_to_memory = meta["id_to_memory"]
+            with open(idmap_path) as f:
+                meta = json.load(f)
+            self._id_to_memory = {int(k): v for k, v in meta["id_to_memory"].items()}
             self._memory_to_id = meta["memory_to_id"]
             self._next_id = meta["next_id"]
             self._dim = meta.get("dim", self._dim)
