@@ -410,6 +410,16 @@ class MemoryStore:
                 (next_id, f"{text} {summary}"),
             )
         self.conn.commit()
+
+        # ── Phase 2: Auto-encode for vector search ──
+        if self._vector_enabled and self.embedding_engine and self.vector_index:
+            try:
+                emb = self.embedding_engine.encode(text)
+                if emb is not None:
+                    self.vector_index.add(next_id, emb)
+            except Exception as exc:
+                logger.debug("Vector encode skipped for %s: %s", next_id, exc)
+
         return next_id
 
     def delete(self, memory_id: str) -> bool:
