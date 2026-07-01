@@ -17,6 +17,7 @@ from typing import Any
 
 from .config import config
 from .entities import classify_salience, extract_entities
+from .fusion import reciprocal_rank_fusion
 from .llm_extractor import LLMExtractor, extract_edges_llm, extract_entities_llm
 
 logger = logging.getLogger(__name__)
@@ -157,6 +158,8 @@ class MemoryStore:
         llm_extractor: LLMExtractor | None = None,
         llm_query_extract: bool = False,
         reranker: Any | None = None,
+        embedding_engine: Any | None = None,
+        vector_index: Any | None = None,
     ) -> None:
         self.weights = weights if weights is not None else _default_weights()
         self.path = str(path) if path is not None else ":memory:"
@@ -172,6 +175,14 @@ class MemoryStore:
         )
         self.llm_extractor = llm_extractor
         self.llm_query_extract = llm_query_extract
+        self.reranker = reranker
+        self.embedding_engine = embedding_engine
+        self.vector_index = vector_index
+        self._vector_enabled = (
+            embedding_engine is not None
+            and embedding_engine.available
+            and vector_index is not None
+        )
         if path is not None:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
         if sqlite3.sqlite_version_info < (3, 35, 0):
@@ -874,6 +885,48 @@ class MemoryStore:
             query_identity_subjects=query_identity_subjects,
             query_entity_objs=query_entity_objs,
         )
+
+        # ── Phase 2: Vector search path ──
+        if self._vector_enabled and self.embedding_engine and self.vector_index:
+            try:
+                vec = self.embedding_engine.encode(query)
+                if vec is not None:
+                    vector_results = self.vector_index.search(vec, k=top_k * 4)
+                    # Map vector results to (memory_id, score) for RRF
+                    vector_list = [(mid, score) for mid, score in vector_results]
+                    # Get existing keyword results as (memory_id, rule_score)
+                    keyword_list = [(r.id, r.score) for r in scored if r.score > 0]
+                    # RRF fusion
+                    merged = reciprocal_rank_fusion(
+                        [keyword_list, vector_list],
+                        k=60,
+                        weights=[0.4, 0.6],
+                    )
+                    # Re-order scored list by merged RRF scores
+                    rrf_scores = dict(merged)
+                    for s in scored:
+                        s.score = rrf_scores.get(s.id, s.score)
+                    # Add vector-only results as new entries
+                    existing_ids = {s.id for s in scored}
+                    for mid, rrf_score in merged:
+                        if mid not in existing_ids:
+                            row = self._rows_by_ids([mid])
+                            if row:
+                                r = row[0]
+                                scored.append(MemoryRecord(
+                                    id=mid,
+                                    raw_text=r["raw_text"],
+                                    summary=r.get("summary", r["raw_text"][:160]),
+                                    confidence=r.get("confidence", 1.0),
+                                    metadata=self._parse_metadata(r.get("metadata")),
+                                    evidence_refs=[],
+                                    score=rrf_score,
+                                    match_reason="vector search (RRF fusion)",
+                                ))
+                    scored.sort(key=lambda x: x.score, reverse=True)
+            except Exception as exc:
+                logger.debug("Vector search skipped: %s", exc)
+
         return self._build_recall_response(scored, top_k)
 
     def _build_scored_candidates(

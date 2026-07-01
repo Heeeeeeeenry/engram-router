@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "engram-router"
-version = "0.1.0"
+version = "0.2.0-dev"
 description = "Lossless on-demand memory routing for AI agents."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,6 +15,11 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pyyaml>=6"]
+llm = [
+    "sentence-transformers>=2.2.0",
+    "faiss-cpu>=1.7.0",
+    "numpy>=1.24.0",
+]
 
 [project.scripts]
 engram = "engram_router.cli:main"
