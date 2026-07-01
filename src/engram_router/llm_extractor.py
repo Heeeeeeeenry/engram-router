@@ -357,7 +357,7 @@ class LLMClient:
             ctx = ssl.create_default_context()
 
         try:
-            with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
+            with urllib.request.urlopen(req, timeout=120, context=ctx) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             choice = data["choices"][0]["message"]
             # Use content only; reasoning_content is the model's internal

@@ -114,7 +114,7 @@ class LLMReranker:
             "Authorization": f"Bearer {self.api_key}",
         })
 
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=120) as resp:
             data = json.loads(resp.read())
         content = data["choices"][0]["message"]["content"].strip()
 
