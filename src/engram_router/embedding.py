@@ -66,9 +66,7 @@ class EmbeddingEngine:
         self._model_info = self._MODELS.get(model, self._MODELS["bge-small"])
         self._backend = backend
         self._api_base = api_base or os.environ.get("ENGRAM_EMBEDDING_API_BASE")
-        self._api_key = api_key or os.environ.get(
-            "ENGRAM_EMBEDDING_API_KEY"
-        ) or os.environ.get("OPENAI_API_KEY")
+        self._api_key = api_key or os.environ.get("ENGRAM_EMBEDDING_API_KEY")
         self._api_model = api_model
         self._local_model = None
         self._lock = threading.Lock()

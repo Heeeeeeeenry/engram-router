@@ -208,12 +208,29 @@ class RecallWeightsConfig:
 
 
 @dataclass
+class PrivacyConfig:
+    """Privacy controls — data never leaves the machine without consent."""
+    allow_cloud_llm: bool = False
+    allow_cloud_embedding: bool = False
+    allow_cloud_reranker: bool = False
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "PrivacyConfig":
+        return cls(
+            allow_cloud_llm=bool(d.get("allow_cloud_llm", False)),
+            allow_cloud_embedding=bool(d.get("allow_cloud_embedding", False)),
+            allow_cloud_reranker=bool(d.get("allow_cloud_reranker", False)),
+        )
+
+
+@dataclass
 class EngramConfig:
     """Master configuration for EngramRouter."""
 
     entities: EntityConfig = field(default_factory=EntityConfig)
     salience: SalienceConfig = field(default_factory=SalienceConfig)
     recall: RecallWeightsConfig = field(default_factory=RecallWeightsConfig)
+    privacy: PrivacyConfig = field(default_factory=PrivacyConfig)
 
     @classmethod
     def load(cls, path: Path | None = None) -> EngramConfig:

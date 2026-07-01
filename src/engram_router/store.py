@@ -430,6 +430,14 @@ class MemoryStore:
         be explicitly synced via _fts_remove.
         """
         self._fts_remove(memory_id)
+
+        # ── Phase 2: Remove from vector index ──
+        if self._vector_enabled and self.vector_index:
+            try:
+                self.vector_index.remove(memory_id)
+            except Exception:
+                pass
+
         cursor = self.conn.execute(
             "DELETE FROM memories WHERE id = ?", (memory_id,)
         )
