@@ -277,9 +277,15 @@ class ForgettingEngine:
             return 0.0
 
         try:
-            accessed_dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            # Replace 'Z' with '+00:00' so fromisoformat works on Python < 3.11.
+            ts_clean = ts.replace("Z", "+00:00")
+            accessed_dt = datetime.fromisoformat(ts_clean)
         except (ValueError, TypeError):
             return 0.0
+
+        # If the parsed datetime is naive (no tzinfo), treat it as UTC.
+        if accessed_dt.tzinfo is None:
+            accessed_dt = accessed_dt.replace(tzinfo=timezone.utc)
 
         now = datetime.now(timezone.utc)
         return (now - accessed_dt).total_seconds() / 86400.0
