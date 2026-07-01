@@ -56,11 +56,20 @@ class VectorIndex:
         self._trained = False
 
         # Load existing index if available
-        loaded = self._load() if self._path else False
+        loaded = False
+        try:
+            loaded = self._load() if self._path else False
+        except (ImportError, Exception) as exc:
+            logger.debug("VectorIndex load skipped: %s", exc)
 
         if not loaded:
-            self._nlist = nlist or 8  # small default, recalculated on train
-            self._init_index()
+            self._nlist = nlist or 8
+            self._index = None
+            try:
+                self._init_index()
+            except ImportError as exc:
+                logger.debug("VectorIndex init skipped (faiss not available): %s", exc)
+                self._index = None
 
     # ── public ────────────────────────────────────────────────
 
@@ -230,12 +239,14 @@ class VectorIndex:
             self._path = Path(path)
         if not self._path:
             return
-        self._save()
-
-    # ── internal ──────────────────────────────────────────────
+        if not loaded:
+            self._nlist = nlist or 8
+            self._index = None
+            self._init_index()
 
     def _init_index(self) -> None:
-        import faiss
+        if faiss is None:
+            raise ImportError("faiss-cpu is required for VectorIndex. Install with: pip install engram-router[llm]")
         quantizer = faiss.IndexFlatIP(self._dim)
         self._index = faiss.IndexIVFFlat(
             quantizer, self._dim, self._nlist, faiss.METRIC_INNER_PRODUCT
