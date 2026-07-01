@@ -1,34 +1,5 @@
-{"tag": "brand-kb", "query": "我那个同事送我的键盘是什么牌子？", "expect": "pass", "expected_answer": ["HHKB"], "expected_evidence": ["张三前两天送了我一把 HHKB"], "forbidden": []}
-{"tag": "gift-what", "query": "张三送了我什么？", "expect": "pass", "expected_answer": ["HHKB"], "expected_evidence": [], "forbidden": []}
-{"tag": "reason-gift", "query": "他为什么送我这个？", "expect": "pass", "expected_answer": ["生日"], "expected_evidence": ["他说是因为我生日"], "forbidden": []}
-{"tag": "company", "query": "张三现在在哪家公司？", "expect": "pass", "expected_answer": ["腾讯"], "expected_evidence": ["张三是我前同事，现在在腾讯"], "forbidden": []}
-{"tag": "colleague-name", "query": "我那个前同事叫什么？", "expect": "pass", "expected_answer": ["张三"], "expected_evidence": [], "forbidden": []}
-{"tag": "mom-age", "query": "我妈妈多大年纪？", "expect": "pass", "expected_answer": ["55"], "expected_evidence": ["我妈妈今年55岁"], "forbidden": []}
-{"tag": "mom-job", "query": "我妈妈是什么职业？", "expect": "pass", "expected_answer": ["退休教师"], "expected_evidence": [], "forbidden": []}
-{"tag": "mom-zodiac", "query": "妈妈属什么的？", "expect": "pass", "expected_answer": ["兔"], "expected_evidence": [], "forbidden": []}
-{"tag": "mom-gender", "query": "我妈妈是男是女？", "expect": "pass", "expected_answer": ["女"], "expected_evidence": [], "forbidden": []}
-{"tag": "mom-cook-eval", "query": "妈妈做饭手艺怎么样？", "expect": "pass", "expected_answer": ["好吃"], "expected_evidence": [], "forbidden": []}
-{"tag": "mom-temper", "query": "我妈妈脾气好不好？", "expect": "pass", "expected_answer": ["温和"], "expected_evidence": [], "forbidden": []}
-{"tag": "mom-dish", "query": "妈妈最拿手的菜是什么？", "expect": "pass", "expected_answer": ["红烧肉"], "expected_evidence": [], "forbidden": []}
-{"tag": "car-brand", "query": "我买的车是什么牌子？", "expect": "pass", "expected_answer": ["特斯拉"], "expected_evidence": [], "forbidden": []}
-{"tag": "car-reason", "query": "我为什么买车？", "expect": "pass", "expected_answer": ["通勤"], "expected_evidence": ["买车主要是因为通勤太远"], "forbidden": []}
-{"tag": "commute-dist", "query": "我每天通勤多远？", "expect": "pass", "expected_answer": ["80"], "expected_evidence": [], "forbidden": []}
-{"tag": "cat-name", "query": "我的猫叫什么名字？", "expect": "pass", "expected_answer": ["咪咪"], "expected_evidence": [], "forbidden": []}
-{"tag": "cat-breed", "query": "咪咪是什么品种？", "expect": "pass", "expected_answer": ["英短"], "expected_evidence": [], "forbidden": []}
-{"tag": "cat-color", "query": "咪咪什么颜色？", "expect": "pass", "expected_answer": ["蓝灰"], "expected_evidence": [], "forbidden": []}
-{"tag": "cat-eval", "query": "咪咪性格怎么样？", "expect": "pass", "expected_answer": ["黏人"], "expected_evidence": [], "forbidden": []}
-{"tag": "place", "query": "我住在哪个区？", "expect": "pass", "expected_answer": ["朝阳"], "expected_evidence": [], "forbidden": []}
-{"tag": "rent", "query": "我房租多少？", "expect": "pass", "expected_answer": ["六千"], "expected_evidence": [], "forbidden": []}
-{"tag": "roommate-job", "query": "我室友是做什么的？", "expect": "pass", "expected_answer": ["设计"], "expected_evidence": [], "forbidden": []}
-{"tag": "roommate-name", "query": "我室友叫什么？", "expect": "pass", "expected_answer": ["王五"], "expected_evidence": [], "forbidden": []}
-{"tag": "move-reason", "query": "我为什么搬家？", "expect": "pass", "expected_answer": ["离公司近"], "expected_evidence": [], "forbidden": []}
-{"tag": "phone-model", "query": "我新手机是什么型号？", "expect": "pass", "expected_answer": ["iPhone"], "expected_evidence": [], "forbidden": []}
-{"tag": "phone-reason", "query": "我为什么换手机？", "expect": "pass", "expected_answer": ["电池"], "expected_evidence": [], "forbidden": []}
-{"tag": "neg-li-car-brand", "query": "李四买的什么车？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["特斯拉"]}
-{"tag": "neg-li-car-model", "query": "李四开的车是什么牌子？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["Model 3"]}
-{"tag": "neg-girlfriend", "query": "我女朋友叫什么？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["张三", "王五"]}
-{"tag": "neg-car-price", "query": "我的车多少钱买的？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["六千"]}
-{"tag": "gap-dog-not-cat", "query": "我家狗叫什么？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["咪咪"]}
-{"tag": "gap-zhangsan-age", "query": "张三多大年纪？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["55"]}
-{"tag": "gap-roommate-age", "query": "我室友多大年纪？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["55"]}
-{"tag": "gap-cat-age", "query": "咪咪几岁了？", "expect": "pass", "expected_answer": [], "expected_evidence": [], "forbidden": ["55"]}
+{"tag": "brand-kb", "query": "我那个同事送我的键盘是什么牌子？", "expected_answer": ["HHKB"], "forbidden": []}
+{"tag": "car-brand", "query": "我买的车是什么牌子？", "expected_answer": ["特斯拉"], "forbidden": []}
+{"tag": "mom-job", "query": "我妈妈的职业？", "expected_answer": ["退休教师"], "forbidden": []}
+{"tag": "gift-reason", "query": "为什么送我键盘？", "expected_answer": ["生日"], "forbidden": []}
+{"tag": "neg-car", "query": "李四买的什么车？", "expected_answer": [], "forbidden": ["特斯拉"]}

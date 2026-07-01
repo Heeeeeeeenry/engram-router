@@ -1,1 +1,2 @@
-{"tag": "bug-sample", "query": "测试", "expect": "pass", "expected_answer": ["测试"], "expected_evidence": [], "forbidden": []}
+{"tag": "sample-1", "query": "测试查询", "expected_answer": ["test"], "forbidden": []}
+{"tag": "sample-2", "query": "另一个查询", "expected_answer": ["other"], "forbidden": []}

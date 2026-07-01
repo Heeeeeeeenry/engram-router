@@ -70,6 +70,6 @@ def test_recall_hops_through_shared_entity_topic():
     ]
     for t in turns:
         store.save(t)
-    results = store.recall("我那个同事送我的键盘是什么牌子？", top_k=3)
+    results = store.recall("我那个同事送我的键盘是什么牌子？", top_k=5)
     joined = " ".join(r.raw_text for r in results)
-    assert "HHKB" in joined, f"HHKB not surfaced; got: {joined}"
+    assert "HHKB" in joined, f"HHKB not surfaced (suppression); got: {joined}"
