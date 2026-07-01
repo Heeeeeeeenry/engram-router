@@ -968,6 +968,42 @@ class MemoryStore:
             )
         self.conn.commit()
 
+    def should_inject(self, query: str) -> bool:
+        """快速判断查询是否需要记忆注入。
+
+        节省上下文：闲聊/通用知识/数学/编程 不注入。
+        仅在查询涉及个人信息/历史/偏好时注入。
+
+        规则（在 recall 之前快速判定，不触发召回）：
+        - 含"什么/谁/怎么/哪个/多大/之前/说过/记得" → 需要
+        - 纯闲聊("你好/哈哈") → 不需要
+        - 通用知识("Python/定义/代码") → 不需要
+        - 实时数据("天气/新闻/股票") → 不需要
+        """
+        import re
+        q = query.strip()
+
+        # 纯闲聊 / 纯表情
+        if re.match(r'^[你好嗨嗯哦啊哈哈嘿]{1,4}$', q):
+            return False
+
+        # 通用知识 / 编程 / 数学 — LLM 自有能力
+        _general = ["python", "代码", "定义", "什么是", "如何", "怎么用",
+                    "1+1", "等于", "数学", "公式", "算法", "编程",
+                    "天气", "新闻", "股票", "汇率", "时间"]
+        if any(kw in q.lower() for kw in _general):
+            return False
+
+        # 依赖个人记忆的关键词
+        _needs_memory = ["什么", "谁", "怎么", "为什么", "哪个", "哪里",
+                         "多大", "几岁", "之前", "说过", "记得",
+                         "上次", "历史", "聊过", "知道"]
+        if any(kw in q for kw in _needs_memory):
+            return True
+
+        # 默认不注入（保守，避免浪费上下文）
+        return False
+
     def recall(self, query: str, top_k: int = 5,
                namespace: str = "default") -> list[MemoryRecord]:
         """Recall top-k memories by a weighted composite score.
