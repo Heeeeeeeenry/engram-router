@@ -114,7 +114,7 @@ class VectorIndex:
                 self._buffer_embs.append(vec)
                 self._buffer_ids.append(faiss_id)
 
-                min_for_train = max(self._nlist * 40, 32)
+                min_for_train = max(self._nlist * 5, 16)
                 if len(self._buffer_ids) >= min_for_train and train_if_needed:
                     self._train_from_buffer()
 
@@ -156,7 +156,7 @@ class VectorIndex:
                 self._buffer_embs.append(vecs)
                 self._buffer_ids.extend(faiss_ids)
 
-                min_for_train = max(self._nlist * 40, 32)
+                min_for_train = max(self._nlist * 5, 16)
                 if len(self._buffer_ids) >= min_for_train:
                     self._train_from_buffer()
 

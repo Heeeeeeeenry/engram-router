@@ -19,6 +19,7 @@ from .config import config
 from .entities import classify_salience, extract_entities
 from .fusion import reciprocal_rank_fusion
 from .llm_extractor import LLMExtractor, extract_edges_llm, extract_entities_llm
+from .query_expansion import QueryExpander, ExpandedQuery
 
 logger = logging.getLogger(__name__)
 
@@ -160,6 +161,7 @@ class MemoryStore:
         reranker: Any | None = None,
         embedding_engine: Any | None = None,
         vector_index: Any | None = None,
+        query_expander: QueryExpander | None = None,
     ) -> None:
         self.weights = weights if weights is not None else _default_weights()
         self.path = str(path) if path is not None else ":memory:"
@@ -178,6 +180,7 @@ class MemoryStore:
         self.reranker = reranker
         self.embedding_engine = embedding_engine
         self.vector_index = vector_index
+        self.query_expander = query_expander
         self._vector_enabled = (
             embedding_engine is not None
             and embedding_engine.available
@@ -782,6 +785,13 @@ class MemoryStore:
             )
         return rows
 
+    def _row_by_id(self, mem_id: str) -> sqlite3.Row | None:
+        """Fetch a single memory row by id. Returns None if not found."""
+        row = self.conn.execute(
+            "SELECT * FROM memories WHERE id = ?", (mem_id,)
+        ).fetchone()
+        return row
+
     def _memory_rows(self, fts_ids: set[str] | None,
                      namespace: str = "default") -> list[sqlite3.Row]:
         """Fetch rows to score, using non-empty FTS hits as a candidate filter."""
@@ -838,8 +848,72 @@ class MemoryStore:
         4. Score every candidate through the composable pipeline.
         5. Sort, truncate, and convert to MemoryRecord with batched refs.
         """
-        terms = self._terms(query)
-        query_entity_objs = extract_entities(query)
+        # ── Phase 2: Query Expansion ───────────────────────────────────
+        if self.query_expander is not None:
+            eq = self.query_expander.expand(query, async_llm=True)
+
+            # 1. Merge synonyms into extra terms for token matching.
+            extra_terms: list[str] = []
+            for synonyms in eq.synonyms.values():
+                extra_terms.extend(synonyms)
+
+            # 2. Extract entities for the base query.
+            query_entity_objs = extract_entities(query)
+
+            # 3. Merge LLM extra entities into query entities.
+            existing = {(e["name"], e.get("kind", "")) for e in query_entity_objs}
+            for ent in eq.extra_entities:
+                key = (ent.get("name", ""), ent.get("kind", ""))
+                if key[0] and key not in existing:
+                    query_entity_objs.append(ent)
+                    existing.add(key)
+
+            # 4. If there are variants, run multi-path recall → RRF fusion.
+            if eq.variants:
+                all_results: list[list[tuple[str, float]]] = []
+
+                # Primary: recall with original query + expanded terms/entities.
+                primary_terms = list(dict.fromkeys(self._terms(query) + extra_terms))
+                primary = self._recall_single(
+                    query, primary_terms, query_entity_objs, namespace,
+                )
+                all_results.append([(r.id, r.score) for r in primary])
+
+                # Each variant gets its own recall path.
+                for variant in eq.variants:
+                    v_terms = list(dict.fromkeys(self._terms(variant)))
+                    v_entities = extract_entities(variant)
+                    # Also merge LLM extra entities into variant entities.
+                    v_existing = {(e["name"], e.get("kind", "")) for e in v_entities}
+                    for ent in eq.extra_entities:
+                        key = (ent.get("name", ""), ent.get("kind", ""))
+                        if key[0] and key not in v_existing:
+                            v_entities.append(ent)
+                            v_existing.add(key)
+                    v_results = self._recall_single(
+                        variant, v_terms, v_entities, namespace,
+                    )
+                    all_results.append([(r.id, r.score) for r in v_results])
+
+                # RRF fuse all recall paths.
+                merged = reciprocal_rank_fusion(all_results, k=60)
+
+                # Sort merged results by RRF score.
+                scored: list[tuple[float, str, Any]] = []
+                for mem_id, rrf_score in merged:
+                    row = self._row_by_id(mem_id)
+                    if row is not None:
+                        scored.append((rrf_score, "rrf-fused", row))
+
+                scored.sort(key=lambda x: x[0], reverse=True)
+                return self._build_recall_response(scored, top_k, query)
+            else:
+                # No variants: use expanded terms/entities with standard pipeline.
+                terms = list(dict.fromkeys(self._terms(query) + extra_terms))
+                # Fall through to standard pipeline below.
+        else:
+            terms = self._terms(query)
+            query_entity_objs = extract_entities(query)
 
         # LLM query augmentation: supplement rule-based entities with LLM-
         # extracted ones for better recall (e.g., unlisted brands, topics).

@@ -1,7 +1,23 @@
 """EngramRouter: lossless on-demand memory routing for AI agents."""
 
 from .store import MemoryStore, MemoryRecord, RecallWeights
+from .query_expansion import (
+    QueryExpander,
+    ExpandedQuery,
+    SynonymTable,
+    ExpansionCache,
+    ExpansionStats,
+)
 
 __version__ = "0.1.0"
 
-__all__ = ["MemoryStore", "MemoryRecord", "RecallWeights"]
+__all__ = [
+    "MemoryStore",
+    "MemoryRecord",
+    "RecallWeights",
+    "QueryExpander",
+    "ExpandedQuery",
+    "SynonymTable",
+    "ExpansionCache",
+    "ExpansionStats",
+]

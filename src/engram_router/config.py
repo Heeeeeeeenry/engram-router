@@ -224,6 +224,34 @@ class PrivacyConfig:
 
 
 @dataclass
+class ExpansionConfig:
+    """Query expansion configuration."""
+
+    # ── Synonym table ──
+    synonyms: dict[str, list[str]] = field(default_factory=dict)
+    """User-defined synonyms merged with built-in defaults.
+       Example:
+         synonyms:
+           HHKB: [机械键盘, 键盘, 静电容]
+           Mac: [苹果电脑, MacBook]
+    """
+
+    # ── LLM query rewriting ──
+    llm_enabled: bool = True
+    """Enable LLM query rewriting. Set to False for synonym-only mode."""
+
+    llm_max_variants: int = 4
+    """Maximum variants per rewrite call."""
+
+    # ── Cache ──
+    cache_size: int = 256
+    """LRU cache size in entries."""
+
+    async_llm: bool = True
+    """Use async LLM mode (recommended). False = sync wait on first call."""
+
+
+@dataclass
 class EngramConfig:
     """Master configuration for EngramRouter."""
 
@@ -231,6 +259,7 @@ class EngramConfig:
     salience: SalienceConfig = field(default_factory=SalienceConfig)
     recall: RecallWeightsConfig = field(default_factory=RecallWeightsConfig)
     privacy: PrivacyConfig = field(default_factory=PrivacyConfig)
+    expansion: ExpansionConfig = field(default_factory=ExpansionConfig)
 
     @classmethod
     def load(cls, path: Path | None = None) -> EngramConfig:
