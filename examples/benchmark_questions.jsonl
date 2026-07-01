@@ -1,0 +1,3 @@
+{"query":"我那个同事送我的键盘是什么牌子？","answer_contains":["HHKB"],"evidence_contains":["张三前两天送了我一把 HHKB"]}
+{"query":"他为什么送我这个？","answer_contains":["生日"],"evidence_contains":["他说是因为我生日"]}
+{"query":"张三现在在哪家公司？","answer_contains":["腾讯"],"evidence_contains":["张三是我前同事，现在在腾讯"]}

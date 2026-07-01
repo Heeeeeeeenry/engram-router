@@ -1,0 +1,1 @@
+{"tag": "daily-sample", "query": "测试", "expect": "pass", "expected_answer": ["测试"], "expected_evidence": [], "forbidden": []}

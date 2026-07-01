@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Test artifacts
+*.db
+*.db-shm
+*.db-wal
+*.pkl
+docs/multi_angle_eval_report.json
+
+# UV
+uv.lock
