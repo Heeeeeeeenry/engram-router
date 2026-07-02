@@ -13,15 +13,23 @@ engram-router 语义联想能力审计 — 10个关键场景实测
   S8  情感推理: "我为什么心情不好" vs "今天被老板批评了"
   S9  跨话题关联: "我之前说的那个计划" vs "我想明年去日本旅游"
   S10 人称指代: "他送我的东西好用吗" vs "张三送了我一把HHKB键盘"
+
+用法:
+  cd engram-router
+  python tests/semantic_audit.py               # 运行对比: 纯规则 vs 规则+向量
+  python tests/semantic_audit.py --baseline    # 仅纯规则
+  python tests/semantic_audit.py --vector      # 仅规则+向量
 """
 
-import os, sys, tempfile, json, time
+import argparse, os, sys, tempfile, json, time
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from engram_router.store import MemoryStore
+from engram_router.embedding import EmbeddingEngine
+from engram_router.vector_index import VectorIndex
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -351,65 +359,228 @@ def print_detailed_report(results: list[ScenarioResult]):
     return passed_count
 
 
-def main():
-    print("engram-router 语义联想审计开始...")
-    
+def run_eval(use_vector: bool) -> tuple[list[ScenarioResult], dict]:
+    """Run all 10 semantic scenarios with or without vector search."""
+    mode_label = "规则+向量" if use_vector else "纯规则"
+    print(f"\n{'='*80}")
+    print(f"  engram-router 语义联想审计 — {mode_label}模式")
+    print(f"{'='*80}")
+
+    # Shared embedding engine (loaded once)
+    engine = EmbeddingEngine() if use_vector else None
+    if use_vector and engine and engine.available:
+        print(f"  ✓ 向量引擎已激活: {engine.backend_name} ({engine.dim}d)")
+    elif use_vector:
+        print(f"  ⚠ 向量引擎不可用: {engine.init_error}")
+
     d = tempfile.mkdtemp()
-    db_path = Path(d) / "semantic_audit.db"
-    
     results: list[ScenarioResult] = []
-    
+
     for scenario in SCENARIOS:
-        # Fresh store per scenario to avoid cross-contamination
-        store = MemoryStore(path=db_path)
-        
-        # Clear any previous data by using a fresh connection
-        # Actually we need a separate DB per scenario
-        store.close()
-        
         scenario_db = Path(d) / f"{scenario.id}.db"
-        store = MemoryStore(path=scenario_db)
-        
+
+        vector_index = None
+        if use_vector and engine and engine.available:
+            vector_index = VectorIndex(
+                dim=engine.dim,
+                path=Path(d) / f"{scenario.id}_vec",
+            )
+
+        store = MemoryStore(
+            path=scenario_db,
+            embedding_engine=engine,
+            vector_index=vector_index,
+        )
+
         # Save memories
         for mem in scenario.store_memories:
             store.save(mem)
-        
+
         # Run recall
         result = evaluate_one(store, scenario)
         results.append(result)
-        
+
         store.close()
-    
-    passed = print_detailed_report(results)
-    
+
+    passed, top1 = print_detailed_report(results, mode_label)
+    return results, {
+        "total": len(results),
+        "passed": passed,
+        "top1_hits": top1,
+        "pass_rate": passed / len(results) * 100,
+        "top1_rate": top1 / len(results) * 100,
+    }
+
+
+def print_detailed_report(results: list[ScenarioResult], mode_label: str = "综合"):
+    """Print detailed per-scenario results."""
+    print("=" * 80)
+    print(f"  engram-router 语义联想能力审计报告 — {mode_label}")
+    print("  (10个关键场景)")
+    print("=" * 80)
+
+    passed_count = 0
+    top1_count = 0
+
+    for r in results:
+        s = r.scenario
+        status = "✅ 通过" if r.passed else "❌ 失败"
+        print(f"\n{'─' * 70}")
+        print(f"  [{s.id}] {s.name}  {status}")
+        print(f"  描述: {s.description}")
+        print(f"  备注: {s.note}")
+
+        print(f"\n  📝 存储的记忆:")
+        for i, mem in enumerate(s.store_memories):
+            marker = " ← ★目标" if i in s.expected_memory_idx else ""
+            print(f"    [{i}] {mem}{marker}")
+
+        print(f"\n  🔍 查询: '{s.query}'")
+
+        print(f"\n  📊 召回结果 (top-3):")
+        for i, (text, score, mid) in enumerate(zip(r.top3_texts, r.top3_scores, r.top3_ids)):
+            is_expected = any(
+                s.store_memories[ei] in text or text in s.store_memories[ei]
+                for ei in s.expected_memory_idx
+            )
+            icon = "⭐" if is_expected else "  "
+            print(f"    [{i}] {icon} {score:.2f} | {mid} | {text[:80]}")
+
+        # Show full top-5 if there are interesting results
+        if len(r.recall_results) > 3:
+            print(f"\n  📊 完整 top-5:")
+            for i, rec in enumerate(r.recall_results):
+                is_expected = any(
+                    s.store_memories[ei] in rec.raw_text or rec.raw_text in s.store_memories[ei]
+                    for ei in s.expected_memory_idx
+                )
+                icon = "⭐" if is_expected else "  "
+                print(f"    [{i}] {icon} {rec.score:.4f} | {rec.id} | {rec.raw_text[:80]}")
+
+        print(f"\n  📋 分析: {r.analysis}")
+
+        if r.passed:
+            passed_count += 1
+        if r.expected_hit_in_top1:
+            top1_count += 1
+
+    # Summary
+    print(f"\n{'=' * 80}")
+    print(f"  汇总 ({mode_label})")
+    print(f"{'=' * 80}")
+    print(f"  总场景数:          {len(results)}")
+    print(f"  通过数:            {passed_count}/{len(results)}  ({passed_count/len(results)*100:.0f}%)")
+    print(f"  Top-1 命中:        {top1_count}/{len(results)}  ({top1_count/len(results)*100:.0f}%)")
+
+    # Per-category analysis
+    print(f"\n  详细分类:")
+    for r in results:
+        status = "✅" if r.passed else "❌"
+        top1 = "🏆" if r.expected_hit_in_top1 else "  "
+        print(f"    {status} {top1} [{r.scenario.id}] {r.scenario.name}: {r.analysis}")
+
+    return passed_count, top1_count
+
+
+def print_comparison(baseline: dict, vector: dict):
+    """Print a side-by-side comparison of 10 scenarios."""
+    print(f"\n{'='*80}")
+    print(f"  📊 对比: 纯规则 vs 规则+向量 (10个语义场景)")
+    print(f"{'='*80}")
+    print(f"  {'指标':<20} {'纯规则':>12} {'规则+向量':>12} {'改进':>10}")
+    print(f"  {'-'*56}")
+
+    for label, key, fmt in [
+        ("通过率(%)", "pass_rate", "{:.1f}"),
+        ("Top-1命中率(%)", "top1_rate", "{:.1f}"),
+        ("通过数", "passed", "{}"),
+        ("Top-1命中数", "top1_hits", "{}"),
+    ]:
+        b_val = baseline.get(key, 0)
+        v_val = vector.get(key, 0)
+        delta = v_val - b_val
+        arrow = "↑" if delta > 0 else "↓" if delta < 0 else "→"
+        print(f"  {label:<20} {fmt.format(b_val):>12} {fmt.format(v_val):>12} {arrow} {fmt.format(abs(delta)):>8}")
+
+    print(f"  {'='*80}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="engram-router 语义联想审计")
+    parser.add_argument("--baseline", action="store_true", help="仅运行纯规则模式")
+    parser.add_argument("--vector", action="store_true", help="仅运行规则+向量模式")
+    args = parser.parse_args()
+
+    run_both = not args.baseline and not args.vector
+    run_baseline = args.baseline or run_both
+    run_vector = args.vector or run_both
+
+    baseline_results = None
+    baseline_summary = None
+    vector_results = None
+    vector_summary = None
+
+    if run_baseline:
+        baseline_results, baseline_summary = run_eval(use_vector=False)
+
+    if run_vector:
+        vector_results, vector_summary = run_eval(use_vector=True)
+
+    if run_both and baseline_summary and vector_summary:
+        print_comparison(baseline_summary, vector_summary)
+
     # Save JSON report
     report_data = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "total_scenarios": len(results),
-        "passed": passed,
-        "pass_rate": f"{passed/len(results)*100:.0f}%",
-        "scenarios": [
-            {
-                "id": r.scenario.id,
-                "name": r.scenario.name,
-                "query": r.scenario.query,
-                "passed": r.passed,
-                "top1_hit": r.expected_hit_in_top1,
-                "top3_hit": r.expected_hit_in_top3,
-                "top3_scores": r.top3_scores,
-                "top3_texts": r.top3_texts,
-                "analysis": r.analysis,
-            }
-            for r in results
-        ],
+        "baseline": None,
+        "vector": None,
     }
-    
+
+    for results, summary, mode in [
+        (baseline_results, baseline_summary, "baseline"),
+        (vector_results, vector_summary, "vector"),
+    ]:
+        if results:
+            report_data[mode] = {
+                "total_scenarios": summary["total"],
+                "passed": summary["passed"],
+                "top1_hits": summary["top1_hits"],
+                "pass_rate": f"{summary['pass_rate']:.0f}%",
+                "top1_rate": f"{summary['top1_rate']:.0f}%",
+                "scenarios": [
+                    {
+                        "id": r.scenario.id,
+                        "name": r.scenario.name,
+                        "query": r.scenario.query,
+                        "passed": r.passed,
+                        "top1_hit": r.expected_hit_in_top1,
+                        "top3_hit": r.expected_hit_in_top3,
+                        "top3_scores": r.top3_scores,
+                        "top3_texts": r.top3_texts,
+                        "analysis": r.analysis,
+                    }
+                    for r in results
+                ],
+            }
+
     out_path = Path(__file__).resolve().parent.parent / "docs" / "semantic_audit_report.json"
     with open(out_path, "w") as f:
         json.dump(report_data, f, ensure_ascii=False, indent=2)
     print(f"\n报告已保存: {out_path}")
-    
-    return 0 if passed >= 4 else 1  # expect at least 40% pass rate
+
+    # Final verdict
+    if run_both and baseline_summary and vector_summary:
+        b_pass = baseline_summary["passed"]
+        v_pass = vector_summary["passed"]
+        if v_pass > b_pass:
+            print(f"\n🏆 向量搜索使通过数提升 {v_pass - b_pass}!")
+        elif v_pass < b_pass:
+            print(f"\n⚠  向量搜索使通过数降低 {b_pass - v_pass}")
+        else:
+            print(f"\n→  向量搜索未改变通过数")
+
+    min_pass = baseline_summary["passed"] if baseline_summary else 0
+    return 0 if min_pass >= 4 else 1
 
 
 if __name__ == "__main__":

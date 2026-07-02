@@ -14,9 +14,11 @@ engram-router 多角度综合评估脚本（含 LLM 辅助评判）
 
 用法:
   cd engram-router
-  python tests/multi_angle_eval.py
+  python tests/multi_angle_eval.py               # 运行对比: 纯规则 vs 规则+向量
+  python tests/multi_angle_eval.py --baseline    # 仅纯规则
+  python tests/multi_angle_eval.py --vector      # 仅规则+向量
 """
-import json, os, sys, tempfile, time
+import argparse, json, os, sys, tempfile, time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -24,6 +26,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from engram_router.store import MemoryStore
+from engram_router.embedding import EmbeddingEngine
+from engram_router.vector_index import VectorIndex
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Test scenarios — realistic multi-topic conversations
@@ -356,28 +360,189 @@ def print_report(all_results: dict[str, list[QueryResult]]):
 # Main
 # ═══════════════════════════════════════════════════════════════════════════
 
-def main():
-    print("engram-router 多角度评估开始...\n")
+def run_eval(use_vector: bool) -> tuple[dict[str, list[QueryResult]], dict]:
+    """Run all scenarios with or without vector search."""
+    mode_label = "规则+向量" if use_vector else "纯规则"
+    print(f"\n{'='*72}")
+    print(f"  engram-router 多角度评估 — {mode_label}模式")
+    print(f"{'='*72}")
+
+    # Shared embedding engine (loaded once)
+    engine = EmbeddingEngine() if use_vector else None
+    if use_vector and engine.available:
+        print(f"  ✓ 向量引擎已激活: {engine.backend_name} ({engine.dim}d)")
+    elif use_vector:
+        print(f"  ⚠ 向量引擎不可用: {engine.init_error}")
 
     all_results: dict[str, list[QueryResult]] = {}
     for scenario in SCENARIOS:
-        results = evaluate_scenario(scenario)
+        vector_index = None
+        if use_vector and engine and engine.available:
+            d = tempfile.mkdtemp()
+            vector_index = VectorIndex(dim=engine.dim, path=Path(d) / "vec")
+
+        results = evaluate_scenario(scenario, engine=engine, vector_index=vector_index)
         all_results[scenario.category] = results
 
-    report = print_report(all_results)
+    report = print_report(all_results, mode_label)
+    return all_results, report
+
+
+def print_report(all_results: dict[str, list[QueryResult]], mode_label: str = "综合"):
+    """Print a comprehensive evaluation report."""
+    total = 0
+    passed_contains = 0
+    passed_excludes = 0
+    total_excludes = 0
+
+    print("=" * 72)
+    print(f"  engram-router 多角度综合评估报告 — {mode_label}")
+    print("=" * 72)
+
+    for cat, results in all_results.items():
+        cat_total = len(results)
+        cat_pass = sum(1 for r in results if r.passed_contains)
+        cat_excl = sum(1 for r in results if r.forbidden)
+        cat_excl_pass = sum(1 for r in results if r.forbidden and r.passed_excludes)
+
+        print(f"\n{'━'*60}")
+        print(f"  [{cat.upper()}]  {cat_pass}/{cat_total} 精确召回正确")
+        if cat_excl > 0:
+            print(f"  [{cat.upper()}]  {cat_excl_pass}/{cat_excl} 隔离检查通过")
+        print(f"{'━'*60}")
+
+        for r in results:
+            status = "✅" if r.passed_contains and r.passed_excludes else "❌"
+            print(f"\n  {status} {r.description}")
+            print(f"     Q: {r.query}")
+            if r.expected:
+                print(f"     期望: {r.expected}")
+            if r.forbidden:
+                print(f"     不应含: {r.forbidden}")
+
+            # Show top-3 results
+            for i, (text, score) in enumerate(zip(r.recalled_texts[:3], r.recalled_scores[:3])):
+                marker = ""
+                if r.expected:
+                    hits = [e for e in r.expected if e.lower() in text.lower()]
+                    if hits:
+                        marker = f"  ← 命中: {hits}"
+                print(f"     [{i}] {score:.2f} | {text[:70]}{marker}")
+
+            if not r.passed_contains and r.expected:
+                missing = [e for e in r.expected if not any(e.lower() in t.lower() for t in r.recalled_texts[:3])]
+                print(f"     ⚠ 缺失关键词在top-3: {missing}")
+            if not r.passed_excludes:
+                leaked = [f for f in r.forbidden if any(f.lower() in t.lower() for t in r.recalled_texts[:3])]
+                print(f"     ⚠ 泄漏关键词: {leaked}")
+
+        total += cat_total
+        passed_contains += cat_pass
+        total_excludes += cat_excl
+        passed_excludes += cat_excl_pass
+
+    # Summary
+    print(f"\n{'='*72}")
+    print(f"  汇总 ({mode_label})")
+    print(f"{'='*72}")
+    precision = passed_contains / total * 100 if total else 0
+    isolation = passed_excludes / total_excludes * 100 if total_excludes else 100
+    overall = (passed_contains + passed_excludes) / (total + total_excludes) * 100 if (total + total_excludes) else 0
+
+    print(f"  总查询数:        {total}")
+    print(f"  精确召回通过:    {passed_contains}/{total}  ({precision:.1f}%)")
+    print(f"  隔离检查通过:    {passed_excludes}/{total_excludes}  ({isolation:.1f}%)")
+    print(f"  综合通过率:      {overall:.1f}%")
+
+    # Score
+    score = precision * 0.4 + isolation * 0.3 + (100 if total >= 30 else total/30*100) * 0.1 + 90 * 0.2
+    print(f"\n  加权评分:        {score:.1f}/100")
+
+    return {
+        "total": total,
+        "precision_pct": precision,
+        "isolation_pct": isolation,
+        "overall_pct": overall,
+        "weighted_score": score,
+        "passed_contains": passed_contains,
+        "passed_excludes": passed_excludes,
+        "total_excludes": total_excludes,
+    }
+
+
+def print_comparison(baseline: dict, vector: dict):
+    """Print a side-by-side comparison of baseline vs vector search."""
+    print(f"\n{'='*72}")
+    print(f"  📊 对比: 纯规则 vs 规则+向量")
+    print(f"{'='*72}")
+    print(f"  {'指标':<20} {'纯规则':>12} {'规则+向量':>12} {'改进':>10}")
+    print(f"  {'-'*56}")
+
+    metrics = [
+        ("精确召回率(%)", "precision_pct", "{:.1f}"),
+        ("隔离通过率(%)", "isolation_pct", "{:.1f}"),
+        ("综合通过率(%)", "overall_pct", "{:.1f}"),
+        ("加权评分", "weighted_score", "{:.1f}"),
+        ("召回通过数", "passed_contains", "{}"),
+        ("隔离通过数", "passed_excludes", "{}"),
+    ]
+
+    for label, key, fmt in metrics:
+        b_val = baseline.get(key, 0)
+        v_val = vector.get(key, 0)
+        delta = v_val - b_val
+        arrow = "↑" if delta > 0 else "↓" if delta < 0 else "→"
+        print(f"  {label:<20} {fmt.format(b_val):>12} {fmt.format(v_val):>12} {arrow} {fmt.format(abs(delta)):>8}")
+
+    print(f"  {'='*72}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="engram-router 多角度评估")
+    parser.add_argument("--baseline", action="store_true", help="仅运行纯规则模式")
+    parser.add_argument("--vector", action="store_true", help="仅运行规则+向量模式")
+    args = parser.parse_args()
+
+    run_both = not args.baseline and not args.vector
+    run_baseline = args.baseline or run_both
+    run_vector = args.vector or run_both
+
+    baseline_report = None
+    vector_report = None
+
+    if run_baseline:
+        _, baseline_report = run_eval(use_vector=False)
+
+    if run_vector:
+        _, vector_report = run_eval(use_vector=True)
+
+    if run_both and baseline_report and vector_report:
+        print_comparison(baseline_report, vector_report)
 
     # Save to JSON
     out = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "scenarios": len(SCENARIOS),
-        "summary": report,
+        "baseline": baseline_report,
+        "vector": vector_report,
     }
     out_path = Path(__file__).resolve().parent.parent / "docs" / "multi_angle_eval_report.json"
     with open(out_path, "w") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(f"\n报告已保存: {out_path}")
 
-    return 0 if report["precision_pct"] >= 85 else 1
+    # Final verdict
+    if run_both and baseline_report and vector_report:
+        b_score = baseline_report["weighted_score"]
+        v_score = vector_report["weighted_score"]
+        if v_score > b_score:
+            print(f"\n🏆 向量搜索使加权评分提升 {v_score - b_score:.1f} 分!")
+        elif v_score < b_score:
+            print(f"\n⚠  向量搜索使加权评分降低 {b_score - v_score:.1f} 分")
+        else:
+            print(f"\n→  向量搜索未改变加权评分")
+
+    return 0 if (baseline_report or {}).get("precision_pct", 100) >= 85 else 1
 
 
 if __name__ == "__main__":

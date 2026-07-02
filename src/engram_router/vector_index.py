@@ -114,7 +114,7 @@ class VectorIndex:
                 self._buffer_embs.append(vec)
                 self._buffer_ids.append(faiss_id)
 
-                min_for_train = max(self._nlist * 5, 16)
+                min_for_train = 1  # Train immediately (flat index for small, IVF for large)
                 if len(self._buffer_ids) >= min_for_train and train_if_needed:
                     self._train_from_buffer()
 
@@ -156,7 +156,7 @@ class VectorIndex:
                 self._buffer_embs.append(vecs)
                 self._buffer_ids.extend(faiss_ids)
 
-                min_for_train = max(self._nlist * 5, 16)
+                min_for_train = 1  # Train immediately (flat index for small, IVF for large)
                 if len(self._buffer_ids) >= min_for_train:
                     self._train_from_buffer()
 
@@ -255,21 +255,29 @@ class VectorIndex:
     def _train_from_buffer(self) -> None:
         import faiss
         all_vecs = np.concatenate(self._buffer_embs, axis=0)
-        if len(all_vecs) < self._nlist:
-            logger.warning(
-                "Not enough vectors to train FAISS IVF (%d < %d)",
-                len(all_vecs), self._nlist,
-            )
+        n_vecs = len(all_vecs)
+        if n_vecs < 1:
             return
-        self._nlist = min(int(np.sqrt(len(all_vecs))), 256)
-        self._init_index()
-        self._index.train(all_vecs)
-        self._index.add(all_vecs)
-        self._trained = True
-        logger.info(
-            "FAISS trained: %d vectors, nlist=%d, dim=%d",
-            len(all_vecs), self._nlist, self._dim,
-        )
+        # For small datasets (< 16 vectors), use IndexFlatIP for exact search.
+        # IVF requires nlist * 5 vectors (typically 40) to train properly.
+        if n_vecs < max(self._nlist * 5, 16):
+            logger.info(
+                "Flat index (exact search): %d vectors, dim=%d",
+                n_vecs, self._dim,
+            )
+            self._index = faiss.IndexFlatIP(self._dim)
+            self._index.add(all_vecs)
+            self._trained = True
+        else:
+            self._nlist = min(int(np.sqrt(n_vecs)), 256)
+            self._init_index()
+            self._index.train(all_vecs)
+            self._index.add(all_vecs)
+            self._trained = True
+            logger.info(
+                "FAISS IVF trained: %d vectors, nlist=%d, dim=%d",
+                n_vecs, self._nlist, self._dim,
+            )
         del self._buffer_embs
         del self._buffer_ids
 
