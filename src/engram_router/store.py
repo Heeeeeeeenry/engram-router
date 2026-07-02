@@ -181,7 +181,7 @@ class MemoryStore:
         self.reranker = reranker
         self.embedding_engine = embedding_engine
         self.vector_index = vector_index
-        self.query_expander = query_expander
+        self.query_expander = query_expander if query_expander is not None else QueryExpander()
         self._vector_enabled = (
             embedding_engine is not None
             and embedding_engine.available
