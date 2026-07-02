@@ -184,7 +184,7 @@ class RecallWeightsConfig:
     correction_penalty: float = 0.3
 
     # ── spreading activation ──
-    max_recall_hops: int = 2
+    max_recall_hops: int = 5
     recall_decay: float = 0.5
     activation_threshold: float = 0.03
 
