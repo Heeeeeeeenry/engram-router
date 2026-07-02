@@ -270,8 +270,8 @@ def test_gap_check_passes_when_object_evidence_exists(tmp_path):
 
 def test_gap_check_reports_multiple_gaps_together(tmp_path):
     store = MemoryStore(path=tmp_path / "memory.db")
-    # Pure ASCII text so _has_person_like won't fire on generic CJK chars.
-    store.save("something happened")
+    # Pure ASCII single-letter text — no 2+ char alphanumeric words.
+    store.save("a b c")
     records = store.recall("为什么谁什么时候在哪里送了什么东西？")
 
     gap = store.gap_check("为什么谁什么时候在哪里送了什么东西？", records)

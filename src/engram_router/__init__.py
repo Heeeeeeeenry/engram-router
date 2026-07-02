@@ -15,6 +15,16 @@ from .causal import (
     Timeline,
     TimedEvent,
 )
+from .persona import (
+    PersonaStore,
+    Persona,
+    PersonaAttr,
+    AttrEvidence,
+)
+from .forgetting import (
+    ForgettingEngine,
+    ForgettingConfig,
+)
 
 __version__ = "0.1.0"
 
@@ -32,4 +42,10 @@ __all__ = [
     "CausalPath",
     "Timeline",
     "TimedEvent",
+    "PersonaStore",
+    "Persona",
+    "PersonaAttr",
+    "AttrEvidence",
+    "ForgettingEngine",
+    "ForgettingConfig",
 ]

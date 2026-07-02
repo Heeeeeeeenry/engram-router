@@ -1074,7 +1074,7 @@ class MemoryStore:
                         scored.append((rrf_score, "rrf-fused", row))
 
                 scored.sort(key=lambda x: x[0], reverse=True)
-                return self._build_recall_response(scored, top_k, query)
+                return self._build_recall_response(scored, top_k, query, namespace=namespace)
             else:
                 # No variants: use expanded terms/entities with standard pipeline.
                 terms = list(dict.fromkeys(self._terms(query) + extra_terms))
@@ -1145,7 +1145,7 @@ class MemoryStore:
             query_identity_subjects=query_identity_subjects,
             query_entity_objs=query_entity_objs,
         )
-        return self._build_recall_response(scored, top_k, query)
+        return self._build_recall_response(scored, top_k, query, namespace=namespace)
 
     def _build_scored_candidates(
         self,
@@ -1426,18 +1426,23 @@ class MemoryStore:
         )
         # Return a larger top-k for RRF to fuse; the final truncation happens
         # after fusion in the caller.
-        return self._build_recall_response(scored, max(50, len(scored)), query)
+        return self._build_recall_response(scored, max(50, len(scored)), query, namespace=namespace)
 
     def _build_recall_response(
         self,
         scored: list[tuple[float, str, sqlite3.Row]],
         top_k: int,
         query: str = "",
+        namespace: str = "default",
     ) -> list[MemoryRecord]:
         """Sort scored candidates, take top-k, and convert to MemoryRecords.
 
         Evidence refs are batch-fetched (one query each for evidence and
         raw_logs) to fix the N+1 query problem in ``_row_to_record``.
+
+        When keyword results are below top_k, supplements with recent items
+        (sorted by created_at DESC) so queries like "罗列对话"/"历史记录"
+        don't return empty.
         """
         scored.sort(
             key=lambda item: (item[0], item[2]["created_at"], item[2]["id"]),
@@ -1445,7 +1450,17 @@ class MemoryStore:
         )
         top = scored[:top_k]
         if not top:
-            return []
+            # No keyword/vector hits at all — fall back to recent items.
+            recent_rows = self.conn.execute(
+                "SELECT * FROM memories WHERE namespace = ? "
+                "ORDER BY created_at DESC LIMIT ?",
+                (namespace, top_k),
+            ).fetchall()
+            fb_records: list[MemoryRecord] = []
+            for row in recent_rows:
+                fb_records.append(self._row_to_record(row, score=0.5,
+                    match_reason="recent fallback (no keyword match)"))
+            return fb_records
 
         mem_ids = [item[2]["id"] for item in top]
         evidence_map = self._batch_evidence_refs(mem_ids)
@@ -1507,6 +1522,26 @@ class MemoryStore:
 
         # ── Phase 3: Record access for forgetting engine ──
         self._record_access([r.id for r in records])
+
+        # ── Phase 4: Recent fallback ──
+        # When keyword/vector recall returns fewer than top_k results,
+        # supplement with recently-saved items. This handles meta-queries
+        # like "罗列最近对话" where no content keyword matches exist.
+        if len(records) < top_k:
+            existing_ids = {r.id for r in records}
+            recent_limit = top_k - len(records)
+            recent_rows = self.conn.execute(
+                "SELECT * FROM memories WHERE namespace = ? "
+                "ORDER BY created_at DESC LIMIT ?",
+                (namespace, recent_limit + top_k),  # extra buffer for dedup
+            ).fetchall()
+            for row in recent_rows:
+                rid = row["id"]
+                if rid not in existing_ids and len(records) < top_k:
+                    records.append(
+                        self._row_to_record(row, score=0.5,
+                            match_reason="recent fallback"))
+                    existing_ids.add(rid)
 
         return records
 
