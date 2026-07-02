@@ -745,11 +745,15 @@ class MemoryStore:
         return parsed if isinstance(parsed, dict) else {}
 
     def entities_for(self, memory_id: str) -> list[dict[str, Any]]:
-        """Return entities linked to a memory.
-
-        Delegates to EntityIndexer (extracted from God Class).
-        """
-        return self._entity_indexer.entities_for(memory_id)
+        rows = self.conn.execute(
+            """
+            SELECT e.id, e.name, e.kind, me.evidence
+            FROM memory_entities me JOIN entities e ON e.id = me.entity_id
+            WHERE me.memory_id = ?
+            """,
+            (memory_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
     def _entity_names_for(self, memory_id: str) -> set[str]:
         rows = self.conn.execute(
@@ -950,16 +954,56 @@ class MemoryStore:
     def _record_access(self, memory_ids: list[str]) -> None:
         """Increment access_count and update accessed_at for recalled memories.
 
-        Delegates to EntityIndexer (extracted from God Class).
+        Called at the end of every successful recall so the forgetting engine
+        can see which memories have been recently accessed.
         """
-        self._entity_indexer.record_access(memory_ids)
+        if not memory_ids:
+            return
+        now = datetime.now(timezone.utc).isoformat()
+        for mid in memory_ids:
+            self.conn.execute(
+                "UPDATE memories SET access_count = access_count + 1, "
+                "accessed_at = ? WHERE id = ?",
+                (now, mid),
+            )
+        self.conn.commit()
 
     def should_inject(self, query: str) -> bool:
         """快速判断查询是否需要记忆注入。
 
-        Delegates to RecallPipeline (extracted from God Class).
+        节省上下文：闲聊/通用知识/数学/编程 不注入。
+        仅在查询涉及个人信息/历史/偏好时注入。
+
+        规则（在 recall 之前快速判定，不触发召回）：
+        - 含"什么/谁/怎么/哪个/多大/之前/说过/记得" → 需要
+        - 纯闲聊("你好/哈哈") → 不需要
+        - 通用知识("Python/定义/代码") → 不需要
+        - 实时数据("天气/新闻/股票") → 不需要
         """
-        return self._recall_pipeline.should_inject(query)
+        import re
+        q = query.strip()
+
+        # 纯闲聊 / 纯表情
+        if re.match(r'^[你好嗨嗯哦啊哈哈嘿]{1,4}$', q):
+            return False
+
+        # 通用知识 / 编程 / 数学 — LLM 自有能力
+        _general = ["python", "代码", "定义", "什么是", "如何", "怎么用",
+                    "1+1", "等于", "数学", "公式", "算法", "编程",
+                    "天气", "新闻", "股票", "汇率", "时间"]
+        if any(kw in q.lower() for kw in _general):
+            return False
+
+        # 依赖个人记忆的关键词
+        _needs_memory = ["什么", "谁", "怎么", "为什么", "哪个", "哪里",
+                         "多大", "几岁", "之前", "说过", "记得",
+                         "上次", "历史", "聊过", "知道",
+                         "最近", "罗列", "列出", "回顾", "总结"]
+        if any(kw in q for kw in _needs_memory):
+            return True
+
+        # 默认不注入（保守，避免浪费上下文）
+        return False
 
     def recall(self, query: str, top_k: int = 5,
                namespace: str = "default") -> list[MemoryRecord]:
@@ -1030,7 +1074,7 @@ class MemoryStore:
                         scored.append((rrf_score, "rrf-fused", row))
 
                 scored.sort(key=lambda x: x[0], reverse=True)
-                return self._build_recall_response(scored, top_k, query)
+                return self._build_recall_response(scored, top_k, query, namespace=namespace)
             else:
                 # No variants: use expanded terms/entities with standard pipeline.
                 terms = list(dict.fromkeys(self._terms(query) + extra_terms))
@@ -1101,7 +1145,7 @@ class MemoryStore:
             query_identity_subjects=query_identity_subjects,
             query_entity_objs=query_entity_objs,
         )
-        return self._build_recall_response(scored, top_k, query)
+        return self._build_recall_response(scored, top_k, query, namespace=namespace)
 
     def _build_scored_candidates(
         self,
@@ -1382,18 +1426,23 @@ class MemoryStore:
         )
         # Return a larger top-k for RRF to fuse; the final truncation happens
         # after fusion in the caller.
-        return self._build_recall_response(scored, max(50, len(scored)), query)
+        return self._build_recall_response(scored, max(50, len(scored)), query, namespace=namespace)
 
     def _build_recall_response(
         self,
         scored: list[tuple[float, str, sqlite3.Row]],
         top_k: int,
         query: str = "",
+        namespace: str = "default",
     ) -> list[MemoryRecord]:
         """Sort scored candidates, take top-k, and convert to MemoryRecords.
 
         Evidence refs are batch-fetched (one query each for evidence and
         raw_logs) to fix the N+1 query problem in ``_row_to_record``.
+
+        When keyword results are below top_k, supplements with recent items
+        (sorted by created_at DESC) so queries like "罗列对话"/"历史记录"
+        don't return empty.
         """
         scored.sort(
             key=lambda item: (item[0], item[2]["created_at"], item[2]["id"]),
@@ -1401,7 +1450,17 @@ class MemoryStore:
         )
         top = scored[:top_k]
         if not top:
-            return []
+            # No keyword/vector hits at all — fall back to recent items.
+            recent_rows = self.conn.execute(
+                "SELECT * FROM memories WHERE namespace = ? "
+                "ORDER BY created_at DESC LIMIT ?",
+                (namespace, top_k),
+            ).fetchall()
+            fb_records: list[MemoryRecord] = []
+            for row in recent_rows:
+                fb_records.append(self._row_to_record(row, score=0.5,
+                    match_reason="recent fallback (no keyword match)"))
+            return fb_records
 
         mem_ids = [item[2]["id"] for item in top]
         evidence_map = self._batch_evidence_refs(mem_ids)
@@ -1463,6 +1522,26 @@ class MemoryStore:
 
         # ── Phase 3: Record access for forgetting engine ──
         self._record_access([r.id for r in records])
+
+        # ── Phase 4: Recent fallback ──
+        # When keyword/vector recall returns fewer than top_k results,
+        # supplement with recently-saved items. This handles meta-queries
+        # like "罗列最近对话" where no content keyword matches exist.
+        if len(records) < top_k:
+            existing_ids = {r.id for r in records}
+            recent_limit = top_k - len(records)
+            recent_rows = self.conn.execute(
+                "SELECT * FROM memories WHERE namespace = ? "
+                "ORDER BY created_at DESC LIMIT ?",
+                (namespace, recent_limit + top_k),  # extra buffer for dedup
+            ).fetchall()
+            for row in recent_rows:
+                rid = row["id"]
+                if rid not in existing_ids and len(records) < top_k:
+                    records.append(
+                        self._row_to_record(row, score=0.5,
+                            match_reason="recent fallback"))
+                    existing_ids.add(rid)
 
         return records
 
