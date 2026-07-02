@@ -1526,6 +1526,25 @@ class MemoryStore:
             except Exception as exc:
                 logger.debug("Vector search skipped: %s", exc)
 
+        # ── Phase 2.5: LLM reranker (semantic re-rank, optional) ──
+        if self.reranker and self.reranker.available and records and len(records) > 1:
+            try:
+                candidates = [{"text": r.raw_text, "score": r.score} for r in records]
+                reranked = self.reranker.rerank(query, candidates)
+                # Rebuild MemoryRecord with new scores
+                rrmap = {rr.get("text",""): rr.get("score",0) for rr in reranked}
+                records = [MemoryRecord(
+                    id=r.id, raw_text=r.raw_text, summary=r.summary,
+                    confidence=r.confidence, metadata=r.metadata,
+                    evidence_refs=r.evidence_refs,
+                    score=rrmap.get(r.raw_text, r.score),
+                    match_reason=r.match_reason,
+                ) for r in records]
+                records.sort(key=lambda x: x.score, reverse=True)
+                logger.debug("Reranker applied to %d records", len(records))
+            except Exception as exc:
+                logger.debug("Reranker skipped: %s", exc)
+
         # ── Phase 3: Record access for forgetting engine ──
         self._record_access([r.id for r in records])
 
