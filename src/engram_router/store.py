@@ -1071,7 +1071,8 @@ class MemoryStore:
                 for mem_id, rrf_score in merged:
                     row = self._row_by_id(mem_id)
                     if row is not None:
-                        scored.append((rrf_score, "rrf-fused", row))
+                        # Boost RRF scores to comparable range
+                        scored.append((rrf_score * 10, "rrf-fused", row))
 
                 scored.sort(key=lambda x: x[0], reverse=True)
                 return self._build_recall_response(scored, top_k, query, namespace=namespace)
@@ -1495,7 +1496,12 @@ class MemoryStore:
                     new_records: list[MemoryRecord] = []
                     existing_ids = {r.id for r in records}
                     for r in records:
-                        new_score = rrf_scores.get(r.id, r.score)
+                        # Blend: keep keyword score as base, boost if also found by vector
+                        rrf_s = rrf_scores.get(r.id, 0)
+                        if rrf_s:
+                            new_score = r.score + rrf_s * 10  # keyword base + vector boost
+                        else:
+                            new_score = r.score
                         new_records.append(MemoryRecord(
                             id=r.id, raw_text=r.raw_text, summary=r.summary,
                             confidence=r.confidence, metadata=r.metadata,
