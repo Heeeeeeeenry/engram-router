@@ -79,9 +79,24 @@ class RecallWeights:
     correction_penalty: float = 0.3
 
     # ── spreading activation (was DEFAULT_MAX_HOPS / DEFAULT_DECAY / _ACT_THRESHOLD)
-    max_recall_hops: int = 2
+    max_recall_hops: int = 5
+    """Safety cap for BFS depth. Actual termination is dynamic (activation × relevance)."""
     recall_decay: float = 0.5
+    """Per-hop activation decay factor."""
     activation_threshold: float = 0.03
+    """Minimum activation to keep expanding a branch."""
+
+    # ── dynamic multi-hop relevance (SAG-inspired query-time relevance gate) ──
+    relevance_decay: float = 0.6
+    """Per-hop relevance decay. Higher = relevance decays slower."""
+    relevance_threshold: float = 0.15
+    """Minimum query relevance to keep expanding. Below this → prune branch."""
+    relevance_entity_kind_weights: dict[str, float] | None = None
+    """Entity kind → relevance multiplier. Defaults built-in if None."""
+    edge_assoc_boost: float = 5.0
+    """Multiplier for edge-association bonus in final scoring.
+    Edge expansion produces small raw activation values (0.01-0.20).
+    This scales them to compete with direct term matches (0.05-0.50 per term)."""
 
     # ── associative reach (_apply_salience_decay) ─────────────────────────
     assoc_reach_base_attr: float = 0.15
@@ -1250,10 +1265,10 @@ class MemoryStore:
                 continue  # identity-subject mismatch → skip this row
             score, reason = result
 
-            # Edge-association bonus.
+            # Edge-association bonus (scaled to compete with direct term matches).
             bonus = edge_bonus.get(row["id"])
             if bonus is not None:
-                score += bonus[0]
+                score += bonus[0] * self.weights.edge_assoc_boost
                 reason = (reason + "; " + bonus[1]).lstrip("; ")
 
             # Correction penalty.
@@ -1602,6 +1617,72 @@ class MemoryStore:
                 out.setdefault(r["memory_id"], []).append(r["raw_log_id"])
         return out
 
+    def _entity_query_relevance(
+        self,
+        entity_name: str,
+        entity_kind: str,
+        query_terms: list[str],
+        query_entities: set[str],
+        query_entity_objs: list[dict[str, Any]],
+    ) -> float:
+        """Score how relevant an expanded entity is to the original query.
+
+        SAG-inspired: at each expansion hop, check if the newly reached entity
+        still connects to the query's semantic intent. If not, prune the branch.
+
+        Scoring factors:
+        1. Direct name overlap with query terms (strongest signal)
+        2. Kind-based relevance multiplier (person/topic > generic noun)
+        3. Substring / partial match with query entities
+
+        Returns 0.0–1.0, where 1.0 = directly mentioned in query.
+        """
+        if not entity_name:
+            return 0.0
+        name_lower = entity_name.lower()
+        score = 0.0
+
+        # 1. Direct term overlap: entity name appears in query terms
+        term_overlap = 0
+        for t in query_terms:
+            if t and (t in name_lower or name_lower in t):
+                term_overlap += 1
+        if term_overlap > 0:
+            # Up to 0.6 for term overlap
+            score = min(0.6, 0.2 * term_overlap)
+
+        # 2. Entity set match: entity is in the query's extracted entities
+        if entity_name in query_entities:
+            score = max(score, 0.9)  # Strong signal: explicitly extracted
+
+        # 3. Kind-based multiplier
+        kind_weights = self.weights.relevance_entity_kind_weights or {
+            "person": 0.9, "topic": 0.8, "object": 0.6,
+            "location": 0.5, "time": 0.4, "number": 0.3,
+            "event": 0.7, "organization": 0.5,
+        }
+        kind_mult = kind_weights.get(entity_kind, 0.3)
+        # Blend: if no term match, fall back to kind weight
+        if score < 0.1:
+            # When query entities are sparse, rely more on kind relevance.
+            # A "time" or "object" entity in a no-entity query still has
+            # structural value for edge traversal, just at a lower weight.
+            if not query_entities:
+                score = kind_mult * 0.5  # Allow traversal through structural entities
+            else:
+                score = kind_mult * 0.4
+        else:
+            # Boost existing score by kind relevance
+            score = score * (0.5 + 0.5 * kind_mult)
+
+        # 4. Bonus: entity name is a substring of a query entity or vice versa
+        for qe in query_entities:
+            if qe and (qe in name_lower or name_lower in qe):
+                score = max(score, 0.7)
+                break
+
+        return min(1.0, score)
+
     def _edge_expansion(
         self,
         query: str,
@@ -1669,62 +1750,123 @@ class MemoryStore:
         if not seed_entity_ids:
             return {}
 
-        # 3. Bounded, re-propagating BFS over the edge graph.
-        #    activated[entity_id] = (activation, relation, hop, path_names)
+        # 3. Dynamic multi-hop BFS with query-relevance gating (SAG-inspired).
+        #    activated[entity_id] = (activation, relation, hop, path_names, relevance)
+        #
+        #    SAG insight: at query time, dynamically connect events through shared
+        #    entities instead of pre-building a global graph. EngramRouter mirrors
+        #    this with relevance-gated edge traversal: only expand through entities
+        #    that maintain semantic connection to the original query.
+        #
+        #    Termination is dual-threshold:
+        #      - activation < activation_threshold → too attenuated, stop
+        #      - relevance < relevance_threshold → lost query connection, stop
         from collections import deque
 
-        # Preload entity names so _name() never hits the DB inside the BFS loop.
-        entity_names: dict[str, str] = {}
-        if seed_entity_ids:
-            e_ph = ",".join("?" for _ in seed_entity_ids)
+        # Preload entity names + kinds for the BFS loop (avoid per-hop DB hits).
+        entity_info: dict[str, tuple[str, str]] = {}  # id → (name, kind)
+        all_eids = set(seed_entity_ids)
+        if all_eids:
+            e_ph = ",".join("?" for _ in all_eids)
             for r in self.conn.execute(
-                f"SELECT id, name FROM entities WHERE id IN ({e_ph})",
-                tuple(seed_entity_ids),
+                f"SELECT id, name, kind FROM entities WHERE id IN ({e_ph})",
+                tuple(all_eids),
             ).fetchall():
-                entity_names[r["id"]] = r["name"]
+                entity_info[r["id"]] = (r["name"], r["kind"] if "kind" in r.keys() else "")
 
         def _name(eid: str) -> str:
-            if eid in entity_names:
-                return entity_names[eid]
-            r = self.conn.execute("SELECT name FROM entities WHERE id = ?", (eid,)).fetchone()
-            if r:
-                entity_names[eid] = r["name"]
-                return str(r["name"])
-            return eid
+            if eid not in entity_info:
+                r = self.conn.execute(
+                    "SELECT name, kind FROM entities WHERE id = ?", (eid,)
+                ).fetchone()
+                if r:
+                    entity_info[eid] = (r["name"], r["kind"] if "kind" in r.keys() else "")
+                else:
+                    entity_info[eid] = (eid, "")
+            return entity_info[eid][0]
 
-        activated: dict[str, tuple[float, str, int, list[str]]] = {}
-        queue: deque[tuple[str, float, int]] = deque()
+        def _kind(eid: str) -> str:
+            _name(eid)  # ensure loaded
+            return entity_info.get(eid, ("", ""))[1]
+
+        # Pre-compute query terms for relevance scoring.
+        _query_terms = list(self._terms(query)) if query else []
+
+        activated: dict[str, tuple[float, str, int, list[str], float]] = {}
+        queue: deque[tuple[str, float, int, float]] = deque()  # (eid, act, hop, relevance)
+
+        # Seed entities start with relevance=1.0 (they directly match the query).
         for eid in seed_entity_ids:
-            queue.append((eid, 1.0, 0))
+            queue.append((eid, 1.0, 0, 1.0))
 
         while queue:
-            src_eid, src_act, hop = queue.popleft()
+            src_eid, src_act, hop, src_relevance = queue.popleft()
             if hop >= max_hops:
                 continue
             next_hop = hop + 1
+
             for src_col, dst_col in (("src_id", "dst_id"), ("dst_id", "src_id")):
                 for e in self.conn.execute(
-                    f"SELECT {dst_col} AS nbr, relation, confidence FROM edges WHERE {src_col} = ?",
+                    f"SELECT {dst_col} AS nbr, relation, confidence "
+                    f"FROM edges WHERE {src_col} = ?",
                     (src_eid,),
                 ).fetchall():
                     nbr = e["nbr"]
                     if nbr in seed_entity_ids:
                         continue  # never re-activate a seed entity
+
+                    # ── Activation decay ──
                     new_act = src_act * decay * float(e["confidence"])
                     if new_act < self.weights.activation_threshold:
                         continue
+
+                    # ── Query relevance check (SAG-style dynamic gate) ──
+                    nbr_name = _name(nbr)
+                    nbr_kind = _kind(nbr)
+                    nbr_relevance = self._entity_query_relevance(
+                        nbr_name, nbr_kind,
+                        _query_terms, query_entities, query_entity_objs,
+                    )
+                    # Relevance decays per hop, blended with the neighbor's own relevance.
+                    nbr_relevance = nbr_relevance * (self.weights.relevance_decay ** next_hop)
+
+                    # ── Adaptive threshold: sparse-entity queries need looser gating ──
+                    # When the query extracts few/no entities (e.g., "根因是什么？"),
+                    # entity-level relevance is inherently low. Use a fraction of the
+                    # standard threshold to avoid over-pruning valid associations.
+                    _adaptive_threshold = self.weights.relevance_threshold
+                    if len(query_entities) <= 1:
+                        # Sparse-entity query: halve the threshold so edge expansion
+                        # can still reach relevant memories through shared entities.
+                        _adaptive_threshold = self.weights.relevance_threshold * 0.4
+                    if nbr_relevance < _adaptive_threshold:
+                        continue  # Lost query connection — prune this branch
+
+                    # ── Effective activation: activation × relevance ──
+                    # A high-confidence edge to an irrelevant entity should not pull.
+                    effective = new_act * nbr_relevance
+
                     prev = activated.get(nbr)
-                    if prev is None or new_act > prev[0]:
-                        src_path = activated.get(src_eid, (0.0, "", 0, [_name(src_eid)]))[3]
-                        activated[nbr] = (new_act, e["relation"], next_hop, src_path + [_name(nbr)])
-                        # Re-queue so the improved activation propagates onward.
-                        queue.append((nbr, new_act, next_hop))
+                    if prev is None or effective > prev[0] * prev[4]:
+                        src_path = (
+                            activated.get(src_eid, (0.0, "", 0, [_name(src_eid)], 1.0))[3]
+                        )
+                        activated[nbr] = (
+                            new_act, e["relation"], next_hop,
+                            src_path + [nbr_name], nbr_relevance,
+                        )
+                        # Re-queue so improved activation propagates onward.
+                        queue.append((nbr, new_act, next_hop, nbr_relevance))
         if not activated:
             return {}
 
         # 4. Map activated neighbour entities -> the memories carrying them
-        #    (excluding seeds), keep the strongest activation per memory.
+        #    (excluding seeds), keep the strongest *effective* activation per memory.
         #    Filter by namespace so edge associations never cross tenants.
+        #
+        #    Uses effective_activation = activation × relevance for final bonus,
+        #    so an entity reached through a strong edge but irrelevant to the query
+        #    contributes less than a weaker edge to a query-relevant entity.
         result: dict[str, tuple[float, str]] = {}
         seed_set = set(seed_ids)
         activated_ids = list(activated.keys())
@@ -1740,11 +1882,16 @@ class MemoryStore:
                 if mid in seed_set:
                     continue
                 entity_id = r["entity_id"]
-                act, relation, hop, path = activated[entity_id]
-                reason = f"edge assoc hop={hop} act={act:.3f} [{' → '.join(path)}] ({relation})"
+                act, relation, hop, path, relevance = activated[entity_id]
+                # ── Effective bonus: raw activation weighted by query relevance ──
+                effective_bonus = act * relevance
+                reason = (
+                    f"edge assoc hop={hop} act={act:.3f} rel={relevance:.3f} "
+                    f"eff={effective_bonus:.3f} [{' → '.join(path)}] ({relation})"
+                )
                 existing = result.get(mid)
-                if existing is None or act > existing[0]:
-                    result[mid] = (act, reason)
+                if existing is None or effective_bonus > existing[0]:
+                    result[mid] = (effective_bonus, reason)
         return result
 
     def _get_corrected_ids(self) -> set[str]:

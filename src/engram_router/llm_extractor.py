@@ -39,8 +39,8 @@ logger = logging.getLogger(__name__)
 
 # Default model: DeepSeek V3 (public API, no proxy issues).
 # For OneAPI (internal proxy), set ENGRA_LLM_BASE_URL and ENGRA_LLM_MODEL.
-DEFAULT_LLM_MODEL = "deepseek-chat"
-DEFAULT_API_BASE = "https://api.deepseek.com/v1"
+DEFAULT_LLM_MODEL = "deepseek-v4-pro"
+DEFAULT_API_BASE = "https://oneapi-comate.baidu-int.com/v1"
 DEFAULT_API_KEY_ENV = "DEEPSEEK_API_KEY"
 
 # Confidence for LLM-annotated entities / edges.

@@ -540,9 +540,12 @@ def test_default_recall_weights_match_hardcoded_values():
     assert w.identity_base_attr_boost == 2.0
     assert w.eval_sensory_boost == 1.5
     assert w.correction_penalty == 0.3
-    assert w.max_recall_hops == 2
+    assert w.max_recall_hops == 5
     assert w.recall_decay == 0.5
     assert w.activation_threshold == 0.03
+    assert w.relevance_decay == 0.6
+    assert w.relevance_threshold == 0.15
+    assert w.edge_assoc_boost == 5.0
     assert w.ascii_base == 4.0
     assert w.ascii_per_char == 0.5
     assert w.ascii_per_char_cap == 6

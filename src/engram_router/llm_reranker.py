@@ -42,7 +42,7 @@ class LLMReranker:
     ):
         self.api_key = api_key or os.environ.get("ENGRAM_LLM_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
         self.base_url = base_url or os.environ.get("ENGRAM_LLM_BASE_URL")
-        self.model = model or os.environ.get("ENGRAM_LLM_MODEL", "gpt-4o-mini")
+        self.model = model or os.environ.get("ENGRA_LLM_MODEL", "deepseek-v4-pro")
         self.max_candidates = max_candidates
         self.weight_llm = weight_llm
         self.weight_rule = weight_rule
