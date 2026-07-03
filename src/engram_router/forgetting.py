@@ -15,8 +15,6 @@ from datetime import datetime, timezone
 from difflib import SequenceMatcher
 from typing import Any
 
-from .store import MemoryStore, MemoryRecord
-
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -82,7 +80,7 @@ class ForgettingEngine:
 
     def __init__(
         self,
-        store: MemoryStore,
+        store: Any,
         config: ForgettingConfig | None = None,
     ) -> None:
         self.store = store
@@ -90,7 +88,7 @@ class ForgettingEngine:
 
     # -- decay ----------------------------------------------------------------
 
-    def decay_score(self, memory: MemoryRecord) -> float:
+    def decay_score(self, memory: Any) -> float:
         """Return the time-decayed score for a memory record.
 
         Implements a simplified Ebbinghaus forgetting curve:
@@ -126,7 +124,7 @@ class ForgettingEngine:
 
     # -- should_forget --------------------------------------------------------
 
-    def should_forget(self, memory: MemoryRecord) -> bool:
+    def should_forget(self, memory: Any) -> bool:
         """Return ``True`` when a memory is a candidate for forgetting.
 
         A memory is eligible when:
@@ -259,7 +257,7 @@ class ForgettingEngine:
 
     # -- helpers --------------------------------------------------------------
 
-    def _days_since_accessed(self, memory: MemoryRecord) -> float:
+    def _days_since_accessed(self, memory: Any) -> float:
         """Days since the last access, or since creation if never accessed."""
         ts = None
 
@@ -288,7 +286,7 @@ class ForgettingEngine:
         now = datetime.now(timezone.utc)
         return (now - accessed_dt).total_seconds() / 86400.0
 
-    def _get_access_count(self, memory: MemoryRecord) -> int:
+    def _get_access_count(self, memory: Any) -> int:
         """Read access_count from the database row (not the MemoryRecord)."""
         row = self.store.conn.execute(
             "SELECT access_count FROM memories WHERE id = ?",
@@ -298,7 +296,7 @@ class ForgettingEngine:
             return 0
         return int(row["access_count"]) if row["access_count"] is not None else 0
 
-    def _is_forgotten(self, memory: MemoryRecord) -> bool:
+    def _is_forgotten(self, memory: Any) -> bool:
         """Check if the memory is already flagged as forgotten."""
         row = self.store.conn.execute(
             "SELECT forgotten FROM memories WHERE id = ?",
@@ -308,7 +306,7 @@ class ForgettingEngine:
             return False
         return bool(row["forgotten"])
 
-    def _has_protected_salience(self, memory: MemoryRecord) -> bool:
+    def _has_protected_salience(self, memory: Any) -> bool:
         """Return True if any linked entity has a protected salience class."""
         rows = self.store.conn.execute(
             "SELECT me.salience_class FROM memory_entities me "
@@ -320,7 +318,7 @@ class ForgettingEngine:
                 return True
         return False
 
-    def _is_corrected(self, memory: MemoryRecord) -> bool:
+    def _is_corrected(self, memory: Any) -> bool:
         """Return True if the memory has a user correction entry."""
         row = self.store.conn.execute(
             "SELECT 1 FROM corrections WHERE target_id = ? LIMIT 1",
@@ -354,6 +352,7 @@ class ForgettingEngine:
 
         # Build MemoryRecord list for should_forget inspection.
         candidates: list[str] = []
+        from .store import MemoryRecord  # lazy import — avoid circular dependency
         for row in rows:
             metadata = self.store._parse_metadata(row["metadata"])
             metadata.setdefault("source", row["source"])

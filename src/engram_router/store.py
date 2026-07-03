@@ -266,6 +266,7 @@ class MemoryStore:
         self._persona: Any = None
         self._causal: Any = None
         self._timeline: Any = None
+        self._forgetting: Any = None
 
     def _init_schema(self) -> None:
         self.conn.executescript(
@@ -733,6 +734,20 @@ class MemoryStore:
             self._timeline = Timeline(self.conn)
         return self._timeline
 
+    @property
+    def forgetting(self):
+        if self._forgetting is None:
+            from .forgetting import ForgettingEngine, ForgettingConfig
+            self._forgetting = ForgettingEngine(self, ForgettingConfig())
+        return self._forgetting
+    def _apply_decay(self, records):
+        try:
+            engine = self.forgetting
+            for r in records:
+                if engine.should_forget(r):
+                    engine.forget(r.id)
+        except Exception:
+            pass
     def _update_persona(self, text):
         try:
             from .entities import extract_entities
@@ -1707,6 +1722,7 @@ class MemoryStore:
 
         # ── Phase 3: Record access for forgetting engine ──
         self._record_access([r.id for r in records])
+        self._apply_decay(records)
 
         # ── Phase 3.5: Vector fallback for queries with no keyword matches ──
         # When keyword recall returns empty or few results, supplement with
