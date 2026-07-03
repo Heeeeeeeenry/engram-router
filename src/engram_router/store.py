@@ -262,6 +262,11 @@ class MemoryStore:
                 pass
         self._init_schema()
 
+        # ── Phase 3: Persona / Causal / Forgetting (lazy-init) ──
+        self._persona: Any = None
+        self._causal: Any = None
+        self._timeline: Any = None
+
     def _init_schema(self) -> None:
         self.conn.executescript(
             """
@@ -532,6 +537,12 @@ class MemoryStore:
             except Exception as exc:
                 logger.debug("Vector encode skipped for %s: %s", next_id, exc)
 
+        # ── Phase 3: auto-update persona from saved text ──
+        try:
+            self._update_persona(text)
+        except Exception as exc:
+            logger.debug("Persona update skipped: %s", exc)
+
         return next_id
 
     def delete(self, memory_id: str) -> bool:
@@ -697,6 +708,40 @@ class MemoryStore:
                     (edge_id, src_id, dst_id, relation, confidence,
                      f"{memory_id}:llm"),
                 )
+
+
+    # ── Phase 3: Persona / Causal / Timeline lazy-init ──
+
+    @property
+    def persona(self):
+        if self._persona is None:
+            from .persona import PersonaStore
+            self._persona = PersonaStore(self, self.llm_extractor)
+        return self._persona
+
+    @property
+    def causal(self):
+        if self._causal is None:
+            from .causal import CausalChain
+            self._causal = CausalChain(self.conn)
+        return self._causal
+
+    @property
+    def timeline(self):
+        if self._timeline is None:
+            from .causal import Timeline
+            self._timeline = Timeline(self.conn)
+        return self._timeline
+
+    def _update_persona(self, text):
+        try:
+            from .entities import extract_entities
+            for ent in extract_entities(text):
+                if ent.get("kind") == "person" and ent.get("name", "") not in ("我", "你", "他", "她", "它"):
+                    self.persona.aggregate(ent["name"])
+        except Exception:
+            pass
+
 
     def _get_or_create_entity(self, name: str, kind: str, salience_class: str = "event") -> str:
         # salience is per-memory (stored on memory_entities), NOT a global
