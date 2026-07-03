@@ -9,7 +9,7 @@ class TestRecentFallback:
 
     def test_historical_records_returns_results(self, tmp_path):
         """'历史记录' query (no keyword match) must return top_k results via fallback."""
-        store = MemoryStore(path=tmp_path / "history.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "history.db")
         store.save("张三送我一把 HHKB 键盘。")
         store.save("今天天气很好，适合散步。")
         store.save("昨天和同事讨论了项目进度。")
@@ -28,7 +28,7 @@ class TestRecentFallback:
 
     def test_list_recent_conversations_returns_results(self, tmp_path):
         """'罗列一下最近对话' query must return top_k results."""
-        store = MemoryStore(path=tmp_path / "recent_convo.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "recent_convo.db")
         store.save("张三送我一把 HHKB 键盘。")
         store.save("今天天气很好，适合散步。")
         store.save("昨天和同事讨论了项目进度。")
@@ -44,7 +44,7 @@ class TestRecentFallback:
 
     def test_recent_chat_returns_results(self, tmp_path):
         """'最近的聊天' query must return top_k results (may match via trigram)."""
-        store = MemoryStore(path=tmp_path / "recent_chat.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "recent_chat.db")
         store.save("张三送我一把 HHKB 键盘。")
         store.save("今天天气很好，适合散步。")
         store.save("昨天和同事讨论了项目进度。")
@@ -60,7 +60,7 @@ class TestRecentFallback:
 
     def test_normal_keyword_query_still_works(self, tmp_path):
         """'HHKB' query must return HHKB-related results, not just any recent items."""
-        store = MemoryStore(path=tmp_path / "hhkb.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "hhkb.db")
         store.save("张三送我一把 HHKB 键盘，是生日礼物。")
         store.save("今天天气很好，适合散步。")
         store.save("昨天和同事讨论了项目进度。")
@@ -79,7 +79,7 @@ class TestRecentFallback:
 
     def test_normal_keyword_query_dominates_over_fallback(self, tmp_path):
         """Keyword-matched items should rank higher than fallback items."""
-        store = MemoryStore(path=tmp_path / "rank.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "rank.db")
         store.save("some filler data A")
         store.save("some filler data B")
         store.save("some filler data C")
@@ -96,7 +96,7 @@ class TestRecentFallback:
 
     def test_empty_results_returns_recent_not_empty(self, tmp_path):
         """Query with zero keyword overlap must not return empty list."""
-        store = MemoryStore(path=tmp_path / "no_keywords.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "no_keywords.db")
         store.save("张三送我一把 HHKB 键盘。")
         store.save("今天天气很好，适合散步。")
         store.save("妈妈做的红烧肉很好吃。")
@@ -112,7 +112,7 @@ class TestRecentFallback:
 
     def test_namespace_isolation_with_fallback(self, tmp_path):
         """Fallback must respect namespace isolation."""
-        store = MemoryStore(path=tmp_path / "ns_fallback.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "ns_fallback.db")
         store.save("work item 1", namespace="work")
         store.save("work item 2", namespace="work")
         store.save("work item 3", namespace="work")
@@ -135,7 +135,7 @@ class TestRecentFallback:
 
     def test_fallback_supplements_partial_keyword_results(self, tmp_path):
         """When keyword results are below top_k, fallback fills the gap."""
-        store = MemoryStore(path=tmp_path / "partial.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "partial.db")
         store.save("张三送我一把 HHKB 键盘。")
         store.save("some filler data A")
         store.save("some filler data B")
@@ -158,7 +158,7 @@ class TestEdgeExpansionStillWorks:
 
     def test_edge_expansion_brings_related_memory(self, tmp_path):
         """A memory reached via edge hops should still appear."""
-        store = MemoryStore(path=tmp_path / "edge_with_fallback.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "edge_with_fallback.db")
         store.save("张三送我一把 HHKB 键盘。")
         store.save("张三现在在腾讯工作。")
 
@@ -169,7 +169,7 @@ class TestEdgeExpansionStillWorks:
 
     def test_edge_expansion_reported_in_match_reason(self, tmp_path):
         """When a record is pulled via edge hop, its match_reason should say so."""
-        store = MemoryStore(path=tmp_path / "edge_reason_fb.db")
+        store = MemoryStore(enable_vector=False, path=tmp_path / "edge_reason_fb.db")
         store.save("张三送我一把 HHKB 键盘。")
         store.save("张三现在在腾讯工作。")
 
