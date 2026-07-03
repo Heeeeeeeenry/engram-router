@@ -215,16 +215,27 @@ class MemoryStore:
             self.reranker = LLMReranker(
                 allow_cloud=config.privacy.allow_cloud_reranker,
             )
-
+        self.vector_index = vector_index
         if embedding_engine is not None:
             self.embedding_engine = embedding_engine
         else:
             self.embedding_engine = EmbeddingEngine(
                 allow_remote=config.privacy.allow_cloud_embedding,
             )
+        # Auto-create vector index if not provided — embedding engine already
+        # handles graceful degradation when sentence-transformers is absent.
+        if self.vector_index is None and self.embedding_engine.available:
+            from .vector_index import VectorIndex
+            vec_path = None
+            if path is not None:
+                p = Path(path)
+                vec_path = p.parent / f"{p.stem}.faiss"
+            self.vector_index = VectorIndex(
+                dim=self.embedding_engine.dim, path=vec_path,
+            )
         self._vector_enabled = (
             self.embedding_engine.available
-            and vector_index is not None
+            and self.vector_index is not None
         )
         if path is not None:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -1514,16 +1525,49 @@ class MemoryStore:
         )
         top = scored[:top_k]
         if not top:
-            # No keyword/vector hits at all — fall back to recent items.
-            recent_rows = self.conn.execute(
-                "SELECT * FROM memories WHERE namespace = ? "
-                "ORDER BY created_at DESC LIMIT ?",
-                (namespace, top_k),
-            ).fetchall()
+            # No keyword/vector hits at all — fall back to vector + recent items.
             fb_records: list[MemoryRecord] = []
-            for row in recent_rows:
-                fb_records.append(self._row_to_record(row, score=0.5,
-                    match_reason="recent fallback (no keyword match)"))
+            existing_ids: set[str] = set()
+
+            # Phase 2 (inline): vector search fallback for keywordless queries
+            if query and self._vector_enabled and self.embedding_engine and self.vector_index:
+                try:
+                    vec = self.embedding_engine.encode(query)
+                    if vec is not None:
+                        vector_results = self.vector_index.search(vec, k=top_k * 2)
+                        for mid, sim in vector_results:
+                            if len(fb_records) >= top_k:
+                                break
+                            row = self._rows_by_ids([mid], namespace=namespace)
+                            if row:
+                                rw = row[0]
+                                summary = rw["summary"] if rw["summary"] else rw["raw_text"][:160]
+                                confidence = rw["confidence"] if rw["confidence"] is not None else 1.0
+                                fb_records.append(MemoryRecord(
+                                    id=mid, raw_text=rw["raw_text"], summary=summary,
+                                    confidence=confidence,
+                                    metadata=self._parse_metadata(rw["metadata"]),
+                                    evidence_refs=[],
+                                    score=0.55 + sim * 0.2,
+                                    match_reason="vector search (semantic)",
+                                ))
+                                existing_ids.add(mid)
+                except Exception as exc:
+                    logger.debug("Vector fallback skipped: %s", exc)
+
+            # Fill remaining slots with recent items
+            if len(fb_records) < top_k:
+                recent_rows = self.conn.execute(
+                    "SELECT * FROM memories WHERE namespace = ? "
+                    "ORDER BY created_at DESC LIMIT ?",
+                    (namespace, top_k * 2),
+                ).fetchall()
+                for row in recent_rows:
+                    rid = row["id"]
+                    if rid not in existing_ids and len(fb_records) < top_k:
+                        fb_records.append(self._row_to_record(row, score=0.5,
+                            match_reason="recent fallback (no keyword match)"))
+                        existing_ids.add(rid)
             return fb_records
 
         mem_ids = [item[2]["id"] for item in top]
@@ -1572,17 +1616,18 @@ class MemoryStore:
                             score=new_score, match_reason=r.match_reason,
                         ))
                     for mid, rrf_score in merged:
-                        if mid not in existing_ids:
-                            row = self._rows_by_ids([mid])
+                        if mid not in existing_ids and len(new_records) < top_k:
+                            row = self._rows_by_ids([mid], namespace=namespace)
                             if row:
                                 rw = row[0]
+                                summary = rw["summary"] if rw["summary"] else rw["raw_text"][:160]
                                 new_records.append(MemoryRecord(
                                     id=mid, raw_text=rw["raw_text"],
-                                    summary=rw.get("summary", rw["raw_text"][:160]),
-                                    confidence=rw.get("confidence", 1.0),
-                                    metadata=self._parse_metadata(rw.get("metadata")),
-                                    evidence_refs=[], score=rrf_score,
-                                    match_reason="vector search (RRF fusion)",
+                                    summary=summary,
+                                    confidence=rw["confidence"] if rw["confidence"] is not None else 1.0,
+                                    metadata=self._parse_metadata(rw["metadata"]),
+                                    evidence_refs=[], score=max(0.55, rrf_score * 60),  # above recent fallback (0.50)
+                                    match_reason="vector search (semantic)",
                                 ))
                     new_records.sort(key=lambda x: x.score, reverse=True)
                     records = new_records
@@ -1610,6 +1655,36 @@ class MemoryStore:
 
         # ── Phase 3: Record access for forgetting engine ──
         self._record_access([r.id for r in records])
+
+        # ── Phase 3.5: Vector fallback for queries with no keyword matches ──
+        # When keyword recall returns empty or few results, supplement with
+        # vector search results directly (simpler than RRF fusion for small stores).
+        if (not records or all(r.score <= 0.1 for r in records)) \
+                and query and self._vector_enabled \
+                and self.embedding_engine and self.vector_index:
+            try:
+                vec = self.embedding_engine.encode(query)
+                if vec is not None:
+                    vector_results = self.vector_index.search(vec, k=top_k * 2)
+                    existing_ids = {r.id for r in records}
+                    for mid, sim in vector_results:
+                        if mid not in existing_ids and len(records) < top_k:
+                            row = self._rows_by_ids([mid], namespace=namespace)
+                            if row:
+                                rw = row[0]
+                                summary = rw["summary"] if rw["summary"] else rw["raw_text"][:160]
+                                confidence = rw["confidence"] if rw["confidence"] is not None else 1.0
+                                records.append(MemoryRecord(
+                                    id=mid, raw_text=rw["raw_text"], summary=summary,
+                                    confidence=confidence,
+                                    metadata=self._parse_metadata(rw["metadata"]),
+                                    evidence_refs=[],
+                                    score=0.55 + sim * 0.2,  # 0.55~0.75, above fallback 0.50
+                                    match_reason="vector search (semantic)",
+                                ))
+                                existing_ids.add(mid)
+            except Exception as exc:
+                logger.debug("Vector fallback skipped: %s", exc)
 
         # ── Phase 4: Recent fallback ──
         # When keyword/vector recall returns fewer than top_k results,

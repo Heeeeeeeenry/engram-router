@@ -108,7 +108,7 @@ class VectorIndex:
                 self._index.add(vec)
             else:
                 # Buffer for later training
-                if not hasattr(self, "_buffer"):
+                if not hasattr(self, "_buffer_embs") or self._buffer_embs is None:
                     self._buffer_embs: list["np.ndarray"] = []  # type: ignore[type-arg]
                     self._buffer_ids: list[int] = []
                 self._buffer_embs.append(vec)
@@ -172,7 +172,7 @@ class VectorIndex:
             List of (memory_id, similarity_score) sorted by similarity DESC.
             Similarity is cosine (inner product on normalized vectors, range -1..1).
         """
-        if not self._trained or self.size == 0:
+        if self.size == 0:
             return []
 
         q = np.asarray(query_vec, dtype=np.float32).reshape(1, -1)
@@ -180,6 +180,23 @@ class VectorIndex:
             raise ValueError(
                 f"Query dim {q.shape[1]} != index dim {self._dim}"
             )
+
+        # Brute-force cosine fallback for untrained / small indices.
+        # FAISS IVF needs training data; for small memory stores (<10K vectors)
+        # brute-force numpy is fast enough and always correct.
+        if not self._trained:
+            if hasattr(self, "_buffer_embs") and self._buffer_embs:
+                all_vecs = np.concatenate(self._buffer_embs, axis=0)  # type: ignore[name-defined]
+                all_ids = self._buffer_ids
+                # Normalize for cosine similarity
+                q_norm = q / (np.linalg.norm(q) + 1e-8)  # type: ignore[name-defined]
+                all_norm = all_vecs / (np.linalg.norm(all_vecs, axis=1, keepdims=True) + 1e-8)  # type: ignore[name-defined]
+                sims = np.dot(all_norm, q_norm.T).flatten()  # type: ignore[name-defined]
+                top_k = min(k, len(sims))
+                top_idx = np.argsort(sims)[::-1][:top_k]  # type: ignore[name-defined]
+                return [(self._id_to_memory.get(all_ids[i], ""), float(sims[i]))
+                        for i in top_idx if sims[i] > 0]
+            return []
 
         k = min(k, self.size)
         with self._lock:

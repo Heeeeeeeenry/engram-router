@@ -2,7 +2,7 @@
 
 > **版本**: v0.1.0 → v0.2.0 路线图  
 > **最后更新**: 2026-07-01  
-> **基于源码**: `src/engram_router/store.py` (1849 行)、`cli.py` (133 行)、`mcp_server.py` (484 行)、`config.py` (269 行)、`entities.py` (167 行)、文档 (`docs/`)
+> **基于源码**: `src/engram_router/store.py` (2561 行)、`cli.py` (133 行)、`mcp_server.py` (484 行)、`config.py` (315 行)、`entities.py` (221 行)、`embedding.py` (新) / `vector_index.py` (新) / `query_expansion.py`、文档 (`docs/`)
 
 ---
 
