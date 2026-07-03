@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 import json
 import logging
+import os
 import re
 import sqlite3
 from dataclasses import asdict, dataclass
@@ -180,6 +181,7 @@ class MemoryStore:
         embedding_engine: Any | None = None,
         vector_index: Any | None = None,
         query_expander: QueryExpander | None = None,
+        enable_vector: bool = True,  # set False to skip embedding model loading (useful for tests)
     ) -> None:
         self.weights = weights if weights is not None else _default_weights()
         self.path = str(path) if path is not None else ":memory:"
@@ -216,27 +218,32 @@ class MemoryStore:
                 allow_cloud=config.privacy.allow_cloud_reranker,
             )
         self.vector_index = vector_index
-        if embedding_engine is not None:
-            self.embedding_engine = embedding_engine
+        # Allow skipping vector via env var for fast test runs
+        _skip_vector = not enable_vector or os.environ.get("ENGRAM_SKIP_VECTOR") == "1"
+        if _skip_vector:
+            self.embedding_engine = None
+            self._vector_enabled = False
         else:
-            self.embedding_engine = EmbeddingEngine(
-                allow_remote=config.privacy.allow_cloud_embedding,
+            if embedding_engine is not None:
+                self.embedding_engine = embedding_engine
+            else:
+                self.embedding_engine = EmbeddingEngine(
+                    allow_remote=config.privacy.allow_cloud_embedding,
+                )
+            # Auto-create vector index if not provided
+            if self.vector_index is None and self.embedding_engine.available:
+                from .vector_index import VectorIndex
+                vec_path = None
+                if path is not None:
+                    p = Path(path)
+                    vec_path = p.parent / f"{p.stem}.faiss"
+                self.vector_index = VectorIndex(
+                    dim=self.embedding_engine.dim, path=vec_path,
+                )
+            self._vector_enabled = (
+                self.embedding_engine.available
+                and self.vector_index is not None
             )
-        # Auto-create vector index if not provided — embedding engine already
-        # handles graceful degradation when sentence-transformers is absent.
-        if self.vector_index is None and self.embedding_engine.available:
-            from .vector_index import VectorIndex
-            vec_path = None
-            if path is not None:
-                p = Path(path)
-                vec_path = p.parent / f"{p.stem}.faiss"
-            self.vector_index = VectorIndex(
-                dim=self.embedding_engine.dim, path=vec_path,
-            )
-        self._vector_enabled = (
-            self.embedding_engine.available
-            and self.vector_index is not None
-        )
         if path is not None:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
         if sqlite3.sqlite_version_info < (3, 35, 0):
