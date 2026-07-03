@@ -541,7 +541,7 @@ def test_default_recall_weights_match_hardcoded_values():
     assert w.eval_sensory_boost == 1.5
     assert w.correction_penalty == 0.3
     assert w.max_recall_hops == 5
-    assert w.recall_decay == 0.5
+    assert w.recall_decay == 0.7
     assert w.activation_threshold == 0.03
     assert w.relevance_decay == 0.6
     assert w.relevance_threshold == 0.15

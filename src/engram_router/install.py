@@ -25,9 +25,9 @@ import os
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -67,7 +67,7 @@ def _install_hermes(dry_run: bool = False) -> str:
         return "✗ Hermes: config.yaml not found"
 
     try:
-        import yaml
+        import yaml  # type: ignore[import-untyped]
         with open(config_path) as f:
             config = yaml.safe_load(f) or {}
     except ImportError:
@@ -80,12 +80,12 @@ def _install_hermes(dry_run: bool = False) -> str:
             return f"would add engram MCP server to {config_path}"
         # Append MCP config
         with open(config_path, "a") as f:
-            f.write(f"\n# engram-router MCP (added by engram-install)\n")
-            f.write(f"mcp_servers:\n")
-            f.write(f"  engram:\n")
+            f.write("\n# engram-router MCP (added by engram-install)\n")
+            f.write("mcp_servers:\n")
+            f.write("  engram:\n")
             f.write(f"    command: {engram_mcp}\n")
-            f.write(f"    args:\n")
-            f.write(f"      - --db\n")
+            f.write("    args:\n")
+            f.write("      - --db\n")
             f.write(f"      - {_default_db()}\n")
         return f"✓ Hermes: engram added to {config_path}"
 
@@ -190,14 +190,14 @@ def _detect_claude_desktop() -> bool:
     path = _claude_desktop_config_path()
     return path is not None and path.exists()
 
-def _read_json(path: Path) -> dict:
+def _read_json(path: Path) -> dict[str, Any]:
     try:
         with open(path) as f:
-            return json.load(f)
+            return cast("dict[str, Any]", json.load(f))
     except (json.JSONDecodeError, FileNotFoundError):
         return {}
 
-def _write_json(path: Path, data: dict) -> None:
+def _write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
@@ -325,7 +325,7 @@ def _install_openclaw(dry_run: bool = False) -> str:
         return f"would run: {' '.join(cmd)}"
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-        return f"✓ OpenClaw: engram added" if result.returncode == 0 else f"⚠ OpenClaw: {result.stderr}"
+        return "✓ OpenClaw: engram added" if result.returncode == 0 else f"⚠ OpenClaw: {result.stderr}"
     except Exception as e:
         return f"✗ OpenClaw: {e}"
 

@@ -254,7 +254,7 @@ ASCII match=1, 2-char CJK match=0, 3-char CJK match=1.
 - id_sequences monotonic allocator + legacy seed: `tests/test_id_sequences.py` (5 cases).
 - Summary-baseline vs evidence-recall benchmark (34 hard gates): `tests/test_benchmark.py`.
 
-Run all: `python -m pytest -q` (127 passed total across 9 test files).
+Run all: `python -m pytest -q` (265 passed total across 9 test files).
 
 ## Indexes
 

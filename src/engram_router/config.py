@@ -12,7 +12,7 @@ Usage:
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -170,7 +170,7 @@ class RecallWeightsConfig:
     # ── recall pipeline ──
     fts_boost: float = 0.1
     shared_entity_multiplier: float = 1.2
-    conflicting_person_penalty: float = 1.5
+    conflicting_person_penalty: float = 2.2
     person_match_boost: float = 1.5
     entity_tie_break_bonus: float = 0.01
 
@@ -185,7 +185,7 @@ class RecallWeightsConfig:
 
     # ── spreading activation ──
     max_recall_hops: int = 5
-    recall_decay: float = 0.5
+    recall_decay: float = 0.7
     activation_threshold: float = 0.03
 
     # ── associative reach ──
@@ -215,7 +215,7 @@ class PrivacyConfig:
     allow_cloud_reranker: bool = False
 
     @classmethod
-    def from_dict(cls, d: dict) -> "PrivacyConfig":
+    def from_dict(cls, d: dict[str, Any]) -> "PrivacyConfig":
         return cls(
             allow_cloud_llm=bool(d.get("allow_cloud_llm", False)),
             allow_cloud_embedding=bool(d.get("allow_cloud_embedding", False)),
@@ -274,7 +274,7 @@ class EngramConfig:
             return config
 
         try:
-            import yaml
+            import yaml  # type: ignore[import-untyped]
         except ImportError:
             return config
 

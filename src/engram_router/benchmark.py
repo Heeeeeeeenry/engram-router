@@ -153,123 +153,127 @@ def run_benchmark(
 ) -> dict[str, Any]:
     """Run both strategies over the cases and return a structured report."""
     store = MemoryStore(path=db_path)
-    for turn in turns:
-        store.save(turn)
+    try:
+        for turn in turns:
+            store.save(turn)
 
-    baseline = SummaryBaseline(turns)
+        baseline = SummaryBaseline(turns)
 
-    summary_answer_hits = 0
-    summary_evidence_hits = 0
-    engram_answer_hits = 0
-    engram_evidence_hits = 0
-    # Hard-gate accounting. A "pass" case is a regression gate; a "known_gap"
-    # case is reported but never fails the run.
-    hard_total = 0
-    hard_passed = 0
-    gap_total = 0
-    gap_passed = 0
-    hard_failures: list[dict[str, Any]] = []
-    case_reports: list[dict[str, Any]] = []
+        summary_answer_hits = 0
+        summary_evidence_hits = 0
+        engram_answer_hits = 0
+        engram_evidence_hits = 0
+        # Hard-gate accounting. A "pass" case is a regression gate; a "known_gap"
+        # case is reported but never fails the run.
+        hard_total = 0
+        hard_passed = 0
+        gap_total = 0
+        gap_passed = 0
+        hard_failures: list[dict[str, Any]] = []
+        case_reports: list[dict[str, Any]] = []
 
-    for case in cases:
-        # Summary strategy.
-        s_answer = baseline.answer(case.query)
-        s_answer_ok = _contains_all(s_answer, case.answer_contains)
-        s_evidence_ok = _contains_all(s_answer, case.evidence_contains)
-        summary_answer_hits += int(s_answer_ok)
-        summary_evidence_hits += int(s_evidence_ok)
+        for case in cases:
+            # Summary strategy.
+            s_answer = baseline.answer(case.query)
+            s_answer_ok = _contains_all(s_answer, case.answer_contains)
+            s_evidence_ok = _contains_all(s_answer, case.evidence_contains)
+            summary_answer_hits += int(s_answer_ok)
+            summary_evidence_hits += int(s_evidence_ok)
 
-        # EngramRouter strategy.
-        e_answer, e_evidence = _engram_answer(store, case.query)
-        e_answer_ok = _contains_all(e_answer, case.answer_contains)
-        e_evidence_ok = _contains_all(e_evidence, case.evidence_contains)
-        # Anti-contamination check runs against the recalled answer text.
-        e_excludes_ok = _contains_none(e_answer, case.answer_excludes)
-        engram_answer_hits += int(e_answer_ok)
-        engram_evidence_hits += int(e_evidence_ok)
+            # EngramRouter strategy.
+            e_answer, e_evidence = _engram_answer(store, case.query)
+            e_answer_ok = _contains_all(e_answer, case.answer_contains)
+            e_evidence_ok = _contains_all(e_evidence, case.evidence_contains)
+            # Anti-contamination check runs against the recalled answer text.
+            e_excludes_ok = _contains_none(e_answer, case.answer_excludes)
+            engram_answer_hits += int(e_answer_ok)
+            engram_evidence_hits += int(e_evidence_ok)
 
-        # A case is satisfied when its positive tokens are all present and no
-        # forbidden token leaked. Evidence is not part of the gate (some cases
-        # assert only on the answer) but is reported for auditing.
-        case_satisfied = e_answer_ok and e_excludes_ok
-        leaked = [n for n in case.answer_excludes if n in e_answer]
+            # A case is satisfied when its positive tokens are all present and no
+            # forbidden token leaked. Evidence is not part of the gate (some cases
+            # assert only on the answer) but is reported for auditing.
+            case_satisfied = e_answer_ok and e_excludes_ok
+            leaked = [n for n in case.answer_excludes if n in e_answer]
 
-        if case.expect == "known_gap":
-            gap_total += 1
-            gap_passed += int(case_satisfied)
-        else:
-            hard_total += 1
-            hard_passed += int(case_satisfied)
-            if not case_satisfied:
-                hard_failures.append(
-                    {
-                        "tag": case.tag,
-                        "query": case.query,
-                        "missing": [n for n in case.answer_contains if n not in e_answer],
-                        "leaked": leaked,
+            if case.expect == "known_gap":
+                gap_total += 1
+                gap_passed += int(case_satisfied)
+            else:
+                hard_total += 1
+                hard_passed += int(case_satisfied)
+                if not case_satisfied:
+                    hard_failures.append(
+                        {
+                            "tag": case.tag,
+                            "query": case.query,
+                            "missing": [n for n in case.answer_contains if n not in e_answer],
+                            "leaked": leaked,
+                            "answer": e_answer,
+                        }
+                    )
+
+            case_reports.append(
+                {
+                    "tag": case.tag,
+                    "query": case.query,
+                    "expect": case.expect,
+                    "expected_answer": case.answer_contains,
+                    "expected_evidence": case.evidence_contains,
+                    "forbidden": case.answer_excludes,
+                    "satisfied": case_satisfied,
+                    "leaked": leaked,
+                    "summary": {
+                        "answer_ok": s_answer_ok,
+                        "evidence_ok": s_evidence_ok,
+                        "answer": s_answer,
+                    },
+                    "engram": {
+                        "answer_ok": e_answer_ok,
+                        "evidence_ok": e_evidence_ok,
+                        "excludes_ok": e_excludes_ok,
                         "answer": e_answer,
-                    }
-                )
+                        "evidence": e_evidence,
+                    },
+                }
+            )
 
-        case_reports.append(
-            {
-                "tag": case.tag,
-                "query": case.query,
-                "expect": case.expect,
-                "expected_answer": case.answer_contains,
-                "expected_evidence": case.evidence_contains,
-                "forbidden": case.answer_excludes,
-                "satisfied": case_satisfied,
-                "leaked": leaked,
-                "summary": {
-                    "answer_ok": s_answer_ok,
-                    "evidence_ok": s_evidence_ok,
-                    "answer": s_answer,
-                },
-                "engram": {
-                    "answer_ok": e_answer_ok,
-                    "evidence_ok": e_evidence_ok,
-                    "excludes_ok": e_excludes_ok,
-                    "answer": e_answer,
-                    "evidence": e_evidence,
-                },
-            }
-        )
+        total = len(cases)
+        summary_context_chars = len(baseline.summary)
+        engram_context_chars = sum(len(t) for t in turns)
 
-    total = len(cases)
-    summary_context_chars = len(baseline.summary)
-    engram_context_chars = sum(len(t) for t in turns)
-
-    return {
-        "total": total,
-        "summary": {
-            "answer_hits": summary_answer_hits,
-            "evidence_hits": summary_evidence_hits,
-            "context_chars": summary_context_chars,
-            "note": "Lossy rolling summary. Stored once, never recalls detail.",
-        },
-        "engram": {
-            "answer_hits": engram_answer_hits,
-            "evidence_hits": engram_evidence_hits,
-            "context_chars_full_corpus": engram_context_chars,
-            "note": "On-demand evidence recall. Only top-k evidence enters context per query.",
-        },
-        "gate": {
-            "hard_total": hard_total,
-            "hard_passed": hard_passed,
-            "hard_failed": hard_total - hard_passed,
-            "known_gap_total": gap_total,
-            "known_gap_passed": gap_passed,
-            "passed": hard_passed == hard_total,
-            "failures": hard_failures,
-        },
-        "verdict": (
-            "engram_better"
-            if engram_answer_hits > summary_answer_hits
-            else "no_improvement"
-        ),
-        "cases": case_reports,
-    }
+        report = {
+            "total": total,
+            "summary": {
+                "answer_hits": summary_answer_hits,
+                "evidence_hits": summary_evidence_hits,
+                "context_chars": summary_context_chars,
+                "note": "Lossy rolling summary. Stored once, never recalls detail.",
+            },
+            "engram": {
+                "answer_hits": engram_answer_hits,
+                "evidence_hits": engram_evidence_hits,
+                "context_chars_full_corpus": engram_context_chars,
+                "note": "On-demand evidence recall. Only top-k evidence enters context per query.",
+            },
+            "gate": {
+                "hard_total": hard_total,
+                "hard_passed": hard_passed,
+                "hard_failed": hard_total - hard_passed,
+                "known_gap_total": gap_total,
+                "known_gap_passed": gap_passed,
+                "passed": hard_passed == hard_total,
+                "failures": hard_failures,
+            },
+            "verdict": (
+                "engram_better"
+                if engram_answer_hits > summary_answer_hits
+                else "no_improvement"
+            ),
+            "cases": case_reports,
+        }
+        return report
+    finally:
+        store.close()
 
 
 def format_report(report: dict[str, Any]) -> str:

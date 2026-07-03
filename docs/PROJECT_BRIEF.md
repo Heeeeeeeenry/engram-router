@@ -19,7 +19,7 @@
 - [x] 一键安装：`engram-install install`（Hermes / Claude / Codex / OpenClaw）
 - [x] LLM 语义重排序（可选，需 API key）
 - [x] YAML 配置系统（`~/.engram/config.yaml`）
-- [x] 127+ 单元测试，117 passed
+- [x] 277 单元测试，265 passed
 
 已知局限：
 - [ ] 纯规则引擎 → 语义覆盖有限（跨人物关联、同义扩展

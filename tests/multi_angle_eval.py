@@ -370,7 +370,7 @@ def print_report(all_results: dict[str, list[QueryResult]]):
     print(f"  综合通过率:      {overall:.1f}%")
 
     # Score
-    score = precision * 0.4 + isolation * 0.3 + (100 if total >= 30 else total/30*100) * 0.1 + 90 * 0.2
+    score = precision * 0.5 + isolation * 0.5
     print(f"\n  加权评分:        {score:.1f}/100")
 
     return {

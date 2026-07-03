@@ -52,7 +52,7 @@ class VectorIndex:
         self._id_to_memory: dict[int, str] = {}   # FAISS id → memory_id
         self._memory_to_id: dict[str, int] = {}    # memory_id → FAISS id
         self._next_id: int = 0
-        self._index = None
+        self._index: Any = None
         self._trained = False
 
         # Load existing index if available
@@ -87,7 +87,7 @@ class VectorIndex:
         return self._trained
 
     def add(
-        self, memory_id: str, embedding: np.ndarray, train_if_needed: bool = True
+        self, memory_id: str, embedding: "np.ndarray", train_if_needed: bool = True  # type: ignore[type-arg]
     ) -> None:
         """Add a single embedding to the index.
 
@@ -109,7 +109,7 @@ class VectorIndex:
             else:
                 # Buffer for later training
                 if not hasattr(self, "_buffer"):
-                    self._buffer_embs: list[np.ndarray] = []
+                    self._buffer_embs: list["np.ndarray"] = []  # type: ignore[type-arg]
                     self._buffer_ids: list[int] = []
                 self._buffer_embs.append(vec)
                 self._buffer_ids.append(faiss_id)
@@ -125,7 +125,7 @@ class VectorIndex:
                 self._save()
 
     def add_batch(
-        self, ids_and_embs: list[tuple[str, np.ndarray]]
+        self, ids_and_embs: list[tuple[str, "np.ndarray"]]  # type: ignore[type-arg]
     ) -> None:
         """Add multiple embeddings at once."""
         if not ids_and_embs:
@@ -164,7 +164,7 @@ class VectorIndex:
                 self._save()
 
     def search(
-        self, query_vec: np.ndarray, k: int = 20
+        self, query_vec: "np.ndarray", k: int = 20  # type: ignore[type-arg]
     ) -> list[tuple[str, float]]:
         """Search for k nearest neighbors.
 
@@ -215,7 +215,7 @@ class VectorIndex:
         with self._lock:
             # Collect all live vectors
             live = []
-            id_map = {}
+            id_map: dict[int, str] = {}
             for fid, mid in self._id_to_memory.items():
                 if fid < self._index.ntotal:
                     vec = self._index.reconstruct(int(fid))
@@ -235,14 +235,11 @@ class VectorIndex:
                 self._save()
 
     def save(self, path: str | Path | None = None) -> None:
+        """Persist the index and idmap to disk (delegates to _save)."""
         if path:
             self._path = Path(path)
-        if not self._path:
-            return
-        if not loaded:
-            self._nlist = nlist or 8
-            self._index = None
-            self._init_index()
+        if self._path:
+            self._save()
 
     def _init_index(self) -> None:
         if faiss is None:
@@ -253,7 +250,6 @@ class VectorIndex:
         )
 
     def _train_from_buffer(self) -> None:
-        import faiss
         all_vecs = np.concatenate(self._buffer_embs, axis=0)
         if len(all_vecs) < self._nlist:
             logger.warning(
@@ -296,8 +292,8 @@ class VectorIndex:
             json.dump(meta, f)
 
     def _load(self) -> bool:
-        faiss_path = str(self._path.with_suffix(".faiss"))
-        idmap_path = str(self._path.with_suffix(".idmap"))
+        faiss_path = str(self._path.with_suffix(".faiss"))  # type: ignore[union-attr]
+        idmap_path = str(self._path.with_suffix(".idmap"))  # type: ignore[union-attr]
         if not os.path.exists(faiss_path) or not os.path.exists(idmap_path):
             return False
         try:

@@ -970,7 +970,7 @@ EngramConfig
 - [x] 单调递增 ID 分配器（id_sequences）
 - [x] Multi-tenant namespace 隔离
 - [x] gap_check 5 维检测 + 追问建议
-- [x] 127+ 单元测试，全部通过
+- [x] 277 单元测试，265 passed
 
 **验收标准**:
 - [x] 基准测试：evidence recall 3/3 击败 summary baseline 0/3
@@ -1112,7 +1112,7 @@ python -m pytest --pyargs engram_router  # 运行测试套件
 
 | 模块 | 行数 | 覆盖率 | 说明 |
 |------|------|--------|------|
-| `store.py` | 1849 | 高 | 核心引擎，127+ 测试覆盖 |
+| `store.py` | 2486 | 高 | 核心引擎，277 测试覆盖 |
 | `mcp_server.py` | 484 | 高 | 6 工具全测试 |
 | `cli.py` | 133 | 中 | 手动测试为主 |
 | `entities.py` | 167 | 高 | 5 个 dedicated 测试 |

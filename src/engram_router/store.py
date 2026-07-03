@@ -14,13 +14,15 @@ import sqlite3
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from .config import config
+from .embedding import EmbeddingEngine
 from .entities import classify_salience, extract_entities
 from .fusion import reciprocal_rank_fusion
 from .llm_extractor import LLMExtractor, extract_edges_llm, extract_entities_llm
-from .query_expansion import QueryExpander, ExpandedQuery
+from .llm_reranker import LLMReranker
+from .query_expansion import QueryExpander
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +83,7 @@ class RecallWeights:
     # ── spreading activation (was DEFAULT_MAX_HOPS / DEFAULT_DECAY / _ACT_THRESHOLD)
     max_recall_hops: int = 5
     """Safety cap for BFS depth. Actual termination is dynamic (activation × relevance)."""
-    recall_decay: float = 0.5
+    recall_decay: float = 0.7
     """Per-hop activation decay factor."""
     activation_threshold: float = 0.03
     """Minimum activation to keep expanding a branch."""
@@ -191,15 +193,37 @@ class MemoryStore:
             if recall_decay is not None
             else self.weights.recall_decay
         )
-        self.llm_extractor = llm_extractor
         self.llm_query_extract = llm_query_extract
-        self.reranker = reranker
-        self.embedding_engine = embedding_engine
         self.vector_index = vector_index
-        self.query_expander = query_expander if query_expander is not None else QueryExpander()
+        self.query_expander = query_expander if query_expander is not None else QueryExpander(
+            allow_cloud_llm=config.privacy.allow_cloud_llm,
+        )
+
+        # ── Cloud privacy gating: create default instances when caller doesn't
+        #    provide them, gated by config.privacy so data never leaves the
+        #    machine without explicit consent.
+        if llm_extractor is not None:
+            self.llm_extractor = llm_extractor
+        else:
+            self.llm_extractor = LLMExtractor(
+                allow_cloud=config.privacy.allow_cloud_llm,
+            )
+
+        if reranker is not None:
+            self.reranker = reranker
+        else:
+            self.reranker = LLMReranker(
+                allow_cloud=config.privacy.allow_cloud_reranker,
+            )
+
+        if embedding_engine is not None:
+            self.embedding_engine = embedding_engine
+        else:
+            self.embedding_engine = EmbeddingEngine(
+                allow_remote=config.privacy.allow_cloud_embedding,
+            )
         self._vector_enabled = (
-            embedding_engine is not None
-            and embedding_engine.available
+            self.embedding_engine.available
             and vector_index is not None
         )
         if path is not None:
@@ -574,11 +598,14 @@ class MemoryStore:
         from, so the inference is always auditable / revocable.
         """
         # Deduplicate entity ids within this memory while keeping kind/name.
+        # Exclude cjk_ngram entities from edge creation to prevent noise.
         uniq: list[dict[str, Any]] = []
         seen_ids: set[str] = set()
         for ent in indexed:
             if ent["id"] in seen_ids:
                 continue
+            if ent.get("kind") == "cjk_ngram":
+                continue  # cjk_ngram is for shared-entity scoring only, not edges
             seen_ids.add(ent["id"])
             uniq.append(ent)
         if len(uniq) < 2:
@@ -919,7 +946,7 @@ class MemoryStore:
         row = self.conn.execute(
             "SELECT * FROM memories WHERE id = ?", (mem_id,)
         ).fetchone()
-        return row
+        return cast("sqlite3.Row | None", row)
 
     def _memory_rows(self, fts_ids: set[str] | None,
                      namespace: str = "default") -> list[sqlite3.Row]:
@@ -961,6 +988,10 @@ class MemoryStore:
             )
         out: dict[str, list[dict[str, Any]]] = {mid: [] for mid in memory_ids}
         for r in rows:
+            # Exclude cjk_ngram entities from the entity map — they are
+            # for FTS5 LIKE fallback only, not for scoring or edge expansion.
+            if r["kind"] == "cjk_ngram":
+                continue
             out.setdefault(r["memory_id"], []).append(
                 {"name": r["name"], "kind": r["kind"], "salience_class": r["salience_class"]}
             )
@@ -1033,7 +1064,7 @@ class MemoryStore:
         """
         # ── Phase 2: Query Expansion ───────────────────────────────────
         if self.query_expander is not None:
-            eq = self.query_expander.expand(query, async_llm=True)
+            eq = self.query_expander.expand(query, async_llm=False)
 
             # 1. Merge synonyms into extra terms for token matching.
             extra_terms: list[str] = []
@@ -1041,7 +1072,10 @@ class MemoryStore:
                 extra_terms.extend(synonyms)
 
             # 2. Extract entities for the base query.
-            query_entity_objs = extract_entities(query)
+            query_entity_objs = [
+                e for e in extract_entities(query)
+                if e.get("kind") != "cjk_ngram"
+            ]
 
             # 3. Merge LLM extra entities into query entities.
             existing = {(e["name"], e.get("kind", "")) for e in query_entity_objs}
@@ -1065,7 +1099,10 @@ class MemoryStore:
                 # Each variant gets its own recall path.
                 for variant in eq.variants:
                     v_terms = list(dict.fromkeys(self._terms(variant)))
-                    v_entities = extract_entities(variant)
+                    v_entities = [
+                        e for e in extract_entities(variant)
+                        if e.get("kind") != "cjk_ngram"
+                    ]
                     # Also merge LLM extra entities into variant entities.
                     v_existing = {(e["name"], e.get("kind", "")) for e in v_entities}
                     for ent in eq.extra_entities:
@@ -1097,7 +1134,10 @@ class MemoryStore:
                 # Fall through to standard pipeline below.
         else:
             terms = self._terms(query)
-            query_entity_objs = extract_entities(query)
+            query_entity_objs = [
+                e for e in extract_entities(query)
+                if e.get("kind") != "cjk_ngram"
+            ]
 
         # LLM query augmentation: supplement rule-based entities with LLM-
         # extracted ones for better recall (e.g., unlisted brands, topics).
@@ -1208,9 +1248,17 @@ class MemoryStore:
                 reason = (reason + "; fts trigram candidate").lstrip("; ")
 
             # Entity/topic hop: reward memories sharing extracted entities.
+            # cjk_ngram entities are excluded — they're for FTS5 LIKE fallback only.
             mem_entity_objs = entity_map.get(row["id"], [])
-            mem_entities = {e["name"] for e in mem_entity_objs}
-            shared = query_entities & mem_entities
+            mem_entities = {
+                e["name"] for e in mem_entity_objs
+                if e.get("kind") != "cjk_ngram"
+            }
+            query_ents_filtered = {
+                e["name"] for e in query_entity_objs
+                if e.get("kind") != "cjk_ngram"
+            }
+            shared = query_ents_filtered & mem_entities
             if shared:
                 score += self.weights.shared_entity_multiplier * len(shared)
                 directly_matched = True
@@ -1720,7 +1768,10 @@ class MemoryStore:
         decay = self.recall_decay if decay is None else decay
 
         # 1. Find seed memories: those with a positive direct token/entity match.
-        query_entity_objs = extract_entities(query)
+        query_entity_objs = [
+            e for e in extract_entities(query)
+            if e.get("kind") != "cjk_ngram"
+        ]
         query_entities = {e["name"] for e in query_entity_objs}
         seed_ids: list[str] = []
         for row in rows:

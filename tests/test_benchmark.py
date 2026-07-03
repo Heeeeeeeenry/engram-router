@@ -36,7 +36,6 @@ DAILY_CONVO = REPO_ROOT / "examples" / "daily_life_demo.md"
 DAILY_CASES = REPO_ROOT / "examples" / "daily_life_questions.jsonl"
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_load_conversation_extracts_user_turns():
     turns = load_conversation(CONVO)
     assert any("HHKB" in t for t in turns)
@@ -46,7 +45,6 @@ def test_load_conversation_extracts_user_turns():
     assert any("别的事情" in t for t in turns)
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_load_cases_parses_jsonl():
     cases = load_cases(CASES)
     assert len(cases) == 3
@@ -54,7 +52,6 @@ def test_load_cases_parses_jsonl():
     assert cases[0].answer_contains == ["HHKB"]
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_summary_baseline_loses_detail():
     turns = load_conversation(CONVO)
     baseline = SummaryBaseline(turns)
@@ -66,7 +63,6 @@ def test_summary_baseline_loses_detail():
     assert "HHKB" not in answer
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_engram_recall_answers_brand_question(tmp_path):
     turns = load_conversation(CONVO)
     store = MemoryStore(path=tmp_path / "bench.db")
@@ -77,7 +73,6 @@ def test_engram_recall_answers_brand_question(tmp_path):
     assert "HHKB" in joined
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_run_benchmark_reports_engram_beats_summary(tmp_path):
     turns = load_conversation(CONVO)
     cases = load_cases(CASES)
@@ -94,7 +89,6 @@ def test_run_benchmark_reports_engram_beats_summary(tmp_path):
     assert "query" in first and "engram" in first and "summary" in first
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_benchmark_cli_runs_and_prints_json(tmp_path, cli_env):
     db_path = tmp_path / "cli_bench.db"
     result = subprocess.run(
@@ -177,7 +171,6 @@ def test_regression_all_hard_gates_pass(tmp_path):
     assert gate["hard_total"] == 34
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_regression_negative_cases_block_contamination(tmp_path):
     """Spot-check the anti-contamination assertions directly through recall.
 
@@ -303,7 +296,6 @@ def test_tech_decision_wangwu_not_in_db_decision(tmp_path):
     assert "李四" in answer
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_tech_decision_cli_gate(tmp_path, cli_env):
     result = subprocess.run(
         [
@@ -391,7 +383,6 @@ def test_bug_redis_hypothesis_failures_are_recalled(tmp_path):
     assert "仓储" in answer or "checkInventory" in answer
 
 
-@pytest.mark.xfail(reason="Needs full corpus data — trimmed during cleanup")
 def test_bug_investigation_cli_gate(tmp_path, cli_env):
     result = subprocess.run(
         [

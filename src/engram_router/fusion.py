@@ -13,7 +13,7 @@ Where:
 from __future__ import annotations
 
 import logging
-from typing import Any, Sequence
+from typing import Sequence
 
 logger = logging.getLogger(__name__)
 

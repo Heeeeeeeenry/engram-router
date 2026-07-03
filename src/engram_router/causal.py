@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import sqlite3
 from dataclasses import dataclass, field
-from typing import Any
+from typing import cast
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class CausalChain:
         row = self.conn.execute(
             "SELECT name FROM entities WHERE id = ?", (entity_id,)
         ).fetchone()
-        return row["name"] if row else entity_id
+        return cast(str, row["name"]) if row else entity_id
 
     def _load_edges(self) -> list[CausalEdge]:
         rows = self.conn.execute(
@@ -462,7 +462,7 @@ class Timeline:
             "SELECT sort_order FROM timed_events WHERE time_name = ? LIMIT 1",
             (time_name,),
         ).fetchone()
-        return row["sort_order"] if row else -1
+        return cast(int, row["sort_order"]) if row else -1
 
 
 # ---------------------------------------------------------------------------

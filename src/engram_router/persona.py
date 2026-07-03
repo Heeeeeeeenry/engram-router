@@ -21,8 +21,7 @@ import json
 import logging
 import sqlite3
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from .config import config
 
@@ -211,7 +210,7 @@ class PersonaStore:
         llm_extractor: Any | None = None,
     ) -> None:
         self._store = store
-        self._conn: sqlite3.Connection = store.conn  # type: ignore[assignment]
+        self._conn: sqlite3.Connection = store.conn
         self._llm_extractor = llm_extractor
         self._llm_available = (
             llm_extractor is not None and getattr(llm_extractor, "available", False)
@@ -255,7 +254,7 @@ class PersonaStore:
         """Generate a unique id via the existing id_sequences mechanism."""
         # Reuse the store's _next_id if we can; otherwise allocate directly.
         try:
-            return self._store._next_id("persona_attrs", "pa")
+            return cast(str, self._store._next_id("persona_attrs", "pa"))
         except (AttributeError, Exception):
             # Fallback: simple monotic counter via the id_sequences table.
             row = self._conn.execute(
@@ -335,10 +334,10 @@ class PersonaStore:
             text = mem["raw_text"]
             mem_conf = float(mem["confidence"])
 
-            for attr in _extract_attrs_from_text(text):
-                key = attr["key"]
+            for attr_data in _extract_attrs_from_text(text):
+                key = attr_data["key"]
                 ev = AttrEvidence(
-                    value=attr["value"],
+                    value=attr_data["value"],
                     source="rule",
                     memory_id=mid,
                     confidence=mem_conf,
@@ -758,12 +757,12 @@ class PersonaStore:
         json_match = re.search(r"\{[^{}]*\}", raw, re.DOTALL)
         if json_match:
             try:
-                return json.loads(json_match.group(0))
+                return cast(dict[str, Any], json.loads(json_match.group(0)))
             except json.JSONDecodeError:
                 pass
         # Try parsing the entire string directly.
         try:
-            return json.loads(raw)
+            return cast(dict[str, Any], json.loads(raw))
         except json.JSONDecodeError:
             return {}
 

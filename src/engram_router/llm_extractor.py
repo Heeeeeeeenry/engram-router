@@ -31,7 +31,7 @@ import re
 import threading
 from collections import OrderedDict
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -368,7 +368,7 @@ class LLMClient:
                     "LLM returned empty content (reasoning used all tokens?). "
                     "Try increasing max_tokens."
                 )
-            return content
+            return str(content)
         except urllib.error.HTTPError as e:
             logger.error("LLM API HTTP %d: %s", e.code, e.read().decode("utf-8", errors="replace")[:500])
             raise
@@ -394,9 +394,10 @@ class LLMExtractor:
         client: LLMClient | None = None,
         enabled: bool = True,
         cache_capacity: int = CACHE_CAPACITY,
+        allow_cloud: bool = True,
     ) -> None:
         self._client = client or LLMClient()
-        self.enabled = enabled and self._client.available
+        self.enabled = enabled and self._client.available and allow_cloud
         self._cache = LRUResultCache(capacity=cache_capacity)
 
     @property
@@ -431,7 +432,7 @@ class LLMExtractor:
 
         # Try direct parse first.
         try:
-            return json.loads(cleaned)
+            return cast(dict[str, Any], json.loads(cleaned))
         except json.JSONDecodeError:
             pass
 
@@ -457,7 +458,7 @@ class LLMExtractor:
 
         for obj in candidates:
             if "entities" in obj:
-                return obj
+                return cast(dict[str, Any], obj)
 
         # Fallback: return first dict or empty.
         if candidates:
@@ -518,16 +519,16 @@ class LLMExtractor:
 
         if candidates:
             results = candidates[0].get("results", [])
-            by_index: dict[int, dict[str, Any]] = {}
+            by_index_fb: dict[int, dict[str, Any]] = {}
             for item in results:
                 idx = int(item.get("index", -1))
                 if 0 <= idx < count:
-                    by_index[idx] = {
+                    by_index_fb[idx] = {
                         "entities": item.get("entities", []),
                         "edges": item.get("edges", []),
                     }
             return [
-                by_index.get(i, {"entities": [], "edges": []})
+                by_index_fb.get(i, {"entities": [], "edges": []})
                 for i in range(count)
             ]
 
@@ -871,7 +872,7 @@ def extract_edges_llm(text: str) -> list[dict[str, Any]]:
     if ext is None:
         return []
     result = ext.extract(text)
-    return result.get("edges", [])
+    return cast(list[dict[str, Any]], result.get("edges", []))
 
 
 def llm_extractor_instance() -> LLMExtractor | None:

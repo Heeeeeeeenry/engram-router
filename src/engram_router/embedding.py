@@ -19,8 +19,9 @@ import json
 import logging
 import os
 import threading
-from pathlib import Path
-from typing import Any, Sequence
+import urllib.error
+import urllib.request
+from typing import Any, Sequence, cast
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,7 @@ class EmbeddingEngine:
         api_key: str | None = None,
         api_model: str = "text-embedding-3-small",
         cache_size: int = 1024,
+        allow_remote: bool = True,
     ):
         self._model_key = model
         self._model_info = self._MODELS.get(model, self._MODELS["bge-small"])
@@ -68,6 +70,7 @@ class EmbeddingEngine:
         self._api_base = api_base or os.environ.get("ENGRAM_EMBEDDING_API_BASE")
         self._api_key = api_key or os.environ.get("ENGRAM_EMBEDDING_API_KEY")
         self._api_model = api_model
+        self._allow_remote = allow_remote
         self._local_model = None
         self._lock = threading.Lock()
         self._initialized = False
@@ -84,7 +87,7 @@ class EmbeddingEngine:
 
     @property
     def dim(self) -> int:
-        return self._model_info["dim"]
+        return cast(int, self._model_info["dim"])
 
     @property
     def backend_name(self) -> str:
@@ -104,7 +107,7 @@ class EmbeddingEngine:
         if not self._initialized:
             return None
         single = isinstance(texts, str)
-        batch = [texts] if single else list(texts)
+        batch: list[str] = [texts] if single else list(texts)  # type: ignore[list-item]
         try:
             if self._backend in ("local", "auto") and self._local_model:
                 vecs = self._encode_local(batch)
@@ -159,7 +162,7 @@ class EmbeddingEngine:
                 self._init_error = f"local model load failed: {exc}"
 
         if self._backend in ("auto", "remote"):
-            if self._api_key:
+            if self._allow_remote and self._api_key:
                 self._backend = "remote"
                 self._initialized = True
                 logger.info(
@@ -203,8 +206,8 @@ class EmbeddingEngine:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 data = json.loads(resp.read())
         except urllib.error.HTTPError as exc:
-            body = exc.read().decode()
-            raise RuntimeError(f"Embedding API error {exc.code}: {body[:200]}")
+            err_body = exc.read().decode()
+            raise RuntimeError(f"Embedding API error {exc.code}: {err_body[:200]}")
 
         # Sort by index to maintain input order
         items = sorted(data["data"], key=lambda x: x["index"])

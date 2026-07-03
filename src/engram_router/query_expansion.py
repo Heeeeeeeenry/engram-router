@@ -20,7 +20,7 @@ import threading
 import time
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +108,13 @@ _DEFAULT_SYNONYMS: dict[str, list[str]] = {
     "什么牌子": ["品牌", "型号", "哪个牌子"],
     "多少钱": ["价格", "多少钱", "价位", "费用"],
     "怎么样": ["评价", "体验", "好用吗"],
+
+    # ── 上位词（品类→上位词方向，增强 FTS5 召回） ──
+    "交通工具": ["车", "电动车", "汽车", "自行车", "地铁", "火车", "飞机"],
+    "外设": ["键盘", "鼠标", "显示器", "耳机", "音响", "摄像头"],
+    "电子设备": ["手机", "平板", "电脑", "笔记本"],
+    "家具": ["桌子", "椅子", "沙发", "床", "柜子"],
+    "宠物": ["猫", "狗", "鱼", "鸟"],
 }
 
 
@@ -214,7 +221,7 @@ def _parse_json_response(raw: str) -> dict[str, Any]:
 
     # Direct parse.
     try:
-        return json.loads(cleaned)
+        return cast(dict[str, Any], json.loads(cleaned))
     except json.JSONDecodeError:
         pass
 
@@ -240,7 +247,7 @@ def _parse_json_response(raw: str) -> dict[str, Any]:
 
     for obj in candidates:
         if "variants" in obj or "entities" in obj:
-            return obj
+            return cast(dict[str, Any], obj)
 
     if candidates:
         return candidates[0]
@@ -268,7 +275,7 @@ class LLMQueryRewriter:
     @property
     def available(self) -> bool:
         """Whether the LLM API is available (has API key)."""
-        return self._client.available
+        return cast(bool, self._client.available)
 
     def rewrite(self, query: str) -> RewriteResult:
         """Call LLM to rewrite a colloquial query into search variants.
@@ -402,10 +409,11 @@ class QueryExpander:
         llm_client: Any | None = None,
         cache_size: int = 256,
         enable_llm: bool = True,
+        allow_cloud_llm: bool = True,
     ) -> None:
         self._synonym_table = synonym_table or SynonymTable()
         self._cache = ExpansionCache(max_size=cache_size)
-        self._enable_llm = enable_llm
+        self._enable_llm = enable_llm and allow_cloud_llm
         self._rewriter = LLMQueryRewriter(client=llm_client, max_variants=4)
 
         # Stats.
@@ -440,7 +448,6 @@ class QueryExpander:
 
         # Step 2: Synonym expansion (zero dependency, always runs).
         synonyms = self._synonym_table.expand(query)
-        extra_entities: list[dict[str, Any]] = []
 
         # Step 3: LLM expansion.
         llm_variants: list[str] = []

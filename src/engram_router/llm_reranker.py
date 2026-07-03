@@ -17,7 +17,7 @@ import json
 import logging
 import os
 import re
-from typing import Any
+from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +39,7 @@ class LLMReranker:
         max_candidates: int = 10,
         weight_llm: float = 0.4,
         weight_rule: float = 0.6,
+        allow_cloud: bool = True,
     ):
         self.api_key = api_key or os.environ.get("ENGRAM_LLM_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
         self.base_url = base_url or os.environ.get("ENGRAM_LLM_BASE_URL")
@@ -46,7 +47,7 @@ class LLMReranker:
         self.max_candidates = max_candidates
         self.weight_llm = weight_llm
         self.weight_rule = weight_rule
-        self._available = bool(self.api_key)
+        self._available = bool(self.api_key) and allow_cloud
 
     @property
     def available(self) -> bool:
@@ -132,7 +133,7 @@ class LLMReranker:
                 raise ValueError(f"Invalid LLM score: {s}")
         while len(scores) < len(candidates):
             scores.append(0.0)
-        return scores[: len(candidates)]
+        return cast("list[float]", scores[: len(candidates)])
 
     @staticmethod
     def _sanitize(text: str) -> str:
