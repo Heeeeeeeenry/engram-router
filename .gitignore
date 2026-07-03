@@ -35,5 +35,13 @@ Thumbs.db
 *.pkl
 docs/multi_angle_eval_report.json
 
+# Audit artifacts
+.coverage
+AUDIT_FINAL_REPORT.md
+PERF_REPORT.md
+XFAIL_ROOT_CAUSE_REPORT.md
+perf_benchmark_results.json
+tests/audit/
+
 # UV
 uv.lock
