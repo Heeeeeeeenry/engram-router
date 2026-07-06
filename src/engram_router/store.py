@@ -752,8 +752,11 @@ class MemoryStore:
         try:
             from .entities import extract_entities
             for ent in extract_entities(text):
-                if ent.get("kind") == "person" and ent.get("name", "") not in ("我", "你", "他", "她", "它"):
-                    self.persona.aggregate(ent["name"])
+                name = ent.get("name", "")
+                if ent.get("kind") == "person" and name not in ("我", "你", "他", "她", "它"):
+                    persona = self.persona.aggregate(name)
+                    if persona is not None:
+                        self.persona.update(persona)
         except Exception:
             pass
 
