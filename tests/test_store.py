@@ -3,6 +3,7 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
+from engram_router.query_expansion import ExpandedQuery
 from engram_router.store import MemoryStore
 
 
@@ -381,6 +382,68 @@ def test_default_namespace_isolation(tmp_path):
 
     assert len(store.recall("data")) == 1
     assert len(store.recall("data", namespace="custom")) == 1
+
+
+def test_fts_candidate_rows_respect_namespace(tmp_path):
+    """FTS candidate hydration must not cross namespace boundaries."""
+    store = MemoryStore(enable_vector=False, path=tmp_path / "memory.db")
+    store.save("sharedkeyword belongs to work only", namespace="work")
+    store.save("sharedkeyword belongs to personal only", namespace="personal")
+
+    work_records = store.recall("sharedkeyword", namespace="work", top_k=5)
+    assert work_records
+    assert all("personal" not in r.raw_text for r in work_records)
+
+    personal_records = store.recall("sharedkeyword", namespace="personal", top_k=5)
+    assert personal_records
+    assert all("work" not in r.raw_text for r in personal_records)
+
+
+class _VariantExpander:
+    def expand(self, query: str, async_llm: bool = False) -> ExpandedQuery:
+        return ExpandedQuery(original=query, variants=[query])
+
+
+def test_query_expansion_rrf_rows_respect_namespace(tmp_path):
+    """RRF-fused query variants must rehydrate rows inside the requested namespace."""
+    store = MemoryStore(
+        enable_vector=False,
+        path=tmp_path / "memory.db",
+        query_expander=_VariantExpander(),
+    )
+    store.save("sharedkeyword work memory", namespace="work")
+    store.save("sharedkeyword personal memory", namespace="personal")
+
+    work_records = store.recall("sharedkeyword", namespace="work", top_k=5)
+    assert work_records
+    assert all("personal" not in r.raw_text for r in work_records)
+
+    personal_records = store.recall("sharedkeyword", namespace="personal", top_k=5)
+    assert personal_records
+    assert all("work" not in r.raw_text for r in personal_records)
+
+
+def test_edge_expansion_hydration_respects_namespace(tmp_path):
+    """Edge-expansion candidate hydration must stay inside the requested namespace.
+
+    The entity table is shared across namespaces (name+kind is the unique key),
+    so a memory in ns=work and one in ns=personal that mention the same person
+    end up pointing at the same entity row. Recall in ns=work must not surface
+    the ns=personal memory via edge traversal — even if that memory is only
+    reached through the missing-edge-ids rehydration branch.
+    """
+    store = MemoryStore(enable_vector=False, path=tmp_path / "memory.db")
+    # Same shared entity name across two namespaces.
+    store.save("Alice went to Paris last summer", namespace="work")
+    store.save("Alice bought a new bike yesterday", namespace="personal")
+
+    work_records = store.recall("Alice Paris", namespace="work", top_k=5)
+    assert work_records
+    assert all("bike" not in r.raw_text for r in work_records)
+
+    personal_records = store.recall("Alice bike", namespace="personal", top_k=5)
+    assert personal_records
+    assert all("Paris" not in r.raw_text for r in personal_records)
 
 
 def test_namespace_migration_preserves_existing_data(tmp_path):

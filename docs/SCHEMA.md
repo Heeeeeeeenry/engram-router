@@ -2,7 +2,7 @@
 
 This document records the **actual** SQLite schema as implemented in
 `src/engram_router/store.py` (`MemoryStore._init_schema`), plus how the tables
-map onto the compaction layers described in `ARCHITECTURE.md`.
+map onto the current memory-routing pipeline described in `docs/PROJECT_BRIEF.md` and the source code in `src/engram_router/store.py`.
 
 It is the source of truth for the on-disk shape. If the code and this file ever
 disagree, the code wins — update this file to match.

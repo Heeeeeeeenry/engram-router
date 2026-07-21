@@ -8,6 +8,12 @@
 EngramRouter 把对话原封不动保存，只在需要时召回最相关的片段——
 不相关的绝不进上下文，需要的带证据回来。
 
+## 文档入口
+
+- [项目概要](docs/PROJECT_BRIEF.md): 当前状态、保留原则、可改进点、可修改点、删除点
+- [存储结构](docs/SCHEMA.md): SQLite 实际 schema
+- [贡献说明](CONTRIBUTING.md): 变更约束和协作规则
+
 ## 核心能力
 
 ```
@@ -82,6 +88,12 @@ engram-mcp --db ~/.engram/memory.db
 | `ENGRAM_SKIP_VECTOR=1` | 跳过高开销的向量模型加载，测试用 |
 | `ENGRAM_EXPANSION_LLM=0` | 关闭 LLM 查询扩展 |
 | `DEEPSEEK_API_KEY` | LLM 功能（可选，降级可用） |
+| `ENGRAM_ALLOW_CLOUD=1` | 一次性打开所有云端调用（LLM 抽取 / 云端 embedding / LLM 重排） |
+| `ENGRAM_ALLOW_CLOUD_LLM=1` | 只允许 LLM 抽取 / 查询改写走云端 |
+| `ENGRAM_ALLOW_CLOUD_EMBEDDING=1` | 只允许 embedding 调用云端 API |
+| `ENGRAM_ALLOW_CLOUD_RERANKER=1` | 只允许 LLM 语义重排调用云端 |
+
+默认情况下即便配置了 API key，云端调用也是关闭的（本地优先原则）。以上变量取值 `1 / true / yes / on`（大小写不敏感）才生效，其他值一律视为关闭。
 
 测试：`ENGRAM_SKIP_VECTOR=1 pytest -q`  → **265 passed, 12 xfailed（4 秒）**
 

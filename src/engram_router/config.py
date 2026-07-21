@@ -223,6 +223,60 @@ class PrivacyConfig:
         )
 
 
+# Environment-variable overrides for cloud-privacy switches.  Values are
+# strings; "1" / "true" / "yes" / "on" (case-insensitive) enable, anything
+# else (including empty) leaves the current setting.  These env vars are the
+# supported way to opt in when running outside a YAML config, so `default=False`
+# on the module `allow_*` parameters does not lock non-developer users out.
+_ALLOW_CLOUD_TRUE = frozenset({"1", "true", "yes", "on"})
+_ENV_ALLOW_CLOUD_ALL = "ENGRAM_ALLOW_CLOUD"
+_ENV_ALLOW_CLOUD_LLM = "ENGRAM_ALLOW_CLOUD_LLM"
+_ENV_ALLOW_CLOUD_EMBEDDING = "ENGRAM_ALLOW_CLOUD_EMBEDDING"
+_ENV_ALLOW_CLOUD_RERANKER = "ENGRAM_ALLOW_CLOUD_RERANKER"
+
+
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in _ALLOW_CLOUD_TRUE
+
+
+def env_allows_cloud(kind: str) -> bool:
+    """Return True when either the global or per-kind env var is set.
+
+    kind: "llm" | "embedding" | "reranker"
+    Used by the module-level engines so a bare ``EmbeddingEngine()`` call
+    (i.e., not going through MemoryStore/config) still respects the env flag.
+    """
+    per_kind = {
+        "llm": _ENV_ALLOW_CLOUD_LLM,
+        "embedding": _ENV_ALLOW_CLOUD_EMBEDDING,
+        "reranker": _ENV_ALLOW_CLOUD_RERANKER,
+    }.get(kind)
+    if per_kind is None:
+        return False
+    return _env_flag(_ENV_ALLOW_CLOUD_ALL) or _env_flag(per_kind)
+
+
+def _apply_env_privacy_overrides(cfg: "EngramConfig") -> None:
+    """Apply ENGRAM_ALLOW_CLOUD* env vars on top of YAML/defaults.
+
+    Env vars can only *enable* cloud (never disable it) — a YAML-disabled
+    setting stays disabled unless the user also sets the env var. This keeps
+    the "opt-in" contract: nothing goes to the cloud unless explicitly turned
+    on somewhere.
+    """
+    if _env_flag(_ENV_ALLOW_CLOUD_ALL):
+        cfg.privacy.allow_cloud_llm = True
+        cfg.privacy.allow_cloud_embedding = True
+        cfg.privacy.allow_cloud_reranker = True
+        return
+    if _env_flag(_ENV_ALLOW_CLOUD_LLM):
+        cfg.privacy.allow_cloud_llm = True
+    if _env_flag(_ENV_ALLOW_CLOUD_EMBEDDING):
+        cfg.privacy.allow_cloud_embedding = True
+    if _env_flag(_ENV_ALLOW_CLOUD_RERANKER):
+        cfg.privacy.allow_cloud_reranker = True
+
+
 @dataclass
 class ExpansionConfig:
     """Query expansion configuration."""
@@ -313,3 +367,6 @@ def _deep_merge(base: Any, override: Any) -> None:
 # ═══════════════════════════════════════════════════════════════════════════
 
 config = EngramConfig.load()
+# Apply env overrides after load() so ENGRAM_ALLOW_CLOUD* wins over YAML/defaults.
+# Only enable is allowed via env (never disable).
+_apply_env_privacy_overrides(config)

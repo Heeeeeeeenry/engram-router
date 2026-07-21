@@ -7,8 +7,8 @@ Thanks for helping build EngramRouter.
 Read these first:
 
 1. `docs/PROJECT_BRIEF.md`
-2. `docs/DEVELOPMENT_RULES.md`
-3. `docs/ROADMAP.md`
+2. `docs/SCHEMA.md`
+3. `README.md`
 
 ## The Most Important Rule
 

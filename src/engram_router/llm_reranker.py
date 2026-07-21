@@ -39,7 +39,7 @@ class LLMReranker:
         max_candidates: int = 10,
         weight_llm: float = 0.4,
         weight_rule: float = 0.6,
-        allow_cloud: bool = True,
+        allow_cloud: bool | None = None,
     ):
         self.api_key = api_key or os.environ.get("ENGRAM_LLM_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
         self.base_url = base_url or os.environ.get("ENGRAM_LLM_BASE_URL")
@@ -47,6 +47,10 @@ class LLMReranker:
         self.max_candidates = max_candidates
         self.weight_llm = weight_llm
         self.weight_rule = weight_rule
+        # allow_cloud=None → default off, but env var can flip on.
+        if allow_cloud is None:
+            from .config import env_allows_cloud
+            allow_cloud = env_allows_cloud("reranker")
         self._available = bool(self.api_key) and allow_cloud
 
     @property

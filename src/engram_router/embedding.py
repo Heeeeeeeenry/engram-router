@@ -62,7 +62,7 @@ class EmbeddingEngine:
         api_key: str | None = None,
         api_model: str = "text-embedding-3-small",
         cache_size: int = 1024,
-        allow_remote: bool = True,
+        allow_remote: bool | None = None,
     ):
         self._model_key = model
         self._model_info = self._MODELS.get(model, self._MODELS["bge-small"])
@@ -70,6 +70,13 @@ class EmbeddingEngine:
         self._api_base = api_base or os.environ.get("ENGRAM_EMBEDDING_API_BASE")
         self._api_key = api_key or os.environ.get("ENGRAM_EMBEDDING_API_KEY")
         self._api_model = api_model
+        # allow_remote resolution:
+        #   explicit True/False  → honor caller
+        #   None (unspecified)   → default off, but ENGRAM_ALLOW_CLOUD /
+        #                          ENGRAM_ALLOW_CLOUD_EMBEDDING can flip on
+        if allow_remote is None:
+            from .config import env_allows_cloud
+            allow_remote = env_allows_cloud("embedding")
         self._allow_remote = allow_remote
         self._local_model = None
         self._lock = threading.Lock()

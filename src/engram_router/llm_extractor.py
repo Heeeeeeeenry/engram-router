@@ -394,9 +394,14 @@ class LLMExtractor:
         client: LLMClient | None = None,
         enabled: bool = True,
         cache_capacity: int = CACHE_CAPACITY,
-        allow_cloud: bool = True,
+        allow_cloud: bool | None = None,
     ) -> None:
         self._client = client or LLMClient()
+        # allow_cloud=None → default off, but ENGRAM_ALLOW_CLOUD /
+        # ENGRAM_ALLOW_CLOUD_LLM can flip on.
+        if allow_cloud is None:
+            from .config import env_allows_cloud
+            allow_cloud = env_allows_cloud("llm")
         self.enabled = enabled and self._client.available and allow_cloud
         self._cache = LRUResultCache(capacity=cache_capacity)
 

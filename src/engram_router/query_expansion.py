@@ -409,10 +409,14 @@ class QueryExpander:
         llm_client: Any | None = None,
         cache_size: int = 256,
         enable_llm: bool = True,
-        allow_cloud_llm: bool = True,
+        allow_cloud_llm: bool | None = None,
     ) -> None:
         self._synonym_table = synonym_table or SynonymTable()
         self._cache = ExpansionCache(max_size=cache_size)
+        # allow_cloud_llm=None → default off, but env var can flip on.
+        if allow_cloud_llm is None:
+            from .config import env_allows_cloud
+            allow_cloud_llm = env_allows_cloud("llm")
         self._enable_llm = enable_llm and allow_cloud_llm
         self._rewriter = LLMQueryRewriter(client=llm_client, max_variants=4)
 

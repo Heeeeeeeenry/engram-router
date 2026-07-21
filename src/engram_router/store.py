@@ -1022,18 +1022,24 @@ class MemoryStore:
             )
         return rows
 
-    def _row_by_id(self, mem_id: str) -> sqlite3.Row | None:
+    def _row_by_id(self, mem_id: str, namespace: str | None = None) -> sqlite3.Row | None:
         """Fetch a single memory row by id. Returns None if not found."""
-        row = self.conn.execute(
-            "SELECT * FROM memories WHERE id = ?", (mem_id,)
-        ).fetchone()
+        if namespace is None:
+            row = self.conn.execute(
+                "SELECT * FROM memories WHERE id = ?", (mem_id,)
+            ).fetchone()
+        else:
+            row = self.conn.execute(
+                "SELECT * FROM memories WHERE id = ? AND namespace = ?",
+                (mem_id, namespace),
+            ).fetchone()
         return cast("sqlite3.Row | None", row)
 
     def _memory_rows(self, fts_ids: set[str] | None,
                      namespace: str = "default") -> list[sqlite3.Row]:
         """Fetch rows to score, using non-empty FTS hits as a candidate filter."""
         if fts_ids:
-            return self._rows_by_ids(list(fts_ids), ordered=True)
+            return self._rows_by_ids(list(fts_ids), ordered=True, namespace=namespace)
         # Full-scan fallback: cap at a generous limit to bound scoring cost,
         # then let the Python ranker pick the best top_k.  ORDER BY created_at
         # DESC ensures recent memories win ties; the composite index
@@ -1202,7 +1208,7 @@ class MemoryStore:
                 # Sort merged results by RRF score.
                 scored: list[tuple[float, str, Any]] = []
                 for mem_id, rrf_score in merged:
-                    row = self._row_by_id(mem_id)
+                    row = self._row_by_id(mem_id, namespace=namespace)
                     if row is not None:
                         # Boost RRF scores to comparable range
                         scored.append((rrf_score * 10, "rrf-fused", row))
@@ -1271,7 +1277,10 @@ class MemoryStore:
                                           namespace=namespace)
         missing_edge_ids = sorted(set(edge_bonus) - {r["id"] for r in rows})
         if missing_edge_ids:
-            rows.extend(self._rows_by_ids(missing_edge_ids))
+            # Namespace must be threaded here — edge_bonus may include memory
+            # ids whose entities are cross-namespace duplicates; without the
+            # filter, hydration would leak rows from other namespaces.
+            rows.extend(self._rows_by_ids(missing_edge_ids, namespace=namespace))
             entity_map = self._entities_for_memories([r["id"] for r in rows])
 
         scored = self._build_scored_candidates(
@@ -1558,7 +1567,7 @@ class MemoryStore:
                                           entity_map=entity_map, namespace=namespace)
         missing_edge_ids = sorted(set(edge_bonus) - {r["id"] for r in rows})
         if missing_edge_ids:
-            rows.extend(self._rows_by_ids(missing_edge_ids))
+            rows.extend(self._rows_by_ids(missing_edge_ids, namespace=namespace))
             entity_map = self._entities_for_memories([r["id"] for r in rows])
 
         scored = self._build_scored_candidates(
