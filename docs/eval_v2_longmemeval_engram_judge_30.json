@@ -1,0 +1,965 @@
+{
+  "timestamp": "2026-07-22T18:19:55",
+  "split": "oracle",
+  "limit": 30,
+  "question_types": null,
+  "use_judge": true,
+  "results": {
+    "engram/ce+/hyde-": {
+      "provider": "engram/ce+/hyde-",
+      "aggregate": {
+        "total_cases": 30,
+        "p_at_1": 0.1,
+        "p_at_3": 0.1333,
+        "p_at_5": 0.1333,
+        "mrr": 0.1111,
+        "ndcg_at_5": 0.115,
+        "recall_at_5": 0.1333,
+        "latency_ms_avg": 12374.2,
+        "latency_ms_p95": 18934.5,
+        "judge_accuracy": 0.8333,
+        "judge_latency_ms_avg": 15406.7
+      },
+      "by_question_type": {
+        "temporal-reasoning": {
+          "n": 30,
+          "p_at_1": 0.1,
+          "mrr": 0.1111,
+          "judge_accuracy": 0.8333
+        }
+      },
+      "per_case": [
+        {
+          "question_id": "gpt4_2655b836",
+          "question_type": "temporal-reasoning",
+          "query": "What was the first issue I had with my new car after its first service?",
+          "answer": "GPS system not functioning correctly",
+          "num_memories": 18,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 12631.5,
+          "top_3": [
+            {
+              "score": 0.8093,
+              "text": "I'm thinking of getting my car detailed soon. Do you know any good detailers in the area or have any"
+            },
+            {
+              "score": 0.7879,
+              "text": "I've been doing some research and found a local detailer with great reviews. I was thinking of takin"
+            },
+            {
+              "score": 0.7804,
+              "text": "I'll definitely ask those questions when I visit the detailer. And yeah, the GPS issue was a bit fru"
+            }
+          ],
+          "judge_correct": 0,
+          "judge_reason": "pipeline error: The read operation timed out"
+        },
+        {
+          "question_id": "gpt4_2487a7cb",
+          "question_type": "temporal-reasoning",
+          "query": "Which event did I attend first, the 'Effective Time Management' workshop or the 'Data Analysis using Python' webinar?",
+          "answer": "'Data Analysis using Python' webinar",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 11171.8,
+          "top_3": [
+            {
+              "score": 0.805,
+              "text": "I'm actually familiar with some of these resources, I participated in a webinar on \"Data Analysis us"
+            },
+            {
+              "score": 0.7993,
+              "text": "I've been thinking about my goals and priorities lately, and I realized that I want to focus more on"
+            },
+            {
+              "score": 0.7813,
+              "text": "I'm trying to work on a project that involves data analysis, and I was wondering if you could recomm"
+            }
+          ],
+          "generated_answer": "The 'Data Analysis using Python' webinar (two months ago) was before the 'Effective Time Management' workshop (last Saturday).",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer confirms the Data Analysis using Python webinar was first, matching the reference, and adds extra temporal details."
+        },
+        {
+          "question_id": "gpt4_76048e76",
+          "question_type": "temporal-reasoning",
+          "query": "Which vehicle did I take care of first in February, the bike or the car?",
+          "answer": "bike",
+          "num_memories": 12,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9060254355346824,
+          "recall_at_5": 1.0,
+          "latency_ms": 16508.5,
+          "top_3": [
+            {
+              "score": 0.8096,
+              "text": "I'm thinking of getting a new bike rack for my car. Do you have any recommendations? By the way, I'v"
+            },
+            {
+              "score": 0.804,
+              "text": "I'm thinking of getting a newer car and I'm researching the new hybrid model of my current Toyota Co"
+            },
+            {
+              "score": 0.7819,
+              "text": "I'm glad to hear about the advanced safety features of the Corolla Hybrid. By the way, I recently ha"
+            }
+          ],
+          "generated_answer": "Your bike repair in mid-February came before the car wash on February 27.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer correctly identifies the bike as the vehicle taken care of first, matching the reference."
+        },
+        {
+          "question_id": "gpt4_2312f94c",
+          "question_type": "temporal-reasoning",
+          "query": "Which device did I got first, the Samsung Galaxy S22 or the Dell XPS 13?",
+          "answer": "Samsung Galaxy S22",
+          "num_memories": 12,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "latency_ms": 7357.1,
+          "top_3": [
+            {
+              "score": 0.6557,
+              "text": "I'm planning a trip to Hawaii and I need to pack the right adapters for my devices. Can you help me "
+            },
+            {
+              "score": 0.6426,
+              "text": "I'm planning a trip to Hawaii and I want to make sure my new phone stays charged. Can you recommend "
+            },
+            {
+              "score": 0.6375,
+              "text": "I was planning to bring my portable power bank, Anker PowerCore 20000, which I bought from Amazon on"
+            }
+          ],
+          "generated_answer": "Samsung Galaxy S22 (acquired February 20th) came before the Dell XPS 13 (arrived February 25th).",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly identifies the Samsung Galaxy S22 as first and adds extra accurate detail."
+        },
+        {
+          "question_id": "0bb5a684",
+          "question_type": "temporal-reasoning",
+          "query": "How many days before the team meeting I was preparing for did I attend the workshop on 'Effective Communication in the Workplace'?",
+          "answer": "7 days. 8 days (including the last day) is also acceptable.",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16412.2,
+          "top_3": [
+            {
+              "score": 0.8093,
+              "text": "I'm glad I attended that workshop on \"Effective Communication in the Workplace\" on January 10th, as "
+            },
+            {
+              "score": 0.8092,
+              "text": "I'm preparing for an upcoming meeting with my team and I want to make sure I'm effectively communica"
+            },
+            {
+              "score": 0.7843,
+              "text": "I'd like to ask about the importance of self-awareness in effective communication. As I reflect on t"
+            }
+          ],
+          "generated_answer": "7 days.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer '7 days' matches the reference's primary answer and is explicitly acceptable."
+        },
+        {
+          "question_id": "08f4fc43",
+          "question_type": "temporal-reasoning",
+          "query": "How many days had passed between the Sunday mass at St. Mary's Church and the Ash Wednesday service at the cathedral?",
+          "answer": "30 days. 31 days (including the last day) is also acceptable.",
+          "num_memories": 11,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 10326.2,
+          "top_3": [
+            {
+              "score": 0.6505,
+              "text": "I'm planning to volunteer at a local soup kitchen this weekend and I was wondering if you could give"
+            },
+            {
+              "score": 0.6452,
+              "text": "I'm thinking of volunteering at a local charity event soon. Do you have any information on organizat"
+            },
+            {
+              "score": 0.64,
+              "text": "That's really helpful, thank you! I think I'll suggest to my Bible study group that we organize a fo"
+            }
+          ],
+          "generated_answer": "30 days",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the reference answer exactly as one of the acceptable values."
+        },
+        {
+          "question_id": "2c63a862",
+          "question_type": "temporal-reasoning",
+          "query": "How many days did it take for me to find a house I loved after starting to work with Rachel?",
+          "answer": "14 days. 15 days (including the last day) is also acceptable.",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 20420.1,
+          "top_3": [
+            {
+              "score": 0.8197,
+              "text": "I've already got pre-approved for a mortgage, actually, on February 10th. The amount was $350,000, w"
+            },
+            {
+              "score": 0.8013,
+              "text": "I'm looking for some advice on neighborhoods near my workplace. I've been working with a real estate"
+            },
+            {
+              "score": 0.7913,
+              "text": "I work in the city of Irvine, California. I'm looking for a family-friendly area with good schools a"
+            }
+          ],
+          "generated_answer": "14 days.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer '14 days' matches one of the acceptable answers explicitly listed in the reference."
+        },
+        {
+          "question_id": "gpt4_385a5000",
+          "question_type": "temporal-reasoning",
+          "query": "Which seeds were started first, the tomatoes or the marigolds?",
+          "answer": "Tomatoes",
+          "num_memories": 10,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 8400.0,
+          "top_3": [
+            {
+              "score": 0.6531,
+              "text": "I'm planning to plant out my seedlings soon and I'm wondering if you can tell me the average soil te"
+            },
+            {
+              "score": 0.6376,
+              "text": "Now that I know the average soil temperature in my area, I'm wondering if it's too early to plant ou"
+            },
+            {
+              "score": 0.6251,
+              "text": "I'm thinking of using a combination of stakes and twine to provide support for my marigolds. Would i"
+            }
+          ],
+          "generated_answer": "Tomatoes were started first (around February 20th), while marigolds were started later (around March 3rd).",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly identifies tomatoes as being started first, with extra details that do not contradict the reference."
+        },
+        {
+          "question_id": "2a1811e2",
+          "question_type": "temporal-reasoning",
+          "query": "How many days had passed between the Hindu festival of Holi and the Sunday mass at St. Mary's Church?",
+          "answer": "21 days. 22 days (including the last day) is also acceptable.",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 11454.3,
+          "top_3": [
+            {
+              "score": 0.817,
+              "text": "I'm planning to volunteer at a local community event next weekend and I was wondering if you could s"
+            },
+            {
+              "score": 0.8014,
+              "text": "I'm excited to share these social media tips with my team to help promote our charity event. By the "
+            },
+            {
+              "score": 0.7863,
+              "text": "That's super helpful, thank you! I think we can definitely make the bake sale a success with these t"
+            }
+          ],
+          "generated_answer": "21 days",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the primary acceptable value '21 days'."
+        },
+        {
+          "question_id": "bbf86515",
+          "question_type": "temporal-reasoning",
+          "query": "How many days before the 'Rack Fest' did I participate in the 'Turbocharged Tuesdays' event?",
+          "answer": "4 days.",
+          "num_memories": 11,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 10310.4,
+          "top_3": [
+            {
+              "score": 0.6505,
+              "text": "I'm thinking of getting a new set of wheels and tires for my 2018 Ford Mustang GT. I've been looking"
+            },
+            {
+              "score": 0.6427,
+              "text": "I'm looking for some recommendations on performance air filters for my 2018 Ford Mustang GT. I recen"
+            },
+            {
+              "score": 0.6426,
+              "text": "I'm also looking for some advice on how to optimize my car's performance for auto racking events. Do"
+            }
+          ],
+          "generated_answer": "4 days",
+          "judge_correct": 1,
+          "judge_reason": "Exact match"
+        },
+        {
+          "question_id": "gpt4_5dcc0aab",
+          "question_type": "temporal-reasoning",
+          "query": "Which pair of shoes did I clean last month?",
+          "answer": "white Adidas sneakers",
+          "num_memories": 29,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "latency_ms": 12581.1,
+          "top_3": [
+            {
+              "score": 0.8096,
+              "text": "I remember I cleaned my white Adidas sneakers last month, which I'd been meaning to do for weeks. Th"
+            },
+            {
+              "score": 0.794,
+              "text": "I'll definitely check out those options to find a good cobbler. And, I almost forgot, I also need to"
+            },
+            {
+              "score": 0.7791,
+              "text": "I'm looking for some advice on choosing a new pair of hiking boots. I'm planning a trip to the mount"
+            }
+          ],
+          "generated_answer": "Your white Adidas sneakers.",
+          "judge_correct": 1,
+          "judge_reason": "Candidate answer matches the reference with minor wording change."
+        },
+        {
+          "question_id": "gpt4_0b2f1d21",
+          "question_type": "temporal-reasoning",
+          "query": "Which event happened first, the purchase of the coffee maker or the malfunction of the stand mixer?",
+          "answer": "The malfunction of the stand mixer",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 13937.4,
+          "top_3": [
+            {
+              "score": 0.817,
+              "text": "I'm thinking of making some desserts for my dinner party, and I was wondering if you have any ideas "
+            },
+            {
+              "score": 0.7965,
+              "text": "I'm also thinking of organizing a dinner party soon, and I want to make sure I have all the necessar"
+            },
+            {
+              "score": 0.7779,
+              "text": "I'm having some issues with my coffee maker's performance lately. I bought it about three weeks ago,"
+            }
+          ],
+          "generated_answer": "The stand mixer malfunction occurred first, as it was taken to a repair shop last month, while the coffee maker was purchased about three weeks ago.",
+          "judge_correct": 1,
+          "judge_reason": "Candidate correctly states the stand mixer malfunction happened first, with extra detail that does not contradict the reference."
+        },
+        {
+          "question_id": "f0853d11",
+          "question_type": "temporal-reasoning",
+          "query": "How many days had passed between the 'Walk for Hunger' event and the 'Coastal Cleanup' event?",
+          "answer": "14 days. 8 days (including the last day) is also acceptable.",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16155.7,
+          "top_3": [
+            {
+              "score": 0.8144,
+              "text": "I'm interested in learning more about the \"American Cancer Society's Making Strides Against Breast C"
+            },
+            {
+              "score": 0.8041,
+              "text": "I'm looking to find some new charity events to participate in, particularly ones that involve walkin"
+            },
+            {
+              "score": 0.7964,
+              "text": "I'm excited to explore these opportunities further. Since I volunteered at the Coastal Cleanup event"
+            }
+          ],
+          "generated_answer": "14 days",
+          "judge_correct": 1,
+          "judge_reason": "The candidate provides one of the explicitly acceptable answers (14 days)."
+        },
+        {
+          "question_id": "gpt4_6ed717ea",
+          "question_type": "temporal-reasoning",
+          "query": "Which item did I purchase first, the dog bed for Max or the training pads for Luna?",
+          "answer": "Training pads for Luna",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 17970.2,
+          "top_3": [
+            {
+              "score": 0.792,
+              "text": "I'm thinking of getting some more supplies for my puppy, Luna. She's still in potty-training, and I'"
+            },
+            {
+              "score": 0.7917,
+              "text": "I'm also interested in getting a better handle on flea and tick prevention for both Luna and my gold"
+            },
+            {
+              "score": 0.7896,
+              "text": "I'm looking for some advice on dog arthritis. I recently got a new Orthopedic Memory Foam dog bed fo"
+            }
+          ],
+          "generated_answer": "The training pads for Luna were purchased first (about a month ago, versus the dog bed about three weeks ago).",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly identifies the training pads for Luna as purchased first and adds consistent extra detail."
+        },
+        {
+          "question_id": "gpt4_70e84552",
+          "question_type": "temporal-reasoning",
+          "query": "Which task did I complete first, fixing the fence or trimming the goats' hooves?",
+          "answer": "Fixing the fence",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 9918.7,
+          "top_3": [
+            {
+              "score": 0.6505,
+              "text": "I'm thinking of hosting a farm open house event soon and I was wondering if you could help me come u"
+            },
+            {
+              "score": 0.6427,
+              "text": "Thanks for the advice! I was thinking of getting a Brown Swiss or a Jersey, as I've heard they're bo"
+            },
+            {
+              "score": 0.6426,
+              "text": "I'm thinking of hosting a farm open house event soon and I want to make sure everything is perfect. "
+            }
+          ],
+          "generated_answer": "The fence fixing was completed first, three weeks ago, while the hoof trimming was done two weeks ago.",
+          "judge_correct": 1,
+          "judge_reason": "Candidate correctly states fixing the fence was first, with extra detail."
+        },
+        {
+          "question_id": "a3838d2b",
+          "question_type": "temporal-reasoning",
+          "query": "How many charity events did I participate in before the 'Run for the Cure' event?",
+          "answer": "4",
+          "num_memories": 34,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 7923.3,
+          "top_3": [
+            {
+              "score": 0.6557,
+              "text": "The \"Run for the Cure\" event was truly inspiring, and I think what resonated with me the most was se"
+            },
+            {
+              "score": 0.64,
+              "text": "That's really helpful, thanks! I've been meaning to get back into cycling for a while now, and this "
+            },
+            {
+              "score": 0.64,
+              "text": "I'm looking for some tips on how to stay motivated to continue participating in charity events. I ju"
+            }
+          ],
+          "generated_answer": "Based on my memories, I participated in two charity events before the \"Run for the Cure\" event: \"Dance for a Cause\" on May 1st and the \"Food for Thought\" charity gala on September 25th.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate states two events while the reference answer is four."
+        },
+        {
+          "question_id": "gpt4_93159ced",
+          "question_type": "temporal-reasoning",
+          "query": "How long have I been working before I started my current job at NovaTech?",
+          "answer": "4 years and 9 months",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 7231.3,
+          "top_3": [
+            {
+              "score": 0.8014,
+              "text": "I'm a software engineer, specifically a backend developer, and I've been in this field since I gradu"
+            },
+            {
+              "score": 0.7994,
+              "text": "I'm working on a project at NovaTech and I need help with optimizing the API performance. Can you pr"
+            },
+            {
+              "score": 0.7892,
+              "text": "I think my team would greatly benefit from these tools, especially with the high-priority project we"
+            }
+          ],
+          "generated_answer": "Based on your memories, you've been working professionally for 9 years and at NovaTech for 4 years and 3 months, so you worked about 4 years and 9 months before starting at NovaTech.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate explicitly states the same 4 years and 9 months as the reference, with correct extra detail."
+        },
+        {
+          "question_id": "gpt4_2d58bcd6",
+          "question_type": "temporal-reasoning",
+          "query": "Which book did I finish reading first, 'The Hate U Give' or 'The Nightingale'?",
+          "answer": "'The Hate U Give'",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 13246.9,
+          "top_3": [
+            {
+              "score": 0.6557,
+              "text": "I'm glad you liked \"The Hate U Give\". I've been trying to read more diversely, and that book was a g"
+            },
+            {
+              "score": 0.6401,
+              "text": "I'm looking for some book recommendations. I just finished reading three fiction novels - \"The Seven"
+            },
+            {
+              "score": 0.6301,
+              "text": "I'm looking for some book recommendations. I've been trying to read more diversely and I just finish"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate responded with 'I don't know', which is considered incorrect per the rules."
+        },
+        {
+          "question_id": "gpt4_65aabe59",
+          "question_type": "temporal-reasoning",
+          "query": "Which device did I set up first, the smart thermostat or the mesh network system?",
+          "answer": "Smart thermostat",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 12003.8,
+          "top_3": [
+            {
+              "score": 0.6531,
+              "text": "I'm not really sure about building my own computer, I think I'll stick with a pre-built one. I've be"
+            },
+            {
+              "score": 0.6452,
+              "text": "I'm having some issues with my desktop computer, it's been freezing up on me randomly and I think it"
+            },
+            {
+              "score": 0.6325,
+              "text": "I'm having some issues with my desktop computer, it's been freezing up on me randomly and I'm thinki"
+            }
+          ],
+          "generated_answer": "The smart thermostat was set up first, a month ago, whereas the mesh network system was upgraded 3 weeks ago.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly identifies the smart thermostat as set up first, matching the reference, and extra timing details do not contradict it."
+        },
+        {
+          "question_id": "982b5123",
+          "question_type": "temporal-reasoning",
+          "query": "How many months ago did I book the Airbnb in San Francisco?",
+          "answer": "Five months ago",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 13387.4,
+          "top_3": [
+            {
+              "score": 0.8197,
+              "text": "I'm planning a trip to San Francisco and was wondering if you could recommend some good neighborhood"
+            },
+            {
+              "score": 0.7913,
+              "text": "I didn't think of checking out vintage or thrift stores. That's a great idea! I'll definitely keep t"
+            },
+            {
+              "score": 0.789,
+              "text": "I'm actually planning to rent a car for my upcoming San Francisco trip, so I was wondering if you co"
+            }
+          ],
+          "generated_answer": "Five months ago.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the reference exactly."
+        },
+        {
+          "question_id": "b9cfe692",
+          "question_type": "temporal-reasoning",
+          "query": "How long did I take to finish 'The Seven Husbands of Evelyn Hugo' and 'The Nightingale' combined?",
+          "answer": "5.5 weeks",
+          "num_memories": 18,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 8515.5,
+          "top_3": [
+            {
+              "score": 0.8028,
+              "text": "I've been listening to fiction, mostly contemporary and historical fiction. I really enjoyed the emo"
+            },
+            {
+              "score": 0.7843,
+              "text": "I'm looking for some book recommendations. I recently finished \"The Nightingale\" by Kristin Hannah, "
+            },
+            {
+              "score": 0.783,
+              "text": "I'm looking for some new audiobook recommendations. I've been enjoying listening to them during my d"
+            }
+          ],
+          "generated_answer": "Five and a half weeks.",
+          "judge_correct": 1,
+          "judge_reason": "Five and a half weeks is equivalent to 5.5 weeks."
+        },
+        {
+          "question_id": "gpt4_4edbafa2",
+          "question_type": "temporal-reasoning",
+          "query": "What was the date on which I attended the first BBQ event in June?",
+          "answer": "June 3rd",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 13122.8,
+          "top_3": [
+            {
+              "score": 0.6504,
+              "text": "Hi! I'm looking for some recommendations on BBQ sauce brands. I've been using Sweet Baby Ray's and l"
+            },
+            {
+              "score": 0.6375,
+              "text": "I'm thinking of hosting my own BBQ party soon, and I want to make sure I have a variety of dishes to"
+            },
+            {
+              "score": 0.6279,
+              "text": "I'm looking for some recommendations on BBQ sauce brands. I recently used up my favorite Sweet Baby "
+            }
+          ],
+          "generated_answer": "June 3rd",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the reference exactly."
+        },
+        {
+          "question_id": "c8090214",
+          "question_type": "temporal-reasoning",
+          "query": "How many days before I bought the iPhone 13 Pro did I attend the Holiday Market?",
+          "answer": "7 days. 8 days (including the last day) is also acceptable.",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 6401.7,
+          "top_3": [
+            {
+              "score": 0.643,
+              "text": "I think I'll keep it simple and add her name in a elegant font, and maybe a small message like \"Sis\""
+            },
+            {
+              "score": 0.6377,
+              "text": "I think I'll go back to the Holiday Market and take a closer look at the jewelry vendors. I remember"
+            },
+            {
+              "score": 0.6352,
+              "text": "I'm looking to upgrade my phone case and screen protector. Can you show me some options for iPhone 1"
+            }
+          ],
+          "generated_answer": "7 days",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer '7 days' matches one of the acceptable answers in the reference."
+        },
+        {
+          "question_id": "gpt4_483dd43c",
+          "question_type": "temporal-reasoning",
+          "query": "Which show did I start watching first, 'The Crown' or 'Game of Thrones'?",
+          "answer": "'Game of Thrones'",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 10928.3,
+          "top_3": [
+            {
+              "score": 0.6481,
+              "text": "I'm looking for some new shows to watch on HBO Max. I've been meaning to check out \"Game of Thrones\""
+            },
+            {
+              "score": 0.6283,
+              "text": "I've seen some of these shows before, but I'll definitely check out the ones I haven't watched yet. "
+            },
+            {
+              "score": 0.6279,
+              "text": "I've seen some of these shows before, but I haven't watched all of them. I'll definitely check them "
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate expresses uncertainty ('I don't know'), which is treated as incorrect per the rules, while the reference clearly states 'Game of Thrones'."
+        },
+        {
+          "question_id": "e4e14d04",
+          "question_type": "temporal-reasoning",
+          "query": "How long had I been a member of 'Book Lovers Unite' when I attended the meetup?",
+          "answer": "Two weeks",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 12410.4,
+          "top_3": [
+            {
+              "score": 0.6531,
+              "text": "I'm looking for some book recommendations. I just finished reading the latest bestseller by John Gri"
+            },
+            {
+              "score": 0.6426,
+              "text": "I think \"Gone Girl\" would be a great choice for a book club discussion, especially since I've alread"
+            },
+            {
+              "score": 0.6401,
+              "text": "I'm looking for some book recommendations. I recently joined a Facebook group called \"Book Lovers Un"
+            }
+          ],
+          "generated_answer": "Based on your memories, you joined the Facebook group three weeks ago and attended the meetup last week, so you had been a member for about two weeks.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate states 'about two weeks', which is a paraphrase and conveys the same duration as the reference 'Two weeks'."
+        },
+        {
+          "question_id": "c9f37c46",
+          "question_type": "temporal-reasoning",
+          "query": "How long had I been watching stand-up comedy specials regularly when I attended the open mic night at the local comedy club?",
+          "answer": "2 months",
+          "num_memories": 11,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 9711.8,
+          "top_3": [
+            {
+              "score": 0.6478,
+              "text": "I'm looking for some advice on writing jokes. I've recently gotten into stand-up comedy and I'm tryi"
+            },
+            {
+              "score": 0.6454,
+              "text": "I've been trying to write jokes about my everyday experiences, but I'm struggling to make them funny"
+            },
+            {
+              "score": 0.6401,
+              "text": "I'm looking for some comedy recommendations. I've been really into stand-up lately - I think it star"
+            }
+          ],
+          "generated_answer": "About two months, since I started watching regularly around three months ago and attended the open mic last month.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer paraphrases '2 months' as 'about two months' and provides consistent supporting details."
+        },
+        {
+          "question_id": "gpt4_2c50253f",
+          "question_type": "temporal-reasoning",
+          "query": "What time do I wake up on Tuesdays and Thursdays?",
+          "answer": "6:45 AM",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16636.9,
+          "top_3": [
+            {
+              "score": 0.6557,
+              "text": "I'm trying to create a personalized morning routine that works for me. I've recently started going f"
+            },
+            {
+              "score": 0.6452,
+              "text": "That's really helpful, thank you! I'll definitely try to incorporate those stretches and exercises i"
+            },
+            {
+              "score": 0.623,
+              "text": "I plan to start by committing to a daily meditation practice of at least 10 minutes, using a combina"
+            }
+          ],
+          "generated_answer": "6:45 AM",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer exactly matches the reference."
+        },
+        {
+          "question_id": "dcfa8644",
+          "question_type": "temporal-reasoning",
+          "query": "How many days had passed since I bought my Adidas running shoes when I realized one of the shoelaces on my old Converse sneakers had broken?",
+          "answer": "14 days. 15 days (including the last day) is also acceptable.",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 18934.5,
+          "top_3": [
+            {
+              "score": 0.817,
+              "text": "I'm looking for some shoe cleaning tips. I've got a pair of sneakers that I wore to play basketball "
+            },
+            {
+              "score": 0.8091,
+              "text": "I think I'll try cleaning my sneakers at home first, but if the stains are really tough, I might tak"
+            },
+            {
+              "score": 0.7937,
+              "text": "I'm thinking of organizing my shoe collection and I was wondering if you could help me with some sho"
+            }
+          ],
+          "generated_answer": "Fourteen days.",
+          "judge_correct": 1,
+          "judge_reason": "Candidate says 'Fourteen days', which is a paraphrase of the accepted 14 days."
+        },
+        {
+          "question_id": "gpt4_b4a80587",
+          "question_type": "temporal-reasoning",
+          "query": "Which event happened first, the road trip to the coast or the arrival of the new prime lens?",
+          "answer": "The arrival of the new prime lens",
+          "num_memories": 12,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 9580.1,
+          "top_3": [
+            {
+              "score": 0.8039,
+              "text": "The coastal trip was amazing! One of my favorite shots from the trip is a portrait of my friend stan"
+            },
+            {
+              "score": 0.8028,
+              "text": "I'm looking for some tips on editing photos of landscapes. I just got back from a road trip to the c"
+            },
+            {
+              "score": 0.7912,
+              "text": "I've been playing around with the lens, trying to get used to the manual focus ring. It's definitely"
+            }
+          ],
+          "generated_answer": "The new prime lens arrived first, as it was taken on the coastal trip according to memory [3].",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly states the lens arrived first, matching the reference answer."
+        },
+        {
+          "question_id": "gpt4_9a159967",
+          "question_type": "temporal-reasoning",
+          "query": "Which airline did I fly with the most in March and April?",
+          "answer": "United Airlines",
+          "num_memories": 16,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5437713091520254,
+          "recall_at_5": 1.0,
+          "latency_ms": 15635.7,
+          "top_3": [
+            {
+              "score": 0.6453,
+              "text": "I'm planning to travel to San Francisco from the 10th to the 14th of next month. I'll be flying into"
+            },
+            {
+              "score": 0.6428,
+              "text": "I'm planning a trip to San Francisco next month and I'm considering flying with Southwest Airlines. "
+            },
+            {
+              "score": 0.6427,
+              "text": "I was impressed with United's in-flight entertainment system on my recent trip. In March, I took a b"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate refused to answer, which is considered incorrect even for a trivial reference."
+        }
+      ]
+    }
+  },
+  "skipped": {}
+}

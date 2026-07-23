@@ -1,0 +1,3 @@
+# Large downloaded eval corpora — fetched on demand by longmemeval_loader.py,
+# not checked in. See tests/longmemeval_loader.py docstring.
+longmemeval/

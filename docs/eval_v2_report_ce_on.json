@@ -1,0 +1,2612 @@
+{
+  "timestamp": "2026-07-21T18:51:09",
+  "rejection_threshold": 1.0,
+  "aggregate": {
+    "positive_cases": 46,
+    "negative_cases": 3,
+    "p_at_1": 0.8261,
+    "p_at_3": 0.9348,
+    "p_at_5": 0.9348,
+    "mrr": 0.8799,
+    "ndcg_at_5": 0.7993,
+    "recall_at_5": 0.9348,
+    "contamination_at_3": 0.0272,
+    "rejection_accuracy": 1.0
+  },
+  "per_scenario": [
+    {
+      "scenario_id": "SA-S1",
+      "source": "semantic_audit",
+      "case_id": "SA-S1",
+      "query": "妈妈多大了",
+      "description": "[semantic_audit] 同义词联想",
+      "is_negative": false,
+      "expected": [
+        "妈妈今年55岁，已经退休了。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 5.26,
+          "text": "妈妈今年55岁，已经退休了。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "我今年30岁，在一家互联网公司工作。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "爸爸今年58岁，还在上班。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "SA-S2",
+      "source": "semantic_audit",
+      "case_id": "SA-S2",
+      "query": "HHKB好用吗",
+      "description": "[semantic_audit] 近义词联想",
+      "is_negative": false,
+      "expected": [
+        "我最喜欢机械键盘，打字手感特别好。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "我最喜欢机械键盘，打字手感特别好。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.0,
+          "text": "鼠标我用的是罗技的无线鼠标。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "显示器是戴尔的27寸4K屏。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "SA-S3",
+      "source": "semantic_audit",
+      "case_id": "SA-S3",
+      "query": "张三同事的老婆",
+      "description": "[semantic_audit] 跨实体推理",
+      "is_negative": false,
+      "expected": [
+        "李丽是我的大学同学，张三是我的前同事。",
+        "李丽是家庭主妇，没有上班。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.9197,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 6.67,
+          "text": "李丽是我的大学同学，张三是我的前同事。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "王芳在北京协和医院工作。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "李丽是家庭主妇，没有上班。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "SA-S4",
+      "source": "semantic_audit",
+      "case_id": "SA-S4",
+      "query": "李四买特斯拉了吗",
+      "description": "[semantic_audit] 否定查询/跨人物",
+      "is_negative": false,
+      "expected": [
+        "李四最近在考虑买电动车。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 0.7648,
+          "text": "李四最近在考虑买电动车。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.4963,
+          "text": "张三上个月买了一辆特斯拉。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.4,
+          "text": "特斯拉最近降价了。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "SA-S5",
+      "source": "semantic_audit",
+      "case_id": "SA-S5",
+      "query": "去年发生了什么",
+      "description": "[semantic_audit] 时间推理",
+      "is_negative": false,
+      "expected": [
+        "2025年妈妈退休了，回家种花。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 2,
+      "p_at_1": 0.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_5": 0.6309,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 1.0,
+          "text": "2024年爸爸换了个新工作。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.4,
+          "text": "2025年妈妈退休了，回家种花。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.1154,
+          "text": "我2023年大学毕业。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "SA-S6",
+      "source": "semantic_audit",
+      "case_id": "SA-S6",
+      "query": "谁送我键盘的原因",
+      "description": "[semantic_audit] 隐含推理（因果）",
+      "is_negative": false,
+      "expected": [
+        "张三送我一把HHKB键盘，因为是生日礼物。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "张三送我一把HHKB键盘，因为是生日礼物。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.0661,
+          "text": "李四也送了我一本书，挺好看的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.0,
+          "text": "我每年生日都会给自己买个礼物。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "SA-S7",
+      "source": "semantic_audit",
+      "case_id": "SA-S7",
+      "query": "我最近胖了",
+      "description": "[semantic_audit] 语义相似（体重）",
+      "is_negative": false,
+      "expected": [
+        "我这个月体重增加了5公斤，得减肥了。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 0.6,
+          "text": "我这个月体重增加了5公斤，得减肥了。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.4013,
+          "text": "我最近开始跑步，每天跑5公里。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.0,
+          "text": "我换了个新手机，拍照效果不错。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "SA-S8",
+      "source": "semantic_audit",
+      "case_id": "SA-S8",
+      "query": "我为什么心情不好",
+      "description": "[semantic_audit] 情感推理（情绪原因）",
+      "is_negative": false,
+      "expected": [
+        "今天在会议室被老板批评了。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 3,
+      "p_at_1": 0.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 0.3333,
+      "ndcg_at_5": 0.5,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "昨天晚上睡得很好。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "中午吃了红烧肉，味道还行。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_1",
+          "score": 0.5,
+          "text": "今天在会议室被老板批评了。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "SA-S9",
+      "source": "semantic_audit",
+      "case_id": "SA-S9",
+      "query": "我之前说的那个计划",
+      "description": "[semantic_audit] 跨话题模糊指代",
+      "is_negative": false,
+      "expected": [
+        "我想明年去日本旅游，看看樱花。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 0.6,
+          "text": "我想明年去日本旅游，看看樱花。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.192,
+          "text": "Python 3.12 的新特性挺多的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.0,
+          "text": "今天的晚饭还不错。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "SA-S10",
+      "source": "semantic_audit",
+      "case_id": "SA-S10",
+      "query": "他送我的东西好用吗",
+      "description": "[semantic_audit] 人称指代",
+      "is_negative": false,
+      "expected": [
+        "张三送了我一把HHKB键盘。"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 0.8133,
+          "text": "张三送了我一把HHKB键盘。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.5357,
+          "text": "李四说这个键盘不好用。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.0,
+          "text": "我自己买了一个鼠标。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-precision_basic",
+      "source": "multi_angle",
+      "case_id": "MA-precision_basic-q0",
+      "query": "我表姐叫什么？",
+      "description": "[precision] 基础人名",
+      "is_negative": false,
+      "expected": [
+        "王芳"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.9197,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 4.06,
+          "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她女儿今年上小学三年级。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "王芳说最近医院很忙，流感季。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "她家养了一只金毛，叫豆豆。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "我上周末去她家，她做了糖醋排骨。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-precision_basic",
+      "source": "multi_angle",
+      "case_id": "MA-precision_basic-q1",
+      "query": "她在哪家医院工作？",
+      "description": "[precision] 地点",
+      "is_negative": false,
+      "expected": [
+        "协和医院"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_5",
+          "score": 0.4181,
+          "text": "王芳说最近医院很忙，流感季。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.039,
+          "text": "她老公是做金融的，在国贸上班。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_3",
+          "score": 0.0251,
+          "text": "我上周末去她家，她做了糖醋排骨。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_4",
+          "score": 0.025,
+          "text": "她家养了一只金毛，叫豆豆。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-precision_basic",
+      "source": "multi_angle",
+      "case_id": "MA-precision_basic-q2",
+      "query": "她是什么科室的？",
+      "description": "[precision] 职业细节",
+      "is_negative": false,
+      "expected": [
+        "儿科"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.4224,
+          "text": "她老公是做金融的，在国贸上班。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.0249,
+          "text": "王芳说最近医院很忙，流感季。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_6",
+          "score": 0.0146,
+          "text": "她女儿今年上小学三年级。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_3",
+          "score": 0.0001,
+          "text": "我上周末去她家，她做了糖醋排骨。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-precision_basic",
+      "source": "multi_angle",
+      "case_id": "MA-precision_basic-q3",
+      "query": "她老公在哪上班？",
+      "description": "[precision] 关联人物",
+      "is_negative": false,
+      "expected": [
+        "国贸"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 1.0,
+          "text": "她老公是做金融的，在国贸上班。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_4",
+          "score": 0.0,
+          "text": "她家养了一只金毛，叫豆豆。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她女儿今年上小学三年级。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "王芳说最近医院很忙，流感季。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "我上周末去她家，她做了糖醋排骨。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-precision_basic",
+      "source": "multi_angle",
+      "case_id": "MA-precision_basic-q4",
+      "query": "她家狗叫什么？",
+      "description": "[precision] 宠物",
+      "is_negative": false,
+      "expected": [
+        "豆豆"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_4",
+          "score": 1.81,
+          "text": "她家养了一只金毛，叫豆豆。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她女儿今年上小学三年级。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "王芳说最近医院很忙，流感季。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "我上周末去她家，她做了糖醋排骨。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "她老公是做金融的，在国贸上班。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-precision_basic",
+      "source": "multi_angle",
+      "case_id": "MA-precision_basic-q5",
+      "query": "她女儿几年级？",
+      "description": "[precision] 家人",
+      "is_negative": false,
+      "expected": [
+        "三年级"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_6",
+          "score": 1.0,
+          "text": "她女儿今年上小学三年级。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_4",
+          "score": 0.0,
+          "text": "她家养了一只金毛，叫豆豆。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "王芳说最近医院很忙，流感季。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "我上周末去她家，她做了糖醋排骨。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "她老公是做金融的，在国贸上班。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-multi_hop",
+      "source": "multi_angle",
+      "case_id": "MA-multi_hop-q0",
+      "query": "陈总投的什么公司？",
+      "description": "[multi_hop] 1跳",
+      "is_negative": false,
+      "expected": [
+        "途灵科技"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 1.0,
+          "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.0,
+          "text": "途灵科技的创始人是清华计算机系毕业的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "他们去年拿了 B 轮，估值 20 亿。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_1",
+          "score": 0.5,
+          "text": "我认识一个投资人叫陈总，他在红杉资本。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-multi_hop",
+      "source": "multi_angle",
+      "case_id": "MA-multi_hop-q1",
+      "query": "途灵科技创始人什么背景？",
+      "description": "[multi_hop] 2跳",
+      "is_negative": false,
+      "expected": [
+        "清华",
+        "计算机"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.6131,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_3",
+          "score": 1.0,
+          "text": "途灵科技的创始人是清华计算机系毕业的。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.5807,
+          "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_1",
+          "score": 0.0319,
+          "text": "我认识一个投资人叫陈总，他在红杉资本。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_5",
+          "score": 0.0,
+          "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "他们去年拿了 B 轮，估值 20 亿。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-multi_hop",
+      "source": "multi_angle",
+      "case_id": "MA-multi_hop-q2",
+      "query": "陈总投的公司估值多少？",
+      "description": "[multi_hop] 2跳+数值",
+      "is_negative": false,
+      "expected": [
+        "B 轮",
+        "20 亿"
+      ],
+      "forbidden": [],
+      "rank_of_target": 2,
+      "p_at_1": 0.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_5": 0.3869,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 1.0,
+          "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_4",
+          "score": 0.2748,
+          "text": "他们去年拿了 B 轮，估值 20 亿。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.0,
+          "text": "途灵科技的创始人是清华计算机系毕业的。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_1",
+          "score": 0.5,
+          "text": "我认识一个投资人叫陈总，他在红杉资本。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-multi_hop",
+      "source": "multi_angle",
+      "case_id": "MA-multi_hop-q3",
+      "query": "他们拿到哪一轮了？",
+      "description": "[multi_hop] 模糊指代",
+      "is_negative": false,
+      "expected": [
+        "B 轮"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_4",
+          "score": 1.0,
+          "text": "他们去年拿了 B 轮，估值 20 亿。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.1282,
+          "text": "我认识一个投资人叫陈总，他在红杉资本。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.112,
+          "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_5",
+          "score": 0.0003,
+          "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "途灵科技的创始人是清华计算机系毕业的。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-isolation",
+      "source": "multi_angle",
+      "case_id": "MA-isolation-q0",
+      "query": "老张开什么车？",
+      "description": "[isolation] 老张的车≠小李的车",
+      "is_negative": false,
+      "expected": [
+        "宝马",
+        "X5"
+      ],
+      "forbidden": [
+        "比亚迪",
+        "海豚"
+      ],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.6131,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_3",
+          "score": 1.0,
+          "text": "老张开一辆黑色宝马 X5。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.3618,
+          "text": "老张是我们部门的技术主管，干了十年了。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_8",
+          "score": 0.0,
+          "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "小李开的是比亚迪海豚，电动车。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她特别喜欢猫，养了两只英短。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-isolation",
+      "source": "multi_angle",
+      "case_id": "MA-isolation-q1",
+      "query": "小李开什么车？",
+      "description": "[isolation] 小李的车≠老张的车",
+      "is_negative": false,
+      "expected": [
+        "比亚迪",
+        "海豚"
+      ],
+      "forbidden": [
+        "宝马",
+        "X5"
+      ],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.6131,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_7",
+          "score": 1.0,
+          "text": "小李开的是比亚迪海豚，电动车。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_5",
+          "score": 0.2012,
+          "text": "小李是去年刚来的应届生，做前端的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_8",
+          "score": 0.0,
+          "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她特别喜欢猫，养了两只英短。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "他喜欢钓鱼，周末经常去密云水库。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-isolation",
+      "source": "multi_angle",
+      "case_id": "MA-isolation-q2",
+      "query": "老张有什么爱好？",
+      "description": "[isolation] 爱好隔离",
+      "is_negative": false,
+      "expected": [
+        "钓鱼"
+      ],
+      "forbidden": [
+        "猫",
+        "英短"
+      ],
+      "rank_of_target": 7,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.1429,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 0.6,
+          "text": "老张是我们部门的技术主管，干了十年了。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.0,
+          "text": "老张开一辆黑色宝马 X5。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_8",
+          "score": 0.5,
+          "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "小李开的是比亚迪海豚，电动车。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她特别喜欢猫，养了两只英短。"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-isolation",
+      "source": "multi_angle",
+      "case_id": "MA-isolation-q3",
+      "query": "小李养了什么宠物？",
+      "description": "[isolation] 宠物隔离",
+      "is_negative": false,
+      "expected": [
+        "猫",
+        "英短"
+      ],
+      "forbidden": [
+        "钓鱼",
+        "金毛"
+      ],
+      "rank_of_target": 2,
+      "p_at_1": 0.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_5": 0.3869,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_7",
+          "score": 0.9971,
+          "text": "小李开的是比亚迪海豚，电动车。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_6",
+          "score": 0.6,
+          "text": "她特别喜欢猫，养了两只英短。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.4,
+          "text": "小李是去年刚来的应届生，做前端的。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_8",
+          "score": 0.5,
+          "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "他喜欢钓鱼，周末经常去密云水库。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-isolation",
+      "source": "multi_angle",
+      "case_id": "MA-isolation-q4",
+      "query": "谁之前在华为做过？",
+      "description": "[isolation] 经历归因",
+      "is_negative": false,
+      "expected": [
+        "华为做过"
+      ],
+      "forbidden": [
+        "小李"
+      ],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.3333,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 1.0,
+          "text": "他之前在华为做过，后来跳过来的。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_5",
+          "score": 0.1187,
+          "text": "小李是去年刚来的应届生，做前端的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_8",
+          "score": 0.0,
+          "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_7",
+          "score": 0.0,
+          "text": "小李开的是比亚迪海豚，电动车。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她特别喜欢猫，养了两只英短。"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-isolation",
+      "source": "multi_angle",
+      "case_id": "MA-isolation-q5",
+      "query": "老张养猫吗？",
+      "description": "[isolation] 负样本:老张不养猫",
+      "is_negative": false,
+      "expected": [],
+      "forbidden": [
+        "猫"
+      ],
+      "rank_of_target": 0,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.3333,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_6",
+          "score": 0.6,
+          "text": "她特别喜欢猫，养了两只英短。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.5983,
+          "text": "老张是我们部门的技术主管，干了十年了。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.4,
+          "text": "老张开一辆黑色宝马 X5。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_8",
+          "score": 0.5,
+          "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "小李开的是比亚迪海豚，电动车。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-fuzzy",
+      "source": "multi_angle",
+      "case_id": "MA-fuzzy-q0",
+      "query": "昨晚去的馆子怎么样？",
+      "description": "[fuzzy] 口语化评价",
+      "is_negative": false,
+      "expected": [
+        "正宗",
+        "态度特别"
+      ],
+      "forbidden": [],
+      "rank_of_target": 2,
+      "p_at_1": 0.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_5": 0.1823,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.0003,
+          "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.0,
+          "text": "我同事推荐的，说他们家的毛血旺更绝。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "服务员态度特别好，还送了果盘。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "人均大概一百二左右，不算贵。"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-fuzzy",
+      "source": "multi_angle",
+      "case_id": "MA-fuzzy-q1",
+      "query": "那几个菜？",
+      "description": "[fuzzy] 省略主语",
+      "is_negative": false,
+      "expected": [
+        "水煮鱼",
+        "宫保鸡丁"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.6131,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 0.6,
+          "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.4682,
+          "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.0,
+          "text": "我同事推荐的，说他们家的毛血旺更绝。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "服务员态度特别好，还送了果盘。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "人均大概一百二左右，不算贵。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-fuzzy",
+      "source": "multi_angle",
+      "case_id": "MA-fuzzy-q2",
+      "query": "花了多少钱？",
+      "description": "[fuzzy] 价格模糊问",
+      "is_negative": false,
+      "expected": [
+        "一百二"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_3",
+          "score": 1.0,
+          "text": "人均大概一百二左右，不算贵。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_5",
+          "score": 0.0527,
+          "text": "我同事推荐的，说他们家的毛血旺更绝。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_4",
+          "score": 0.001,
+          "text": "服务员态度特别好，还送了果盘。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_2",
+          "score": 0.0,
+          "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_1",
+          "score": 0.0,
+          "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-fuzzy",
+      "source": "multi_angle",
+      "case_id": "MA-fuzzy-q3",
+      "query": "在哪吃的？",
+      "description": "[fuzzy] 地点",
+      "is_negative": false,
+      "expected": [
+        "望京"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.0001,
+          "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.0,
+          "text": "我同事推荐的，说他们家的毛血旺更绝。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "服务员态度特别好，还送了果盘。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "人均大概一百二左右，不算贵。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-negative",
+      "source": "multi_angle",
+      "case_id": "MA-negative-q0",
+      "query": "我结婚了吗？",
+      "description": "[negative] 未提及→空",
+      "is_negative": true,
+      "expected": [],
+      "forbidden": [],
+      "rank_of_target": 0,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": 1.0,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 0.6,
+          "text": "我大学学的是计算机专业。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.0,
+          "text": "毕业后去了百度做了三年后端。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "现在在一家创业公司做架构。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-negative",
+      "source": "multi_angle",
+      "case_id": "MA-negative-q1",
+      "query": "我工资多少？",
+      "description": "[negative] 未提及→空",
+      "is_negative": true,
+      "expected": [],
+      "forbidden": [],
+      "rank_of_target": 0,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": 1.0,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 0.15,
+          "text": "我大学学的是计算机专业。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "现在在一家创业公司做架构。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "毕业后去了百度做了三年后端。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-negative",
+      "source": "multi_angle",
+      "case_id": "MA-negative-q2",
+      "query": "我在哪个城市生活？",
+      "description": "[negative] 未提及→空",
+      "is_negative": true,
+      "expected": [],
+      "forbidden": [],
+      "rank_of_target": 0,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": 1.0,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_3",
+          "score": 0.6,
+          "text": "现在在一家创业公司做架构。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.0,
+          "text": "我大学学的是计算机专业。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "毕业后去了百度做了三年后端。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-negative",
+      "source": "multi_angle",
+      "case_id": "MA-negative-q3",
+      "query": "我在百度做什么？",
+      "description": "[negative] 已知信息确认",
+      "is_negative": false,
+      "expected": [
+        "后端"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 1.0,
+          "text": "毕业后去了百度做了三年后端。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.0946,
+          "text": "现在在一家创业公司做架构。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_1",
+          "score": 0.0,
+          "text": "我大学学的是计算机专业。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-temporal",
+      "source": "multi_angle",
+      "case_id": "MA-temporal-q0",
+      "query": "我什么时候离职的？",
+      "description": "[temporal] 时间点",
+      "is_negative": false,
+      "expected": [
+        "3月",
+        "2024"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.6131,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "2024年3月，我从百度离职了。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_2",
+          "score": 0.4024,
+          "text": "离职后我去西藏玩了一个月。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.187,
+          "text": "7月1号正式入职新公司。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_6",
+          "score": 0.175,
+          "text": "新公司在海淀，离家有点远。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_4",
+          "score": 0.0009,
+          "text": "6月中拿到了一家 AI 公司的 offer。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-temporal",
+      "source": "multi_angle",
+      "case_id": "MA-temporal-q1",
+      "query": "离职后干了什么？",
+      "description": "[temporal] 时序关系",
+      "is_negative": false,
+      "expected": [
+        "西藏"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 1.0,
+          "text": "离职后我去西藏玩了一个月。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.2828,
+          "text": "2024年3月，我从百度离职了。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_5",
+          "score": 0.117,
+          "text": "7月1号正式入职新公司。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_6",
+          "score": 0.1167,
+          "text": "新公司在海淀，离家有点远。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_4",
+          "score": 0.0021,
+          "text": "6月中拿到了一家 AI 公司的 offer。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-temporal",
+      "source": "multi_angle",
+      "case_id": "MA-temporal-q2",
+      "query": "什么时候入职新公司的？",
+      "description": "[temporal] 最新时间",
+      "is_negative": false,
+      "expected": [
+        "7月"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_5",
+          "score": 1.0,
+          "text": "7月1号正式入职新公司。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_6",
+          "score": 0.2078,
+          "text": "新公司在海淀，离家有点远。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_4",
+          "score": 0.1305,
+          "text": "6月中拿到了一家 AI 公司的 offer。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_1",
+          "score": 0.0021,
+          "text": "2024年3月，我从百度离职了。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_2",
+          "score": 0.0,
+          "text": "离职后我去西藏玩了一个月。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-temporal",
+      "source": "multi_angle",
+      "case_id": "MA-temporal-q3",
+      "query": "新公司在哪？",
+      "description": "[temporal] 关联信息",
+      "is_negative": false,
+      "expected": [
+        "海淀"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_6",
+          "score": 1.0,
+          "text": "新公司在海淀，离家有点远。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_5",
+          "score": 0.372,
+          "text": "7月1号正式入职新公司。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_4",
+          "score": 0.0,
+          "text": "6月中拿到了一家 AI 公司的 offer。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "5月份回来开始找工作。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "离职后我去西藏玩了一个月。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-contradiction",
+      "source": "multi_angle",
+      "case_id": "MA-contradiction-q0",
+      "query": "我最喜欢什么语言？",
+      "description": "[contradiction] 矛盾偏好→返回多个",
+      "is_negative": false,
+      "expected": [
+        "Rust",
+        "Python"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.3431,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 1.0,
+          "text": "我觉得 Python 是最适合做 AI 的语言。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.0988,
+          "text": "不过 Python 的生态还是最完善的。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_4",
+          "score": 0.0,
+          "text": "最近在学 Rust，感觉这才是未来。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "后来用了 Go 写后端，发现性能确实好很多。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-contradiction",
+      "source": "multi_angle",
+      "case_id": "MA-contradiction-q1",
+      "query": "我觉得什么语言性能好？",
+      "description": "[contradiction] 精确匹配",
+      "is_negative": false,
+      "expected": [
+        "Go"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_2",
+          "score": 0.856,
+          "text": "后来用了 Go 写后端，发现性能确实好很多。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_1",
+          "score": 0.6615,
+          "text": "我觉得 Python 是最适合做 AI 的语言。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_4",
+          "score": 0.0,
+          "text": "最近在学 Rust，感觉这才是未来。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "不过 Python 的生态还是最完善的。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-long_conversation",
+      "source": "multi_angle",
+      "case_id": "MA-long_conversation-q0",
+      "query": "A轮融资目标是多少？",
+      "description": "[long] 长对话中精确召回",
+      "is_negative": false,
+      "expected": [
+        "5000"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_21",
+          "score": 1.0,
+          "text": "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_7",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_49",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_44",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_39",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-long_conversation",
+      "source": "multi_angle",
+      "case_id": "MA-long_conversation-q1",
+      "query": "CTO看好什么方向？",
+      "description": "[long] 长对话中关键信息",
+      "is_negative": false,
+      "expected": [
+        "边缘计算"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_36",
+          "score": 8.41,
+          "text": "CTO 说他看好边缘计算方向，让我们提前布局。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_9",
+          "score": 0.5,
+          "text": "中午吃了2个菜，食堂今天还行。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_8",
+          "score": 0.5,
+          "text": "我在考虑要不要换一台3TB的硬盘。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "同事小明请假了，他家里有事。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-long_conversation",
+      "source": "multi_angle",
+      "case_id": "MA-long_conversation-q2",
+      "query": "Q3要完成几个核心功能？",
+      "description": "[long] 数值信息",
+      "is_negative": false,
+      "expected": [
+        "核心功能"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_7",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_49",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_44",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_39",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_33",
+          "score": 0.0,
+          "text": "老板说Q3的目标是完成3个核心功能。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-semantic",
+      "source": "multi_angle",
+      "case_id": "MA-semantic-q0",
+      "query": "妈妈多大了",
+      "description": "[semantic] 同义词:多大了→年龄",
+      "is_negative": false,
+      "expected": [
+        "55"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_1",
+          "score": 0.6,
+          "text": "妈妈今年55岁，退休教师。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_6",
+          "score": 0.4,
+          "text": "2025年妈妈退休了。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_9",
+          "score": 0.5,
+          "text": "体重增加了5公斤，需要控制饮食。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_8",
+          "score": 0.5,
+          "text": "我最近开始跑步健身。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "2024年爸爸换了工作。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-semantic",
+      "source": "multi_angle",
+      "case_id": "MA-semantic-q1",
+      "query": "李四买特斯拉了吗",
+      "description": "[semantic] 否定查询:李四没买特斯拉",
+      "is_negative": false,
+      "expected": [
+        "比亚迪"
+      ],
+      "forbidden": [
+        "特斯拉"
+      ],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.3333,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_5",
+          "score": 1.0,
+          "text": "李四买了比亚迪电动车。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_4",
+          "score": 0.8027,
+          "text": "张三买了特斯拉Model 3。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.0227,
+          "text": "我最喜欢机械键盘。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_9",
+          "score": 0.0,
+          "text": "体重增加了5公斤，需要控制饮食。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_11",
+          "score": 0.0,
+          "text": "中午吃了红烧肉，味道还行。"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-semantic",
+      "source": "multi_angle",
+      "case_id": "MA-semantic-q2",
+      "query": "我为什么心情不好",
+      "description": "[semantic] 情感推理:心情不好→被批评",
+      "is_negative": false,
+      "expected": [
+        "批评"
+      ],
+      "forbidden": [],
+      "rank_of_target": 0,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_3",
+          "score": 0.6588,
+          "text": "李丽是张三是前同事，她是家庭主妇。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_13",
+          "score": 0.4003,
+          "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_14",
+          "score": 0.1938,
+          "text": "李四说这个键盘不好用。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_8",
+          "score": 0.0761,
+          "text": "我最近开始跑步健身。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_12",
+          "score": 0.0011,
+          "text": "我想明年去日本旅游，看樱花。"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-semantic",
+      "source": "multi_angle",
+      "case_id": "MA-semantic-q3",
+      "query": "我之前说的那个计划",
+      "description": "[semantic] 模糊指代:计划→旅游",
+      "is_negative": false,
+      "expected": [
+        "日本旅游"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_12",
+          "score": 0.6,
+          "text": "我想明年去日本旅游，看樱花。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.4105,
+          "text": "李丽是张三是前同事，她是家庭主妇。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_14",
+          "score": 0.4,
+          "text": "李四说这个键盘不好用。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_8",
+          "score": 0.068,
+          "text": "我最近开始跑步健身。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_13",
+          "score": 0.0001,
+          "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "MA-semantic",
+      "source": "multi_angle",
+      "case_id": "MA-semantic-q4",
+      "query": "他送我的东西好用吗",
+      "description": "[semantic] 人称指代:他→张三,东西→键盘",
+      "is_negative": false,
+      "expected": [
+        "HHKB",
+        "键盘"
+      ],
+      "forbidden": [
+        "不好用"
+      ],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 0.4308,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.3333,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_14",
+          "score": 0.8209,
+          "text": "李四说这个键盘不好用。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_13",
+          "score": 0.8133,
+          "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_3",
+          "score": 0.1237,
+          "text": "李丽是张三是前同事，她是家庭主妇。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_2",
+          "score": 0.0584,
+          "text": "我最喜欢机械键盘。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_8",
+          "score": 0.0001,
+          "text": "我最近开始跑步健身。"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "MA-semantic",
+      "source": "multi_angle",
+      "case_id": "MA-semantic-q5",
+      "query": "我胖了吗",
+      "description": "[semantic] 语义相似:胖→体重增加",
+      "is_negative": false,
+      "expected": [
+        "体重"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_9",
+          "score": 0.6,
+          "text": "体重增加了5公斤，需要控制饮食。"
+        },
+        {
+          "rank": 2,
+          "id": "mem_3",
+          "score": 0.4007,
+          "text": "李丽是张三是前同事，她是家庭主妇。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_14",
+          "score": 0.4,
+          "text": "李四说这个键盘不好用。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_13",
+          "score": 0.0877,
+          "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_8",
+          "score": 0.0443,
+          "text": "我最近开始跑步健身。"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    }
+  ],
+  "regressions_vs_old_report": [
+    "SA-S5 was reported passed but P@1=0 (target at rank 2)",
+    "SA-S8 was reported passed but P@1=0 (target at rank 3)",
+    "MA-multi_hop-q2 was reported passed but P@1=0 (target at rank 2)",
+    "MA-isolation-q3 was reported passed but P@1=0 (target at rank 2)",
+    "MA-isolation-q5 was reported passed but P@1=0 (target at rank not-in-top-10)"
+  ]
+}

@@ -1,0 +1,5808 @@
+{
+  "timestamp": "2026-07-22T13:08:19",
+  "workspace": "/var/folders/kq/78jjkb0j6jn27b8gjtpmpt100000gn/T/eval_v2_matrix_ejdh9rqt",
+  "results": {
+    "engram/ce+/hyde-": {
+      "provider": "engram/ce+/hyde-",
+      "aggregate": {
+        "positive_cases": 46,
+        "negative_cases": 3,
+        "p_at_1": 0.6087,
+        "p_at_3": 0.8261,
+        "p_at_5": 0.8696,
+        "mrr": 0.7165,
+        "ndcg_at_5": 0.6695,
+        "recall_at_5": 0.8696,
+        "contamination_at_3": 0.0272,
+        "rejection_accuracy": 1.0,
+        "latency_ms_avg": 7633.6,
+        "latency_ms_p95": 17151.6
+      },
+      "per_case": [
+        {
+          "scenario_id": "SA-S1",
+          "case_id": "SA-S1",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 1.7,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 5.76,
+              "text": "妈妈今年55岁，已经退休了。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.5,
+              "text": "我今年30岁，在一家互联网公司工作。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.5,
+              "text": "爸爸今年58岁，还在上班。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S2",
+          "case_id": "SA-S2",
+          "query": "HHKB好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5597.8,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.8093,
+              "text": "我最喜欢机械键盘，打字手感特别好。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.8065,
+              "text": "显示器是戴尔的27寸4K屏。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.804,
+              "text": "鼠标我用的是罗技的无线鼠标。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S3",
+          "case_id": "SA-S3",
+          "query": "张三同事的老婆",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 9399.2,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.6557,
+              "text": "李丽是我的大学同学，张三是我的前同事。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.6452,
+              "text": "王芳在北京协和医院工作。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6349,
+              "text": "李丽是家庭主妇，没有上班。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S4",
+          "case_id": "SA-S4",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6716.9,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6557,
+              "text": "李四最近在考虑买电动车。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.6452,
+              "text": "特斯拉最近降价了。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6349,
+              "text": "张三上个月买了一辆特斯拉。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S5",
+          "case_id": "SA-S5",
+          "query": "去年发生了什么",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4057.8,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.55,
+              "text": "2024年爸爸换了个新工作。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.55,
+              "text": "2025年妈妈退休了，回家种花。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.5,
+              "text": "我2023年大学毕业。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S6",
+          "case_id": "SA-S6",
+          "query": "谁送我键盘的原因",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3726.5,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.6557,
+              "text": "张三送我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6426,
+              "text": "李四也送了我一本书，挺好看的。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.6375,
+              "text": "我每年生日都会给自己买个礼物。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S7",
+          "case_id": "SA-S7",
+          "query": "我最近胖了",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2.2,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 2.16,
+              "text": "我最近开始跑步，每天跑5公里。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.2,
+              "text": "我换了个新手机，拍照效果不错。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.2,
+              "text": "我这个月体重增加了5公斤，得减肥了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S8",
+          "case_id": "SA-S8",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6968.0,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.6557,
+              "text": "昨天晚上睡得很好。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6452,
+              "text": "中午吃了红烧肉，味道还行。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6349,
+              "text": "今天在会议室被老板批评了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S9",
+          "case_id": "SA-S9",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7825.2,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.8197,
+              "text": "Python 3.12 的新特性挺多的。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.8065,
+              "text": "今天的晚饭还不错。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.7937,
+              "text": "我想明年去日本旅游，看看樱花。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S10",
+          "case_id": "SA-S10",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7545.4,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6531,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6478,
+              "text": "张三送了我一把HHKB键盘。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.6349,
+              "text": "我自己买了一个鼠标。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q0",
+          "query": "我表姐叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4463.1,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.6557,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6452,
+              "text": "她女儿今年上小学三年级。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6349,
+              "text": "王芳说最近医院很忙，流感季。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q1",
+          "query": "她在哪家医院工作？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.16666666666666666,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 10942.2,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 0.6557,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6452,
+              "text": "她女儿今年上小学三年级。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6349,
+              "text": "王芳说最近医院很忙，流感季。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q2",
+          "query": "她是什么科室的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8206.9,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.6557,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.64,
+              "text": "王芳说最近医院很忙，流感季。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6328,
+              "text": "她老公是做金融的，在国贸上班。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q3",
+          "query": "她老公在哪上班？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4203.0,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6557,
+              "text": "她老公是做金融的，在国贸上班。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6452,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6349,
+              "text": "她女儿今年上小学三年级。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q4",
+          "query": "她家狗叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 14643.8,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 0.6557,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6452,
+              "text": "她女儿今年上小学三年级。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6349,
+              "text": "王芳说最近医院很忙，流感季。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q5",
+          "query": "她女儿几年级？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5331.6,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.8197,
+              "text": "她女儿今年上小学三年级。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.8013,
+              "text": "王芳说最近医院很忙，流感季。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.7988,
+              "text": "她家养了一只金毛，叫豆豆。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q0",
+          "query": "陈总投的什么公司？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.8772153153380493,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 15482.2,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6505,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6478,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6375,
+              "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q1",
+          "query": "途灵科技创始人什么背景？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 9046.0,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.8197,
+              "text": "途灵科技的创始人是清华计算机系毕业的。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.8065,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.7937,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q2",
+          "query": "陈总投的公司估值多少？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "ndcg_at_5": 0.26406812257259094,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8533.7,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.8118,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.8117,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.7962,
+              "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q3",
+          "query": "他们拿到哪一轮了？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 12693.4,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 0.817,
+              "text": "他们去年拿了 B 轮，估值 20 亿。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.8017,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.7888,
+              "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q0",
+          "query": "老张开什么车？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 17151.6,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.6557,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "mem_8",
+              "score": 0.6349,
+              "text": "她每天骑共享单车到地铁站。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q1",
+          "query": "小李开什么车？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 9233.1,
+          "top_3": [
+            {
+              "id": "mem_7",
+              "score": 0.8197,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.8065,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            },
+            {
+              "id": "mem_8",
+              "score": 0.7937,
+              "text": "她每天骑共享单车到地铁站。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q2",
+          "query": "老张有什么爱好？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.125,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 16415.0,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.8144,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.8117,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "mem_8",
+              "score": 0.7789,
+              "text": "她每天骑共享单车到地铁站。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q3",
+          "query": "小李养了什么宠物？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.3065735963827292,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 22730.9,
+          "top_3": [
+            {
+              "id": "mem_7",
+              "score": 0.8197,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.8065,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.7863,
+              "text": "她特别喜欢猫，养了两只英短。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q4",
+          "query": "谁之前在华为做过？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 6103.9,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6557,
+              "text": "他之前在华为做过，后来跳过来的。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6352,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            },
+            {
+              "id": "mem_8",
+              "score": 0.6326,
+              "text": "她每天骑共享单车到地铁站。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q5",
+          "query": "老张养猫吗？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 9811.4,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.6557,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6349,
+              "text": "她特别喜欢猫，养了两只英短。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q0",
+          "query": "昨晚去的馆子怎么样？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.15981489151543202,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5204.8,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.6557,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6452,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6349,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q1",
+          "query": "那几个菜？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.3065735963827292,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2.3,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 1.76,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_5",
+              "score": 1.31,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            },
+            {
+              "id": "mem_2",
+              "score": 1.31,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q2",
+          "query": "花了多少钱？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2852.5,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 1.31,
+              "text": "人均大概一百二左右，不算贵。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.3024,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.15,
+              "text": "服务员态度特别好，还送了果盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q3",
+          "query": "在哪吃的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3.4,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.55,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.15,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.15,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q0",
+          "query": "我结婚了吗？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 3965.9,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.15,
+              "text": "毕业后去了百度做了三年后端。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.15,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.5,
+              "text": "现在在一家创业公司做架构。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q1",
+          "query": "我工资多少？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 4321.5,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.15,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.5,
+              "text": "现在在一家创业公司做架构。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.5,
+              "text": "毕业后去了百度做了三年后端。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q2",
+          "query": "我在哪个城市生活？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 8175.9,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.6504,
+              "text": "现在在一家创业公司做架构。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6479,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6375,
+              "text": "毕业后去了百度做了三年后端。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q3",
+          "query": "我在百度做什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 15774.2,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.8197,
+              "text": "毕业后去了百度做了三年后端。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.8065,
+              "text": "现在在一家创业公司做架构。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.7937,
+              "text": "我大学学的是计算机专业。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q0",
+          "query": "我什么时候离职的？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.3868528072345416,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5194.0,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6531,
+              "text": "离职后我去西藏玩了一个月。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6426,
+              "text": "2024年3月，我从百度离职了。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6327,
+              "text": "7月1号正式入职新公司。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q1",
+          "query": "离职后干了什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6025.8,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6481,
+              "text": "离职后我去西藏玩了一个月。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6354,
+              "text": "2024年3月，我从百度离职了。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6352,
+              "text": "新公司在海淀，离家有点远。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q2",
+          "query": "什么时候入职新公司的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8317.7,
+          "top_3": [
+            {
+              "id": "mem_5",
+              "score": 0.8197,
+              "text": "7月1号正式入职新公司。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.8014,
+              "text": "新公司在海淀，离家有点远。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.7888,
+              "text": "6月中拿到了一家 AI 公司的 offer。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q3",
+          "query": "新公司在哪？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6030.7,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.6557,
+              "text": "新公司在海淀，离家有点远。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6452,
+              "text": "7月1号正式入职新公司。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6349,
+              "text": "6月中拿到了一家 AI 公司的 offer。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q0",
+          "query": "我最喜欢什么语言？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.3431272824944109,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 14621.8,
+          "top_3": [
+            {
+              "id": "mem_1",
+              "score": 0.6557,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.6376,
+              "text": "不过 Python 的生态还是最完善的。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6375,
+              "text": "最近在学 Rust，感觉这才是未来。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q1",
+          "query": "我觉得什么语言性能好？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5934.6,
+          "top_3": [
+            {
+              "id": "mem_2",
+              "score": 0.6531,
+              "text": "后来用了 Go 写后端，发现性能确实好很多。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6478,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6349,
+              "text": "最近在学 Rust，感觉这才是未来。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q0",
+          "query": "A轮融资目标是多少？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7066.4,
+          "top_3": [
+            {
+              "id": "mem_21",
+              "score": 0.6557,
+              "text": "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。"
+            },
+            {
+              "id": "mem_49",
+              "score": 0.6452,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "mem_44",
+              "score": 0.6349,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q1",
+          "query": "CTO看好什么方向？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 22455.9,
+          "top_3": [
+            {
+              "id": "mem_36",
+              "score": 0.6557,
+              "text": "CTO 说他看好边缘计算方向，让我们提前布局。"
+            },
+            {
+              "id": "mem_50",
+              "score": 0.6376,
+              "text": "我在考虑要不要换一台1TB的硬盘。"
+            },
+            {
+              "id": "mem_49",
+              "score": 0.6276,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q2",
+          "query": "Q3要完成几个核心功能？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7282.8,
+          "top_3": [
+            {
+              "id": "mem_49",
+              "score": 0.8197,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "mem_44",
+              "score": 0.8065,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "mem_39",
+              "score": 0.7937,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q0",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2.6,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 5.76,
+              "text": "2025年妈妈退休了。"
+            },
+            {
+              "id": "mem_1",
+              "score": 5.71,
+              "text": "妈妈今年55岁，退休教师。"
+            },
+            {
+              "id": "mem_9",
+              "score": 0.5,
+              "text": "体重增加了5公斤，需要控制饮食。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q1",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.16666666666666666,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 4571.2,
+          "top_3": [
+            {
+              "id": "mem_14",
+              "score": 0.6505,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6426,
+              "text": "张三买了特斯拉Model 3。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.635,
+              "text": "我最喜欢机械键盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q2",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3660.8,
+          "top_3": [
+            {
+              "id": "mem_13",
+              "score": 0.6295,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_14",
+              "score": 0.6264,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6235,
+              "text": "我最喜欢机械键盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q3",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8090.7,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.6332,
+              "text": "李丽是张三是前同事，她是家庭主妇。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6285,
+              "text": "我最喜欢机械键盘。"
+            },
+            {
+              "id": "mem_14",
+              "score": 0.6238,
+              "text": "李四说这个键盘不好用。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q4",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.649014791936513,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 7655.9,
+          "top_3": [
+            {
+              "id": "mem_13",
+              "score": 0.8066,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_14",
+              "score": 0.8044,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.799,
+              "text": "我最喜欢机械键盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q5",
+          "query": "我胖了吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "ndcg_at_5": 0.4306765580733931,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4.8,
+          "top_3": [
+            {
+              "id": "mem_3",
+              "score": 0.378,
+              "text": "李丽是张三是前同事，她是家庭主妇。"
+            },
+            {
+              "id": "mem_14",
+              "score": 0.378,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_13",
+              "score": 0.2,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            }
+          ]
+        }
+      ]
+    },
+    "engram/ce+/hyde-/w0.85": {
+      "provider": "engram/ce+/hyde-/w0.85",
+      "aggregate": {
+        "positive_cases": 46,
+        "negative_cases": 3,
+        "p_at_1": 0.6087,
+        "p_at_3": 0.7826,
+        "p_at_5": 0.8913,
+        "mrr": 0.7031,
+        "ndcg_at_5": 0.7044,
+        "recall_at_5": 0.8804,
+        "contamination_at_3": 0.0136,
+        "rejection_accuracy": 1.0,
+        "latency_ms_avg": 6461.6,
+        "latency_ms_p95": 12977.1
+      },
+      "per_case": [
+        {
+          "scenario_id": "SA-S1",
+          "case_id": "SA-S1",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 1.4,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 5.76,
+              "text": "妈妈今年55岁，已经退休了。"
+            },
+            {
+              "id": "mem_1",
+              "score": 5.76,
+              "text": "妈妈今年55岁，已经退休了。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.5,
+              "text": "我今年30岁，在一家互联网公司工作。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S2",
+          "case_id": "SA-S2",
+          "query": "HHKB好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7560.9,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 0.812,
+              "text": "我最喜欢机械键盘，打字手感特别好。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.7967,
+              "text": "我最喜欢机械键盘，打字手感特别好。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.7939,
+              "text": "鼠标我用的是罗技的无线鼠标。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S3",
+          "case_id": "SA-S3",
+          "query": "张三同事的老婆",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9674679834891694,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8291.0,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 0.6557,
+              "text": "李丽是我的大学同学，张三是我的前同事。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "李丽是我的大学同学，张三是我的前同事。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6349,
+              "text": "王芳在北京协和医院工作。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S4",
+          "case_id": "SA-S4",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 10017.8,
+          "top_3": [
+            {
+              "id": "mem_5",
+              "score": 0.8197,
+              "text": "李四最近在考虑买电动车。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.8065,
+              "text": "李四最近在考虑买电动车。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.7937,
+              "text": "特斯拉最近降价了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S5",
+          "case_id": "SA-S5",
+          "query": "去年发生了什么",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5437713091520254,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6437.7,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.6404,
+              "text": "我2023年大学毕业。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6402,
+              "text": "2024年爸爸换了个新工作。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6402,
+              "text": "2025年妈妈退休了，回家种花。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S6",
+          "case_id": "SA-S6",
+          "query": "谁送我键盘的原因",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7782.4,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 0.6557,
+              "text": "张三送我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "张三送我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.63,
+              "text": "李四也送了我一本书，挺好看的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S7",
+          "case_id": "SA-S7",
+          "query": "我最近胖了",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "ndcg_at_5": 0.4306765580733931,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2.5,
+          "top_3": [
+            {
+              "id": "mem_5",
+              "score": 2.16,
+              "text": "我最近开始跑步，每天跑5公里。"
+            },
+            {
+              "id": "mem_2",
+              "score": 2.16,
+              "text": "我最近开始跑步，每天跑5公里。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.2,
+              "text": "我换了个新手机，拍照效果不错。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S8",
+          "case_id": "SA-S8",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "ndcg_at_5": 0.4306765580733931,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3465.8,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.6557,
+              "text": "昨天晚上睡得很好。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.6401,
+              "text": "昨天晚上睡得很好。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6375,
+              "text": "中午吃了红烧肉，味道还行。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S9",
+          "case_id": "SA-S9",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8126.2,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.6557,
+              "text": "Python 3.12 的新特性挺多的。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6452,
+              "text": "今天的晚饭还不错。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.63,
+              "text": "我想明年去日本旅游，看看樱花。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S10",
+          "case_id": "SA-S10",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6509209298071326,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7682.4,
+          "top_3": [
+            {
+              "id": "mem_5",
+              "score": 0.6453,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6453,
+              "text": "张三送了我一把HHKB键盘。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6351,
+              "text": "李四说这个键盘不好用。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q0",
+          "query": "我表姐叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6493.7,
+          "top_3": [
+            {
+              "id": "mem_7",
+              "score": 0.6557,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "mem_9",
+              "score": 0.6349,
+              "text": "我上周末去她家，她做了糖醋排骨。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q1",
+          "query": "她在哪家医院工作？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.2,
+          "ndcg_at_5": 0.38685280723454163,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 11544.4,
+          "top_3": [
+            {
+              "id": "mem_10",
+              "score": 0.6557,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6452,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "mem_9",
+              "score": 0.6349,
+              "text": "我上周末去她家，她做了糖醋排骨。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q2",
+          "query": "她是什么科室的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 12977.1,
+          "top_3": [
+            {
+              "id": "mem_7",
+              "score": 0.6557,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "mem_8",
+              "score": 0.6277,
+              "text": "她老公是做金融的，在国贸上班。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q3",
+          "query": "她老公在哪上班？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 9449.0,
+          "top_3": [
+            {
+              "id": "mem_8",
+              "score": 0.6557,
+              "text": "她老公是做金融的，在国贸上班。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6452,
+              "text": "她老公是做金融的，在国贸上班。"
+            },
+            {
+              "id": "mem_10",
+              "score": 0.6254,
+              "text": "她家养了一只金毛，叫豆豆。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q4",
+          "query": "她家狗叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6240.4,
+          "top_3": [
+            {
+              "id": "mem_10",
+              "score": 0.6557,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6452,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "mem_9",
+              "score": 0.6349,
+              "text": "我上周末去她家，她做了糖醋排骨。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q5",
+          "query": "她女儿几年级？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 9668.9,
+          "top_3": [
+            {
+              "id": "mem_12",
+              "score": 0.4918,
+              "text": "她女儿今年上小学三年级。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.4839,
+              "text": "她女儿今年上小学三年级。"
+            },
+            {
+              "id": "mem_10",
+              "score": 0.4667,
+              "text": "她家养了一只金毛，叫豆豆。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q0",
+          "query": "陈总投的什么公司？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5624.9,
+          "top_3": [
+            {
+              "id": "mem_7",
+              "score": 0.6505,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6401,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6401,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q1",
+          "query": "途灵科技创始人什么背景？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 11369.8,
+          "top_3": [
+            {
+              "id": "mem_8",
+              "score": 0.6557,
+              "text": "途灵科技的创始人是清华计算机系毕业的。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.6452,
+              "text": "途灵科技的创始人是清华计算机系毕业的。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.6349,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q2",
+          "query": "陈总投的公司估值多少？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.14285714285714285,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4145.0,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.6453,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.6356,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.63,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q3",
+          "query": "他们拿到哪一轮了？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6542.1,
+          "top_3": [
+            {
+              "id": "mem_9",
+              "score": 0.6456,
+              "text": "他们去年拿了 B 轮，估值 20 亿。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.6378,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.6284,
+              "text": "他们去年拿了 B 轮，估值 20 亿。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q0",
+          "query": "老张开什么车？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 9826.9,
+          "top_3": [
+            {
+              "id": "mem_11",
+              "score": 0.8093,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "mem_9",
+              "score": 0.8041,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.7964,
+              "text": "老张开一辆黑色宝马 X5。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q1",
+          "query": "小李开什么车？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5614.9,
+          "top_3": [
+            {
+              "id": "mem_15",
+              "score": 0.6557,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.6452,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            },
+            {
+              "id": "mem_13",
+              "score": 0.6349,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q2",
+          "query": "老张有什么爱好？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 13432.3,
+          "top_3": [
+            {
+              "id": "mem_9",
+              "score": 0.6557,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "mem_11",
+              "score": 0.64,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6351,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q3",
+          "query": "小李养了什么宠物？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.2,
+          "ndcg_at_5": 0.23719771276929622,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7576.9,
+          "top_3": [
+            {
+              "id": "mem_15",
+              "score": 0.8197,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            },
+            {
+              "id": "mem_13",
+              "score": 0.8039,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.7962,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q4",
+          "query": "谁之前在华为做过？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 3268.2,
+          "top_3": [
+            {
+              "id": "mem_10",
+              "score": 0.6557,
+              "text": "他之前在华为做过，后来跳过来的。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6452,
+              "text": "他之前在华为做过，后来跳过来的。"
+            },
+            {
+              "id": "mem_13",
+              "score": 0.6206,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q5",
+          "query": "老张养猫吗？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4123.5,
+          "top_3": [
+            {
+              "id": "mem_9",
+              "score": 0.8197,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "mem_11",
+              "score": 0.8039,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.7912,
+              "text": "老张开一辆黑色宝马 X5。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q0",
+          "query": "昨晚去的馆子怎么样？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.09271639884807328,
+          "recall_at_5": 0.5,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 16139.0,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.6557,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.6349,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q1",
+          "query": "那几个菜？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.3065735963827292,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2.7,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 1.76,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_1",
+              "score": 1.76,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_7",
+              "score": 1.31,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q2",
+          "query": "花了多少钱？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4281.3,
+          "top_3": [
+            {
+              "id": "mem_8",
+              "score": 1.31,
+              "text": "人均大概一百二左右，不算贵。"
+            },
+            {
+              "id": "mem_3",
+              "score": 1.31,
+              "text": "人均大概一百二左右，不算贵。"
+            },
+            {
+              "id": "mem_10",
+              "score": 0.3024,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q3",
+          "query": "在哪吃的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3.3,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.55,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.55,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.15,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q0",
+          "query": "我结婚了吗？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 3463.3,
+          "top_3": [
+            {
+              "id": "mem_5",
+              "score": 0.15,
+              "text": "毕业后去了百度做了三年后端。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.15,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.15,
+              "text": "毕业后去了百度做了三年后端。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q1",
+          "query": "我工资多少？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 6964.3,
+          "top_3": [
+            {
+              "id": "mem_4",
+              "score": 0.15,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.15,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.5,
+              "text": "现在在一家创业公司做架构。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q2",
+          "query": "我在哪个城市生活？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 4198.2,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.4918,
+              "text": "现在在一家创业公司做架构。"
+            },
+            {
+              "id": "mem_4",
+              "score": 0.4813,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.4737,
+              "text": "现在在一家创业公司做架构。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q3",
+          "query": "我在百度做什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5297.7,
+          "top_3": [
+            {
+              "id": "mem_5",
+              "score": 0.8197,
+              "text": "毕业后去了百度做了三年后端。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.8065,
+              "text": "毕业后去了百度做了三年后端。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.7937,
+              "text": "现在在一家创业公司做架构。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q0",
+          "query": "我什么时候离职的？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6509209298071326,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4740.7,
+          "top_3": [
+            {
+              "id": "mem_8",
+              "score": 0.6557,
+              "text": "离职后我去西藏玩了一个月。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.6452,
+              "text": "2024年3月，我从百度离职了。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.63,
+              "text": "离职后我去西藏玩了一个月。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q1",
+          "query": "离职后干了什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7572.2,
+          "top_3": [
+            {
+              "id": "mem_8",
+              "score": 0.6557,
+              "text": "离职后我去西藏玩了一个月。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.6452,
+              "text": "离职后我去西藏玩了一个月。"
+            },
+            {
+              "id": "mem_7",
+              "score": 0.6349,
+              "text": "2024年3月，我从百度离职了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q2",
+          "query": "什么时候入职新公司的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7729.0,
+          "top_3": [
+            {
+              "id": "mem_11",
+              "score": 0.8197,
+              "text": "7月1号正式入职新公司。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.8065,
+              "text": "7月1号正式入职新公司。"
+            },
+            {
+              "id": "mem_12",
+              "score": 0.7937,
+              "text": "新公司在海淀，离家有点远。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q3",
+          "query": "新公司在哪？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5948.5,
+          "top_3": [
+            {
+              "id": "mem_12",
+              "score": 0.6557,
+              "text": "新公司在海淀，离家有点远。"
+            },
+            {
+              "id": "mem_11",
+              "score": 0.64,
+              "text": "7月1号正式入职新公司。"
+            },
+            {
+              "id": "mem_6",
+              "score": 0.64,
+              "text": "新公司在海淀，离家有点远。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q0",
+          "query": "我最喜欢什么语言？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.41247582707130004,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6185.8,
+          "top_3": [
+            {
+              "id": "mem_5",
+              "score": 0.6557,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "mem_1",
+              "score": 0.6452,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "mem_8",
+              "score": 0.6252,
+              "text": "最近在学 Rust，感觉这才是未来。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q1",
+          "query": "我觉得什么语言性能好？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7095.3,
+          "top_3": [
+            {
+              "id": "mem_6",
+              "score": 0.6505,
+              "text": "后来用了 Go 写后端，发现性能确实好很多。"
+            },
+            {
+              "id": "mem_5",
+              "score": 0.6452,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "mem_2",
+              "score": 0.635,
+              "text": "后来用了 Go 写后端，发现性能确实好很多。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q0",
+          "query": "A轮融资目标是多少？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5443.5,
+          "top_3": [
+            {
+              "id": "mem_73",
+              "score": 0.8197,
+              "text": "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。"
+            },
+            {
+              "id": "mem_21",
+              "score": 0.8065,
+              "text": "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。"
+            },
+            {
+              "id": "mem_96",
+              "score": 0.782,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q1",
+          "query": "CTO看好什么方向？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 11239.6,
+          "top_3": [
+            {
+              "id": "mem_88",
+              "score": 0.6557,
+              "text": "CTO 说他看好边缘计算方向，让我们提前布局。"
+            },
+            {
+              "id": "mem_36",
+              "score": 0.6452,
+              "text": "CTO 说他看好边缘计算方向，让我们提前布局。"
+            },
+            {
+              "id": "mem_97",
+              "score": 0.63,
+              "text": "我在考虑要不要换一台2TB的硬盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q2",
+          "query": "Q3要完成几个核心功能？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4844.7,
+          "top_3": [
+            {
+              "id": "mem_96",
+              "score": 0.6557,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "mem_91",
+              "score": 0.6452,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "mem_85",
+              "score": 0.6349,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q0",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5706417189553201,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3.8,
+          "top_3": [
+            {
+              "id": "mem_20",
+              "score": 5.76,
+              "text": "2025年妈妈退休了。"
+            },
+            {
+              "id": "mem_6",
+              "score": 5.76,
+              "text": "2025年妈妈退休了。"
+            },
+            {
+              "id": "mem_15",
+              "score": 5.71,
+              "text": "妈妈今年55岁，退休教师。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q1",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5437713091520254,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4230.1,
+          "top_3": [
+            {
+              "id": "mem_28",
+              "score": 0.8096,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_14",
+              "score": 0.7967,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_19",
+              "score": 0.7842,
+              "text": "李四买了比亚迪电动车。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q2",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5001.3,
+          "top_3": [
+            {
+              "id": "mem_28",
+              "score": 0.4765,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_27",
+              "score": 0.4765,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_13",
+              "score": 0.4691,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q3",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.2,
+          "ndcg_at_5": 0.38685280723454163,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6058.4,
+          "top_3": [
+            {
+              "id": "mem_28",
+              "score": 0.6404,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_27",
+              "score": 0.6301,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_17",
+              "score": 0.6131,
+              "text": "李丽是张三是前同事，她是家庭主妇。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q4",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6934264036172708,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 12905.7,
+          "top_3": [
+            {
+              "id": "mem_28",
+              "score": 0.6404,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_27",
+              "score": 0.6404,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "mem_13",
+              "score": 0.6303,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q5",
+          "query": "我胖了吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.1,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.7,
+          "top_3": [
+            {
+              "id": "mem_28",
+              "score": 0.378,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "mem_17",
+              "score": 0.378,
+              "text": "李丽是张三是前同事，她是家庭主妇。"
+            },
+            {
+              "id": "mem_3",
+              "score": 0.378,
+              "text": "李丽是张三是前同事，她是家庭主妇。"
+            }
+          ]
+        }
+      ]
+    },
+    "naive-vector": {
+      "provider": "naive-vector",
+      "aggregate": {
+        "positive_cases": 46,
+        "negative_cases": 3,
+        "p_at_1": 0.6087,
+        "p_at_3": 0.9348,
+        "p_at_5": 0.9348,
+        "mrr": 0.7563,
+        "ndcg_at_5": 0.708,
+        "recall_at_5": 0.9348,
+        "contamination_at_3": 0.0408,
+        "rejection_accuracy": 1.0,
+        "latency_ms_avg": 11.7,
+        "latency_ms_p95": 36.3
+      },
+      "per_case": [
+        {
+          "scenario_id": "SA-S1",
+          "case_id": "SA-S1",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 32.4,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.617,
+              "text": "妈妈今年55岁，已经退休了。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.5191,
+              "text": "爸爸今年58岁，还在上班。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4,
+              "text": "我今年30岁，在一家互联网公司工作。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S2",
+          "case_id": "SA-S2",
+          "query": "HHKB好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 31.9,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.4567,
+              "text": "我最喜欢机械键盘，打字手感特别好。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.3827,
+              "text": "鼠标我用的是罗技的无线鼠标。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.3545,
+              "text": "显示器是戴尔的27寸4K屏。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S3",
+          "case_id": "SA-S3",
+          "query": "张三同事的老婆",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 41.2,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.5975,
+              "text": "李丽是我的大学同学，张三是我的前同事。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.345,
+              "text": "王芳在北京协和医院工作。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.3339,
+              "text": "李丽是家庭主妇，没有上班。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S4",
+          "case_id": "SA-S4",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 36.3,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.6841,
+              "text": "李四最近在考虑买电动车。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.6752,
+              "text": "张三上个月买了一辆特斯拉。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.6043,
+              "text": "特斯拉最近降价了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S5",
+          "case_id": "SA-S5",
+          "query": "去年发生了什么",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.4,
+          "top_3": [
+            {
+              "id": "nv_3",
+              "score": 0.4383,
+              "text": "我2023年大学毕业。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.4336,
+              "text": "2024年爸爸换了个新工作。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.3856,
+              "text": "2025年妈妈退休了，回家种花。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S6",
+          "case_id": "SA-S6",
+          "query": "谁送我键盘的原因",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 10.3,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.6089,
+              "text": "张三送我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.4146,
+              "text": "李四也送了我一本书，挺好看的。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4053,
+              "text": "我每年生日都会给自己买个礼物。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S7",
+          "case_id": "SA-S7",
+          "query": "我最近胖了",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.3,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.7134,
+              "text": "我这个月体重增加了5公斤，得减肥了。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.5835,
+              "text": "我最近开始跑步，每天跑5公里。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.5,
+              "text": "我换了个新手机，拍照效果不错。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S8",
+          "case_id": "SA-S8",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.5,
+          "top_3": [
+            {
+              "id": "nv_3",
+              "score": 0.443,
+              "text": "昨天晚上睡得很好。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.31,
+              "text": "中午吃了红烧肉，味道还行。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.3024,
+              "text": "今天在会议室被老板批评了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S9",
+          "case_id": "SA-S9",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.6,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.4371,
+              "text": "今天的晚饭还不错。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4315,
+              "text": "Python 3.12 的新特性挺多的。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.3851,
+              "text": "我想明年去日本旅游，看看樱花。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S10",
+          "case_id": "SA-S10",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.1,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.4984,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4874,
+              "text": "张三送了我一把HHKB键盘。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4447,
+              "text": "我自己买了一个鼠标。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q0",
+          "query": "我表姐叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8.7,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.5512,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.407,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "nv_6",
+              "score": 0.3329,
+              "text": "她女儿今年上小学三年级。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q1",
+          "query": "她在哪家医院工作？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.2,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.5377,
+              "text": "她老公是做金融的，在国贸上班。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.5144,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.5117,
+              "text": "王芳说最近医院很忙，流感季。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q2",
+          "query": "她是什么科室的？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.5,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.4833,
+              "text": "她老公是做金融的，在国贸上班。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4666,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.4508,
+              "text": "她家养了一只金毛，叫豆豆。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q3",
+          "query": "她老公在哪上班？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5.8,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.7335,
+              "text": "她老公是做金融的，在国贸上班。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4931,
+              "text": "我上周末去她家，她做了糖醋排骨。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.405,
+              "text": "她家养了一只金毛，叫豆豆。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q4",
+          "query": "她家狗叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.0,
+          "top_3": [
+            {
+              "id": "nv_4",
+              "score": 0.652,
+              "text": "她家养了一只金毛，叫豆豆。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.3421,
+              "text": "她老公是做金融的，在国贸上班。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.3353,
+              "text": "我上周末去她家，她做了糖醋排骨。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q5",
+          "query": "她女儿几年级？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5.9,
+          "top_3": [
+            {
+              "id": "nv_6",
+              "score": 0.7761,
+              "text": "她女儿今年上小学三年级。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4662,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.4479,
+              "text": "她家养了一只金毛，叫豆豆。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q0",
+          "query": "陈总投的什么公司？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6240505200038378,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 8.9,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.6789,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.6632,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.5029,
+              "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q1",
+          "query": "途灵科技创始人什么背景？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 11.3,
+          "top_3": [
+            {
+              "id": "nv_3",
+              "score": 0.7107,
+              "text": "途灵科技的创始人是清华计算机系毕业的。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.6507,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4176,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q2",
+          "query": "陈总投的公司估值多少？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.3065735963827292,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.6,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.6642,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.6124,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.5922,
+              "text": "他们去年拿了 B 轮，估值 20 亿。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q3",
+          "query": "他们拿到哪一轮了？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.4,
+          "top_3": [
+            {
+              "id": "nv_4",
+              "score": 0.6226,
+              "text": "他们去年拿了 B 轮，估值 20 亿。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4636,
+              "text": "我认识一个投资人叫陈总，他在红杉资本。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.4298,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q0",
+          "query": "老张开什么车？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 10.0,
+          "top_3": [
+            {
+              "id": "nv_3",
+              "score": 0.6759,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.5302,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "nv_7",
+              "score": 0.4892,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q1",
+          "query": "小李开什么车？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 6.2,
+          "top_3": [
+            {
+              "id": "nv_7",
+              "score": 0.6787,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.5472,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4803,
+              "text": "老张开一辆黑色宝马 X5。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q2",
+          "query": "老张有什么爱好？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.0,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.5513,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4219,
+              "text": "老张开一辆黑色宝马 X5。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.3836,
+              "text": "他喜欢钓鱼，周末经常去密云水库。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q3",
+          "query": "小李养了什么宠物？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.3868528072345416,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.2,
+          "top_3": [
+            {
+              "id": "nv_7",
+              "score": 0.5483,
+              "text": "小李开的是比亚迪海豚，电动车。"
+            },
+            {
+              "id": "nv_6",
+              "score": 0.4313,
+              "text": "她特别喜欢猫，养了两只英短。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.4097,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q4",
+          "query": "谁之前在华为做过？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 6.4,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.8086,
+              "text": "他之前在华为做过，后来跳过来的。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.4966,
+              "text": "小李是去年刚来的应届生，做前端的。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.492,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q5",
+          "query": "老张养猫吗？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 11.9,
+          "top_3": [
+            {
+              "id": "nv_6",
+              "score": 0.5744,
+              "text": "她特别喜欢猫，养了两只英短。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4903,
+              "text": "老张是我们部门的技术主管，干了十年了。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4138,
+              "text": "老张开一辆黑色宝马 X5。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q0",
+          "query": "昨晚去的馆子怎么样？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.19420217938308018,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 11.4,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.6113,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.4494,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.4433,
+              "text": "服务员态度特别好，还送了果盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q1",
+          "query": "那几个菜？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 19.0,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.4833,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4483,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.4122,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q2",
+          "query": "花了多少钱？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.6,
+          "top_3": [
+            {
+              "id": "nv_3",
+              "score": 0.6763,
+              "text": "人均大概一百二左右，不算贵。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.3827,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.3598,
+              "text": "服务员态度特别好，还送了果盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q3",
+          "query": "在哪吃的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.6,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.5057,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.4615,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.3788,
+              "text": "人均大概一百二左右，不算贵。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q0",
+          "query": "我结婚了吗？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 5.7,
+          "top_3": [
+            {
+              "id": "nv_3",
+              "score": 0.3919,
+              "text": "现在在一家创业公司做架构。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.3848,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.3594,
+              "text": "毕业后去了百度做了三年后端。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q1",
+          "query": "我工资多少？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 5.8,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.4892,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.399,
+              "text": "现在在一家创业公司做架构。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.3566,
+              "text": "毕业后去了百度做了三年后端。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q2",
+          "query": "我在哪个城市生活？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 7.2,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.3896,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.3307,
+              "text": "现在在一家创业公司做架构。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.2743,
+              "text": "毕业后去了百度做了三年后端。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q3",
+          "query": "我在百度做什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.5,
+          "top_3": [
+            {
+              "id": "nv_2",
+              "score": 0.5593,
+              "text": "毕业后去了百度做了三年后端。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.4667,
+              "text": "我大学学的是计算机专业。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4565,
+              "text": "现在在一家创业公司做架构。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q0",
+          "query": "我什么时候离职的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.0,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.6687,
+              "text": "2024年3月，我从百度离职了。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.5948,
+              "text": "5月份回来开始找工作。"
+            },
+            {
+              "id": "nv_5",
+              "score": 0.5925,
+              "text": "7月1号正式入职新公司。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q1",
+          "query": "离职后干了什么？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.3,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.5829,
+              "text": "2024年3月，我从百度离职了。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.511,
+              "text": "5月份回来开始找工作。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.4989,
+              "text": "离职后我去西藏玩了一个月。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q2",
+          "query": "什么时候入职新公司的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 7.1,
+          "top_3": [
+            {
+              "id": "nv_5",
+              "score": 0.7881,
+              "text": "7月1号正式入职新公司。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.6013,
+              "text": "5月份回来开始找工作。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.5982,
+              "text": "6月中拿到了一家 AI 公司的 offer。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q3",
+          "query": "新公司在哪？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.5,
+          "top_3": [
+            {
+              "id": "nv_5",
+              "score": 0.693,
+              "text": "7月1号正式入职新公司。"
+            },
+            {
+              "id": "nv_6",
+              "score": 0.6687,
+              "text": "新公司在海淀，离家有点远。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.5549,
+              "text": "6月中拿到了一家 AI 公司的 offer。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q0",
+          "query": "我最喜欢什么语言？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.3431272824944109,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 28.0,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.6004,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4496,
+              "text": "不过 Python 的生态还是最完善的。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.4258,
+              "text": "最近在学 Rust，感觉这才是未来。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q1",
+          "query": "我觉得什么语言性能好？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.7,
+          "top_3": [
+            {
+              "id": "nv_1",
+              "score": 0.5976,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.5459,
+              "text": "后来用了 Go 写后端，发现性能确实好很多。"
+            },
+            {
+              "id": "nv_3",
+              "score": 0.4658,
+              "text": "不过 Python 的生态还是最完善的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q0",
+          "query": "A轮融资目标是多少？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 9.0,
+          "top_3": [
+            {
+              "id": "nv_21",
+              "score": 0.7477,
+              "text": "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.5193,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "nv_49",
+              "score": 0.5193,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q1",
+          "query": "CTO看好什么方向？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 21.6,
+          "top_3": [
+            {
+              "id": "nv_36",
+              "score": 0.7049,
+              "text": "CTO 说他看好边缘计算方向，让我们提前布局。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.5494,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "nv_49",
+              "score": 0.5494,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q2",
+          "query": "Q3要完成几个核心功能？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 21.5,
+          "top_3": [
+            {
+              "id": "nv_17",
+              "score": 0.8083,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.8083,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            },
+            {
+              "id": "nv_49",
+              "score": 0.8083,
+              "text": "老板说Q3的目标是完成3个核心功能。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q0",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.8,
+          "top_3": [
+            {
+              "id": "nv_6",
+              "score": 0.6172,
+              "text": "2025年妈妈退休了。"
+            },
+            {
+              "id": "nv_1",
+              "score": 0.5479,
+              "text": "妈妈今年55岁，退休教师。"
+            },
+            {
+              "id": "nv_7",
+              "score": 0.478,
+              "text": "2024年爸爸换了工作。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q1",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 6.4,
+          "top_3": [
+            {
+              "id": "nv_5",
+              "score": 0.7053,
+              "text": "李四买了比亚迪电动车。"
+            },
+            {
+              "id": "nv_4",
+              "score": 0.6811,
+              "text": "张三买了特斯拉Model 3。"
+            },
+            {
+              "id": "nv_14",
+              "score": 0.5284,
+              "text": "李四说这个键盘不好用。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q2",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.16666666666666666,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.2,
+          "top_3": [
+            {
+              "id": "nv_14",
+              "score": 0.3727,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "nv_8",
+              "score": 0.3617,
+              "text": "我最近开始跑步健身。"
+            },
+            {
+              "id": "nv_9",
+              "score": 0.3168,
+              "text": "体重增加了5公斤，需要控制饮食。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q3",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.125,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6.4,
+          "top_3": [
+            {
+              "id": "nv_8",
+              "score": 0.5142,
+              "text": "我最近开始跑步健身。"
+            },
+            {
+              "id": "nv_7",
+              "score": 0.5031,
+              "text": "2024年爸爸换了工作。"
+            },
+            {
+              "id": "nv_10",
+              "score": 0.4538,
+              "text": "今天在会议室被老板批评了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q4",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.4437016069115603,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.3333333333333333,
+          "rejection_correct": null,
+          "latency_ms": 6.5,
+          "top_3": [
+            {
+              "id": "nv_14",
+              "score": 0.4984,
+              "text": "李四说这个键盘不好用。"
+            },
+            {
+              "id": "nv_13",
+              "score": 0.4934,
+              "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
+            },
+            {
+              "id": "nv_2",
+              "score": 0.4202,
+              "text": "我最喜欢机械键盘。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q5",
+          "query": "我胖了吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 45.6,
+          "top_3": [
+            {
+              "id": "nv_9",
+              "score": 0.5431,
+              "text": "体重增加了5公斤，需要控制饮食。"
+            },
+            {
+              "id": "nv_8",
+              "score": 0.5243,
+              "text": "我最近开始跑步健身。"
+            },
+            {
+              "id": "nv_11",
+              "score": 0.4085,
+              "text": "中午吃了红烧肉，味道还行。"
+            }
+          ]
+        }
+      ]
+    },
+    "long-context": {
+      "provider": "long-context",
+      "aggregate": {
+        "positive_cases": 46,
+        "negative_cases": 3,
+        "p_at_1": 0.6739,
+        "p_at_3": 0.6739,
+        "p_at_5": 0.6739,
+        "mrr": 0.6739,
+        "ndcg_at_5": 0.6078,
+        "recall_at_5": 0.663,
+        "contamination_at_3": 0.0,
+        "rejection_accuracy": 1.0,
+        "latency_ms_avg": 3186.4,
+        "latency_ms_p95": 4866.5
+      },
+      "per_case": [
+        {
+          "scenario_id": "SA-S1",
+          "case_id": "SA-S1",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2376.2,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "妈妈今年55岁，已经退休了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S2",
+          "case_id": "SA-S2",
+          "query": "HHKB好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2142.9,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我最喜欢机械键盘，打字手感特别好。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S3",
+          "case_id": "SA-S3",
+          "query": "张三同事的老婆",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4158.3,
+          "top_3": []
+        },
+        {
+          "scenario_id": "SA-S4",
+          "case_id": "SA-S4",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4454.3,
+          "top_3": []
+        },
+        {
+          "scenario_id": "SA-S5",
+          "case_id": "SA-S5",
+          "query": "去年发生了什么",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3278.7,
+          "top_3": [
+            {
+              "id": "lc_2",
+              "score": 1.0,
+              "text": "2024年爸爸换了个新工作。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S6",
+          "case_id": "SA-S6",
+          "query": "谁送我键盘的原因",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4165.0,
+          "top_3": []
+        },
+        {
+          "scenario_id": "SA-S7",
+          "case_id": "SA-S7",
+          "query": "我最近胖了",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2620.5,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我这个月体重增加了5公斤，得减肥了。"
+            },
+            {
+              "id": "lc_2",
+              "score": 0.5,
+              "text": "我最近开始跑步，每天跑5公里。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S8",
+          "case_id": "SA-S8",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 1929.3,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "今天在会议室被老板批评了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S9",
+          "case_id": "SA-S9",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2093.4,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我想明年去日本旅游，看看樱花。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "SA-S10",
+          "case_id": "SA-S10",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3671.5,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "张三送了我一把HHKB键盘。"
+            },
+            {
+              "id": "lc_2",
+              "score": 0.5,
+              "text": "李四说这个键盘不好用。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q0",
+          "query": "我表姐叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2620.5,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q1",
+          "query": "她在哪家医院工作？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 1947.5,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q2",
+          "query": "她是什么科室的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2157.1,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q3",
+          "query": "她老公在哪上班？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2036.5,
+          "top_3": [
+            {
+              "id": "lc_2",
+              "score": 1.0,
+              "text": "她老公是做金融的，在国贸上班。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q4",
+          "query": "她家狗叫什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2715.6,
+          "top_3": [
+            {
+              "id": "lc_4",
+              "score": 1.0,
+              "text": "她家养了一只金毛，叫豆豆。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-precision_basic",
+          "case_id": "MA-precision_basic-q5",
+          "query": "她女儿几年级？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 1895.1,
+          "top_3": [
+            {
+              "id": "lc_6",
+              "score": 1.0,
+              "text": "她女儿今年上小学三年级。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q0",
+          "query": "陈总投的什么公司？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3369.0,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q1",
+          "query": "途灵科技创始人什么背景？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2873.9,
+          "top_3": [
+            {
+              "id": "lc_3",
+              "score": 1.0,
+              "text": "途灵科技的创始人是清华计算机系毕业的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q2",
+          "query": "陈总投的公司估值多少？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4265.3,
+          "top_3": [
+            {
+              "id": "lc_4",
+              "score": 1.0,
+              "text": "他们去年拿了 B 轮，估值 20 亿。"
+            },
+            {
+              "id": "lc_2",
+              "score": 0.5,
+              "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-multi_hop",
+          "case_id": "MA-multi_hop-q3",
+          "query": "他们拿到哪一轮了？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3587.0,
+          "top_3": [
+            {
+              "id": "lc_4",
+              "score": 1.0,
+              "text": "他们去年拿了 B 轮，估值 20 亿。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q0",
+          "query": "老张开什么车？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 1902.7,
+          "top_3": [
+            {
+              "id": "lc_3",
+              "score": 1.0,
+              "text": "老张开一辆黑色宝马 X5。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q1",
+          "query": "小李开什么车？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4300.3,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q2",
+          "query": "老张有什么爱好？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3057.7,
+          "top_3": [
+            {
+              "id": "lc_4",
+              "score": 1.0,
+              "text": "他喜欢钓鱼，周末经常去密云水库。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q3",
+          "query": "小李养了什么宠物？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4866.5,
+          "top_3": [
+            {
+              "id": "lc_6",
+              "score": 1.0,
+              "text": "她特别喜欢猫，养了两只英短。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q4",
+          "query": "谁之前在华为做过？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4053.1,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-isolation",
+          "case_id": "MA-isolation-q5",
+          "query": "老张养猫吗？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4494.7,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q0",
+          "query": "昨晚去的馆子怎么样？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 5090.7,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q1",
+          "query": "那几个菜？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3685.2,
+          "top_3": [
+            {
+              "id": "lc_2",
+              "score": 1.0,
+              "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
+            },
+            {
+              "id": "lc_5",
+              "score": 0.5,
+              "text": "我同事推荐的，说他们家的毛血旺更绝。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q2",
+          "query": "花了多少钱？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2455.7,
+          "top_3": [
+            {
+              "id": "lc_3",
+              "score": 1.0,
+              "text": "人均大概一百二左右，不算贵。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-fuzzy",
+          "case_id": "MA-fuzzy-q3",
+          "query": "在哪吃的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2458.7,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我昨天晚上去吃了一家川菜馆，在望京那边。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q0",
+          "query": "我结婚了吗？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 1462.5,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q1",
+          "query": "我工资多少？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 2104.4,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q2",
+          "query": "我在哪个城市生活？",
+          "is_negative": true,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": 1.0,
+          "latency_ms": 2333.6,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-negative",
+          "case_id": "MA-negative-q3",
+          "query": "我在百度做什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2317.3,
+          "top_3": [
+            {
+              "id": "lc_2",
+              "score": 1.0,
+              "text": "毕业后去了百度做了三年后端。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q0",
+          "query": "我什么时候离职的？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2075.3,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "2024年3月，我从百度离职了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q1",
+          "query": "离职后干了什么？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3248.2,
+          "top_3": [
+            {
+              "id": "lc_2",
+              "score": 1.0,
+              "text": "离职后我去西藏玩了一个月。"
+            },
+            {
+              "id": "lc_1",
+              "score": 0.5,
+              "text": "2024年3月，我从百度离职了。"
+            },
+            {
+              "id": "lc_3",
+              "score": 0.3333,
+              "text": "5月份回来开始找工作。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q2",
+          "query": "什么时候入职新公司的？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3780.4,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-temporal",
+          "case_id": "MA-temporal-q3",
+          "query": "新公司在哪？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2335.1,
+          "top_3": [
+            {
+              "id": "lc_6",
+              "score": 1.0,
+              "text": "新公司在海淀，离家有点远。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q0",
+          "query": "我最喜欢什么语言？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.2800617028281894,
+          "recall_at_5": 0.5,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2746.7,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "我觉得 Python 是最适合做 AI 的语言。"
+            },
+            {
+              "id": "lc_3",
+              "score": 0.5,
+              "text": "不过 Python 的生态还是最完善的。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-contradiction",
+          "case_id": "MA-contradiction-q1",
+          "query": "我觉得什么语言性能好？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3484.9,
+          "top_3": [
+            {
+              "id": "lc_2",
+              "score": 1.0,
+              "text": "后来用了 Go 写后端，发现性能确实好很多。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q0",
+          "query": "A轮融资目标是多少？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3135.9,
+          "top_3": [
+            {
+              "id": "lc_21",
+              "score": 1.0,
+              "text": "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q1",
+          "query": "CTO看好什么方向？",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 2923.3,
+          "top_3": [
+            {
+              "id": "lc_36",
+              "score": 1.0,
+              "text": "CTO 说他看好边缘计算方向，让我们提前布局。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-long_conversation",
+          "case_id": "MA-long_conversation-q2",
+          "query": "Q3要完成几个核心功能？",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4208.6,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q0",
+          "query": "妈妈多大了",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3035.8,
+          "top_3": [
+            {
+              "id": "lc_1",
+              "score": 1.0,
+              "text": "妈妈今年55岁，退休教师。"
+            },
+            {
+              "id": "lc_6",
+              "score": 0.5,
+              "text": "2025年妈妈退休了。"
+            }
+          ]
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q1",
+          "query": "李四买特斯拉了吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3819.2,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q2",
+          "query": "我为什么心情不好",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 6345.1,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q3",
+          "query": "我之前说的那个计划",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3691.3,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q4",
+          "query": "他送我的东西好用吗",
+          "is_negative": false,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 4697.2,
+          "top_3": []
+        },
+        {
+          "scenario_id": "MA-semantic",
+          "case_id": "MA-semantic-q5",
+          "query": "我胖了吗",
+          "is_negative": false,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "contamination_at_3": 0.0,
+          "rejection_correct": null,
+          "latency_ms": 3663.4,
+          "top_3": [
+            {
+              "id": "lc_9",
+              "score": 1.0,
+              "text": "体重增加了5公斤，需要控制饮食。"
+            },
+            {
+              "id": "lc_8",
+              "score": 0.5,
+              "text": "我最近开始跑步健身。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "skipped": {}
+}

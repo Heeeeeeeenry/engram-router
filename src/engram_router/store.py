@@ -18,9 +18,11 @@ from pathlib import Path
 from typing import Any, cast
 
 from .config import config
+from .cross_encoder import CrossEncoderReranker
 from .embedding import EmbeddingEngine
 from .entities import classify_salience, extract_entities
 from .fusion import reciprocal_rank_fusion
+from .hyde import HyDEExpander
 from .llm_extractor import LLMExtractor, extract_edges_llm, extract_entities_llm
 from .llm_reranker import LLMReranker
 from .query_expansion import QueryExpander
@@ -114,6 +116,34 @@ class RecallWeights:
     At 10K+ memories the full scan would OOM; 2000 rows is a generous
     budget for the Python ranker to find top_k from."""
 
+    # ── cross-encoder reranker (Phase 1 of rerank_and_hyde.md) ────────────
+    ce_enabled: bool = True
+    """Enable cross-encoder reranking after fusion, before context boosts.
+    Falls back gracefully if sentence-transformers is missing or the model
+    can't be loaded — recall() continues without CE."""
+    ce_model: str = "bge-v2-m3"
+    """CrossEncoderReranker model key. See cross_encoder._LOCAL_MODELS."""
+    ce_max_candidates: int = 20
+    """Only rerank top-N of the fusion output; tail keeps original order."""
+    ce_weight: float = 0.6
+    """Blend factor: final = ce_weight * ce_norm + (1 - ce_weight) * fusion_norm.
+    0.0 disables CE contribution, 1.0 makes CE the sole ordering signal."""
+
+    # ── HyDE query expansion (Phase 2 of rerank_and_hyde.md) ──────────────
+    hyde_enabled: bool = False
+    """Enable HyDE (Hypothetical Document Embeddings). Off by default because
+    it requires an LLM key and adds 300–600 ms per fresh query."""
+    hyde_num_hypotheses: int = 3
+    """How many hypothetical answers to generate per query."""
+    hyde_min_query_chars: int = 10
+    """Short queries carry too little signal — skip HyDE below this length."""
+    hyde_top_k: int = 20
+    """Per-hypothesis vector-search width. The RRF layer folds them together."""
+    hyde_rrf_weight: float = 0.25
+    """RRF weight for the HyDE-derived result list vs the primary keyword
+    list (weight 0.4) and vector list (weight 0.6). Reduced from 0.5 after
+    L-fix eval (2026-07-23)."""
+
     def __post_init__(self) -> None:
         """Validate weights on construction so misconfiguration is caught early."""
         if not (0 < self.recall_decay <= 1):
@@ -130,6 +160,18 @@ class RecallWeights:
             raise ValueError(
                 f"max_recall_hops must be >= 1, got {self.max_recall_hops}"
             )
+        if not (0.0 <= self.ce_weight <= 1.0):
+            raise ValueError(f"ce_weight must be in [0, 1], got {self.ce_weight}")
+        if self.ce_max_candidates < 1:
+            raise ValueError(f"ce_max_candidates must be >= 1, got {self.ce_max_candidates}")
+        if self.hyde_num_hypotheses < 1:
+            raise ValueError(f"hyde_num_hypotheses must be >= 1, got {self.hyde_num_hypotheses}")
+        if self.hyde_min_query_chars < 1:
+            raise ValueError(f"hyde_min_query_chars must be >= 1, got {self.hyde_min_query_chars}")
+        if self.hyde_top_k < 1:
+            raise ValueError(f"hyde_top_k must be >= 1, got {self.hyde_top_k}")
+        if not (0.0 <= self.hyde_rrf_weight <= 5.0):
+            raise ValueError(f"hyde_rrf_weight must be in [0, 5], got {self.hyde_rrf_weight}")
 
 
 def _default_weights() -> RecallWeights:
@@ -178,6 +220,8 @@ class MemoryStore:
         llm_extractor: LLMExtractor | None = None,
         llm_query_extract: bool = False,
         reranker: Any | None = None,
+        cross_encoder: Any | None = None,
+        hyde: Any | None = None,
         embedding_engine: Any | None = None,
         vector_index: Any | None = None,
         query_expander: QueryExpander | None = None,
@@ -217,6 +261,45 @@ class MemoryStore:
             self.reranker = LLMReranker(
                 allow_cloud=config.privacy.allow_cloud_reranker,
             )
+
+        # ── Cross-encoder reranker (Phase 1 rerank_and_hyde.md) ──
+        _skip_ce = (
+            os.environ.get("ENGRAM_SKIP_CE") == "1"
+            or os.environ.get("ENGRAM_SKIP_VECTOR") == "1"
+        ) and os.environ.get("ENGRAM_FORCE_CE") != "1"
+        if cross_encoder is not None:
+            self.cross_encoder = cross_encoder
+        elif self.weights.ce_enabled and not _skip_ce:
+            try:
+                self.cross_encoder = CrossEncoderReranker(
+                    model=self.weights.ce_model,
+                    max_candidates=self.weights.ce_max_candidates,
+                    ce_weight=self.weights.ce_weight,
+                    allow_cloud=config.privacy.allow_cloud_reranker,
+                )
+            except Exception as exc:
+                logger.debug("CrossEncoderReranker init failed: %s", exc)
+                self.cross_encoder = None
+        else:
+            self.cross_encoder = None
+
+        # ── HyDE (Phase 2 rerank_and_hyde.md) ──
+        if hyde is not None:
+            self.hyde = hyde
+        elif self.weights.hyde_enabled:
+            try:
+                self.hyde = HyDEExpander(
+                    num_hypotheses=self.weights.hyde_num_hypotheses,
+                    min_query_chars=self.weights.hyde_min_query_chars,
+                    allow_cloud=config.privacy.allow_cloud_llm,
+                    should_run=self.should_inject,
+                )
+            except Exception as exc:
+                logger.debug("HyDEExpander init failed: %s", exc)
+                self.hyde = None
+        else:
+            self.hyde = None
+
         self.vector_index = vector_index
         # Allow skipping vector via env var for fast test runs
         _skip_vector = not enable_vector or os.environ.get("ENGRAM_SKIP_VECTOR") == "1"
@@ -1665,6 +1748,9 @@ class MemoryStore:
             )
 
         # ── Phase 2: Vector-search fusion ──
+        # Track hyde/vector ids for hyde-only de-weighting before CE.
+        _hyde_ids: set[str] = set()
+        _vector_ids: set[str] = set()
         if query and self._vector_enabled and self.embedding_engine and self.vector_index:
             try:
                 vec = self.embedding_engine.encode(query)
@@ -1672,11 +1758,42 @@ class MemoryStore:
                     vector_results = self.vector_index.search(vec, k=top_k * 4)
                     vector_list = [(mid, score) for mid, score in vector_results]
                     keyword_list = [(r.id, r.score) for r in records if r.score > 0]
+
+                    # ── HyDE result list (Phase 2 of rerank_and_hyde.md).
+                    hyde_list: list[tuple[str, float]] = []
+                    hyde_result = None
+                    hyde_skipped = False
+                    if self.hyde and getattr(self.hyde, "available", False) \
+                            and self.weights.hyde_rrf_weight > 0:
+                        try:
+                            hyde_list, hyde_result = self.hyde.expand_and_recall(
+                                query, self.embedding_engine, self.vector_index,
+                                k=self.weights.hyde_top_k,
+                            )
+                            if hyde_result:
+                                if hyde_result.source == "skipped":
+                                    hyde_skipped = True
+                                if hyde_result.hypotheses:
+                                    logger.debug("HyDE: %d hypotheses, %d candidates, source=%s",
+                                                 len(hyde_result.hypotheses), len(hyde_list),
+                                                 hyde_result.source)
+                        except Exception as exc:
+                            logger.debug("HyDE skipped: %s", exc)
+                            hyde_skipped = True
+
+                    hyde_ids: set[str] = {mid for mid, _ in hyde_list}
+                    vector_ids: set[str] = {mid for mid, _ in vector_list}
+                    _hyde_ids = hyde_ids
+                    _vector_ids = vector_ids
+
+                    result_lists: list[list[tuple[str, float]]] = [keyword_list, vector_list]
+                    rrf_weights: list[float] = [0.4, 0.6]
+                    if hyde_list:
+                        result_lists.append(hyde_list)
+                        rrf_weights.append(float(self.weights.hyde_rrf_weight))
+
                     merged = reciprocal_rank_fusion(
-                        [keyword_list, vector_list],
-                        k=60,
-                        weights=[0.4, 0.6],
-                    )
+                        result_lists, k=60, weights=rrf_weights)
                     rrf_scores = dict(merged)
                     # Build new list (MemoryRecord is frozen)
                     new_records: list[MemoryRecord] = []
@@ -1685,14 +1802,17 @@ class MemoryStore:
                         # Blend: keep keyword score as base, boost if also found by vector
                         rrf_s = rrf_scores.get(r.id, 0)
                         if rrf_s:
-                            new_score = r.score + rrf_s * 10  # keyword base + vector boost
+                            new_score = r.score + rrf_s * 10
                         else:
                             new_score = r.score
+                        reason = r.match_reason
+                        if r.id in hyde_ids and "HyDE" not in reason:
+                            reason = (reason + " · HyDE" if reason else "HyDE").strip(" ·")
                         new_records.append(MemoryRecord(
                             id=r.id, raw_text=r.raw_text, summary=r.summary,
                             confidence=r.confidence, metadata=r.metadata,
                             evidence_refs=r.evidence_refs,
-                            score=new_score, match_reason=r.match_reason,
+                            score=new_score, match_reason=reason,
                         ))
                     for mid, rrf_score in merged:
                         if mid not in existing_ids and len(new_records) < top_k:
@@ -1700,18 +1820,74 @@ class MemoryStore:
                             if row:
                                 rw = row[0]
                                 summary = rw["summary"] if rw["summary"] else rw["raw_text"][:160]
+                                reason = "HyDE (hypothetical)" if mid in hyde_ids else "vector search (semantic)"
+                                # Reduce confidence for vector-only hits when HyDE
+                                # was skipped (negative query → wrong direction).
+                                base_score = max(0.55, rrf_score * 60)
+                                if hyde_skipped and mid not in hyde_ids:
+                                    base_score *= 0.8
                                 new_records.append(MemoryRecord(
-                                    id=mid, raw_text=rw["raw_text"],
-                                    summary=summary,
+                                    id=mid, raw_text=rw["raw_text"], summary=summary,
                                     confidence=rw["confidence"] if rw["confidence"] is not None else 1.0,
                                     metadata=self._parse_metadata(rw["metadata"]),
-                                    evidence_refs=[], score=max(0.55, rrf_score * 60),  # above recent fallback (0.50)
-                                    match_reason="vector search (semantic)",
+                                    evidence_refs=[], score=base_score,
+                                    match_reason=reason,
                                 ))
                     new_records.sort(key=lambda x: x.score, reverse=True)
                     records = new_records
             except Exception as exc:
                 logger.debug("Vector search skipped: %s", exc)
+
+        # ── Phase 2.35: HyDE-only candidate de-weight ──
+        # Candidates found ONLY by HyDE (not in keyword or vector) are lower
+        # confidence.  De-weight so CE doesn't accidentally promote a
+        # hyde-only match into top-1 and poison rejection accuracy.
+        if _hyde_ids and _vector_ids and records:
+            keyword_ids_before = {r.id for r in records
+                                  if "HyDE" in (r.match_reason or "")
+                                  and "vector" not in (r.match_reason or "").lower()}
+            hyde_only = _hyde_ids - _vector_ids - keyword_ids_before
+            if hyde_only:
+                records = [
+                    MemoryRecord(
+                        id=r.id, raw_text=r.raw_text, summary=r.summary,
+                        confidence=r.confidence, metadata=r.metadata,
+                        evidence_refs=r.evidence_refs,
+                        score=r.score * 0.7,
+                        match_reason=r.match_reason + " · hyde-only deweight",
+                    ) if r.id in hyde_only else r
+                    for r in records
+                ]
+
+        # ── Phase 2.4: Cross-encoder rerank (Phase 1 rerank_and_hyde.md) ──
+        if self.cross_encoder and getattr(self.cross_encoder, "available", False) \
+                and query and len(records) > 1:
+            try:
+                cands = [{"text": r.raw_text, "score": r.score, "id": r.id} for r in records]
+                reranked = self.cross_encoder.rerank(query, cands)
+                new_order: list[MemoryRecord] = []
+                for c in reranked:
+                    src = next((r for r in records if r.id == c["id"]), None)
+                    if src is None:
+                        continue
+                    reason = src.match_reason
+                    if "ce_score" in c and "cross-encoder" not in reason:
+                        reason = (reason + " · cross-encoder" if reason else "cross-encoder").strip(" ·")
+                    new_order.append(MemoryRecord(
+                        id=src.id, raw_text=src.raw_text, summary=src.summary,
+                        confidence=src.confidence, metadata=src.metadata,
+                        evidence_refs=src.evidence_refs,
+                        score=float(c.get("score", src.score)),
+                        match_reason=reason,
+                    ))
+                seen = {r.id for r in new_order}
+                for r in records:
+                    if r.id not in seen:
+                        new_order.append(r)
+                records = new_order
+                logger.debug("Cross-encoder reranked %d records", len(cands))
+            except Exception as exc:
+                logger.debug("Cross-encoder skipped: %s", exc)
 
         # ── Phase 2.5: LLM reranker (semantic re-rank, optional) ──
         if self.reranker and self.reranker.available and records and len(records) > 1:

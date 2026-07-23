@@ -45,3 +45,8 @@ tests/audit/
 
 # UV
 uv.lock
+
+# Local CodeSee analysis artifacts (do not push)
+.codesee/
+.agents/
+AGENTS.md
