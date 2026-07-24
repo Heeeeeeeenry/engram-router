@@ -337,11 +337,16 @@ class HyDEExpander:
         similarities from :meth:`VectorIndex.search`; RRF (in ``store.recall``)
         will disregard the magnitudes and use rank only, so the caller
         doesn't need to renormalise.
+
+        Short-circuits before the LLM call when both embedding AND vector index
+        are unavailable, saving 300-600ms of wasted latency.
         """
+        if embedding is None and vector_index is None:
+            return [], HyDEResult(query=query, source="skipped",
+                                  skip_reason="embedding and vector index unavailable")
+
         result = self.generate(query)
         if not result.hypotheses:
-            return [], result
-        if embedding is None or vector_index is None:
             return [], result
 
         # De-dupe by memory id, keep highest per-id similarity across the

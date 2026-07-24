@@ -26,6 +26,7 @@ from .hyde import HyDEExpander
 from .llm_extractor import LLMExtractor, extract_edges_llm, extract_entities_llm
 from .llm_reranker import LLMReranker
 from .query_expansion import QueryExpander
+from . import query_intent
 
 logger = logging.getLogger(__name__)
 
@@ -144,6 +145,26 @@ class RecallWeights:
     list (weight 0.4) and vector list (weight 0.6). Reduced from 0.5 after
     L-fix eval (2026-07-23)."""
 
+    # ── RRF fusion scaling (was inline magic numbers) ─────────────────────
+    rrf_keyword_weight: float = 0.4
+    """RRF weight for the keyword/FTS recall list."""
+    rrf_vector_weight: float = 0.6
+    """RRF weight for the bi-encoder vector recall list."""
+    rrf_score_boost: float = 10.0
+    """Multiplier: keyword + vector RRF boost for existing records."""
+    rrf_new_insert_score_scale: float = 60.0
+    """Multiplier: RRF score → MemoryRecord.score for new vector-only candidates."""
+    vector_fallback_base: float = 0.55
+    """Base score for vector-only fallback candidates (above recent fallback)."""
+    vector_fallback_sim_scale: float = 0.2
+    """Sim multiplier for vector fallback: base + sim * scale."""
+    recent_fallback_score: float = 0.5
+    """Score for recent-item fallback when no keyword/vector matches."""
+    hyde_skip_vector_penalty: float = 0.8
+    """Multiplier for vector-only hits when HyDE was skipped (negative query)."""
+    hyde_only_penalty: float = 0.7
+    """Multiplier for HyDE-only hits (not in keyword or vector) before CE."""
+
     def __post_init__(self) -> None:
         """Validate weights on construction so misconfiguration is caught early."""
         if not (0 < self.recall_decay <= 1):
@@ -172,6 +193,12 @@ class RecallWeights:
             raise ValueError(f"hyde_top_k must be >= 1, got {self.hyde_top_k}")
         if not (0.0 <= self.hyde_rrf_weight <= 5.0):
             raise ValueError(f"hyde_rrf_weight must be in [0, 5], got {self.hyde_rrf_weight}")
+        if self.rrf_score_boost <= 0:
+            raise ValueError(f"rrf_score_boost must be > 0, got {self.rrf_score_boost}")
+        if not (0.0 <= self.hyde_skip_vector_penalty <= 1.0):
+            raise ValueError(f"hyde_skip_vector_penalty must be in [0,1], got {self.hyde_skip_vector_penalty}")
+        if not (0.0 <= self.hyde_only_penalty <= 1.0):
+            raise ValueError(f"hyde_only_penalty must be in [0,1], got {self.hyde_only_penalty}")
 
 
 def _default_weights() -> RecallWeights:
@@ -265,7 +292,6 @@ class MemoryStore:
         # ── Cross-encoder reranker (Phase 1 rerank_and_hyde.md) ──
         _skip_ce = (
             os.environ.get("ENGRAM_SKIP_CE") == "1"
-            or os.environ.get("ENGRAM_SKIP_VECTOR") == "1"
         ) and os.environ.get("ENGRAM_FORCE_CE") != "1"
         if cross_encoder is not None:
             self.cross_encoder = cross_encoder
@@ -581,7 +607,7 @@ class MemoryStore:
         # table.  See _fts_candidates() lines 557-563.
         pass
 
-    MAX_TEXT_BYTES = 10240  # P0: prevent OOM from unbounded input
+    MAX_TEXT_BYTES = 49152  # 48KB — raised from 10KB for LongMemEval _s split (0.09% of memories exceed 10KB, mostly tokenization artifacts)
 
     def save(self, text: str, source: str = "conversation", metadata: dict[str, Any] | None = None,
              namespace: str = "default") -> str:
@@ -1710,7 +1736,7 @@ class MemoryStore:
                                     confidence=confidence,
                                     metadata=self._parse_metadata(rw["metadata"]),
                                     evidence_refs=[],
-                                    score=0.55 + sim * 0.2,
+                                    score=self.weights.vector_fallback_base + sim * self.weights.vector_fallback_sim_scale,
                                     match_reason="vector search (semantic)",
                                 ))
                                 existing_ids.add(mid)
@@ -1727,7 +1753,7 @@ class MemoryStore:
                 for row in recent_rows:
                     rid = row["id"]
                     if rid not in existing_ids and len(fb_records) < top_k:
-                        fb_records.append(self._row_to_record(row, score=0.5,
+                        fb_records.append(self._row_to_record(row, score=self.weights.recent_fallback_score,
                             match_reason="recent fallback (no keyword match)"))
                         existing_ids.add(rid)
             return fb_records
@@ -1748,12 +1774,21 @@ class MemoryStore:
             )
 
         # ── Phase 2: Vector-search fusion ──
+        # Pre-compute the query vector once — used by RRF fusion (Phase 2)
+        # and post-CE fallback (Phase 3.5) below.
+        _query_vec: Any = None
+        if query and self._vector_enabled and self.embedding_engine and self.vector_index:
+            try:
+                _query_vec = self.embedding_engine.encode(query)
+            except Exception:
+                _query_vec = None
+
         # Track hyde/vector ids for hyde-only de-weighting before CE.
         _hyde_ids: set[str] = set()
         _vector_ids: set[str] = set()
-        if query and self._vector_enabled and self.embedding_engine and self.vector_index:
+        if _query_vec is not None:
             try:
-                vec = self.embedding_engine.encode(query)
+                vec = _query_vec
                 if vec is not None:
                     vector_results = self.vector_index.search(vec, k=top_k * 4)
                     vector_list = [(mid, score) for mid, score in vector_results]
@@ -1787,7 +1822,10 @@ class MemoryStore:
                     _vector_ids = vector_ids
 
                     result_lists: list[list[tuple[str, float]]] = [keyword_list, vector_list]
-                    rrf_weights: list[float] = [0.4, 0.6]
+                    rrf_weights: list[float] = [
+                        self.weights.rrf_keyword_weight,
+                        self.weights.rrf_vector_weight,
+                    ]
                     if hyde_list:
                         result_lists.append(hyde_list)
                         rrf_weights.append(float(self.weights.hyde_rrf_weight))
@@ -1802,7 +1840,7 @@ class MemoryStore:
                         # Blend: keep keyword score as base, boost if also found by vector
                         rrf_s = rrf_scores.get(r.id, 0)
                         if rrf_s:
-                            new_score = r.score + rrf_s * 10
+                            new_score = r.score + rrf_s * self.weights.rrf_score_boost
                         else:
                             new_score = r.score
                         reason = r.match_reason
@@ -1823,9 +1861,10 @@ class MemoryStore:
                                 reason = "HyDE (hypothetical)" if mid in hyde_ids else "vector search (semantic)"
                                 # Reduce confidence for vector-only hits when HyDE
                                 # was skipped (negative query → wrong direction).
-                                base_score = max(0.55, rrf_score * 60)
+                                base_score = max(self.weights.vector_fallback_base,
+                                                 rrf_score * self.weights.rrf_new_insert_score_scale)
                                 if hyde_skipped and mid not in hyde_ids:
-                                    base_score *= 0.8
+                                    base_score *= self.weights.hyde_skip_vector_penalty
                                 new_records.append(MemoryRecord(
                                     id=mid, raw_text=rw["raw_text"], summary=summary,
                                     confidence=rw["confidence"] if rw["confidence"] is not None else 1.0,
@@ -1853,13 +1892,18 @@ class MemoryStore:
                         id=r.id, raw_text=r.raw_text, summary=r.summary,
                         confidence=r.confidence, metadata=r.metadata,
                         evidence_refs=r.evidence_refs,
-                        score=r.score * 0.7,
+                        score=r.score * self.weights.hyde_only_penalty,
                         match_reason=r.match_reason + " · hyde-only deweight",
                     ) if r.id in hyde_only else r
                     for r in records
                 ]
 
         # ── Phase 2.4: Cross-encoder rerank (Phase 1 rerank_and_hyde.md) ──
+        # Save pre-CE signal so Phase 3.5 can decide whether to fall back to
+        # vector search.  After CE normalisation all scores fall into [0,1],
+        # making threshold-based checks (score <= 0.1) semantically broken.
+        _had_meaningful_hits = bool(records) and not all(
+            r.score <= 0 for r in records)
         if self.cross_encoder and getattr(self.cross_encoder, "available", False) \
                 and query and len(records) > 1:
             try:
@@ -1913,13 +1957,12 @@ class MemoryStore:
         self._apply_decay(records)
 
         # ── Phase 3.5: Vector fallback for queries with no keyword matches ──
-        # When keyword recall returns empty or few results, supplement with
-        # vector search results directly (simpler than RRF fusion for small stores).
-        if (not records or all(r.score <= 0.1 for r in records)) \
-                and query and self._vector_enabled \
-                and self.embedding_engine and self.vector_index:
+        # Uses pre-CE flag (_had_meaningful_hits) so CE/LLM normalisation
+        # doesn't cause the threshold to misfire (all scores become [0,1]).
+        if (not records or not _had_meaningful_hits) \
+                and _query_vec is not None:
             try:
-                vec = self.embedding_engine.encode(query)
+                vec = _query_vec
                 if vec is not None:
                     vector_results = self.vector_index.search(vec, k=top_k * 2)
                     existing_ids = {r.id for r in records}
@@ -1935,7 +1978,8 @@ class MemoryStore:
                                     confidence=confidence,
                                     metadata=self._parse_metadata(rw["metadata"]),
                                     evidence_refs=[],
-                                    score=0.55 + sim * 0.2,  # 0.55~0.75, above fallback 0.50
+                                    score=self.weights.vector_fallback_base
+                                          + sim * self.weights.vector_fallback_sim_scale,
                                     match_reason="vector search (semantic)",
                                 ))
                                 existing_ids.add(mid)
@@ -1958,7 +2002,7 @@ class MemoryStore:
                 rid = row["id"]
                 if rid not in existing_ids and len(records) < top_k:
                     records.append(
-                        self._row_to_record(row, score=0.5,
+                        self._row_to_record(row, score=self.weights.recent_fallback_score,
                             match_reason="recent fallback"))
                     existing_ids.add(rid)
 
@@ -2308,27 +2352,9 @@ class MemoryStore:
                 subjects.add(name)
         return subjects
 
-    @staticmethod
-    def _asks_brand(query: str) -> bool:
-        return any(k in query for k in ("牌子", "品牌", "什么型号", "型号", "哪个牌", "什么款"))
-
-    @staticmethod
-    def _asks_identity(query: str) -> bool:
-        """Identity questions ('是谁/叫什么/多大/几岁/什么星座') ask for the
-        constant base attributes (name/age/gender) of a subject."""
-        return any(k in query for k in (
-            "是谁", "叫什么", "叫啥", "名字", "多大", "几岁", "多少岁", "年龄",
-            "什么星座", "属相", "什么血型", "哪里人", "哪儿人", "是男是女", "性别",
-        ))
-
-    @staticmethod
-    def _asks_eval(query: str) -> bool:
-        """Evaluation/quality questions ('怎么样/好不好/如何/好吃吗/手艺') ask for
-        a judgement, which lives in sensory/evaluative content."""
-        return any(k in query for k in (
-            "怎么样", "好不好", "好吃吗", "好吃不", "如何", "厉害吗", "手艺",
-            "性格", "脾气", "好看吗", "漂亮吗",
-        ))
+    _asks_brand = staticmethod(query_intent.asks_brand)
+    _asks_identity = staticmethod(query_intent.asks_identity)
+    _asks_eval = staticmethod(query_intent.asks_eval)
 
     def gap_check(self, query: str, memories: list[MemoryRecord] | None = None,
                   namespace: str = "default", scan_all: bool = False) -> dict[str, Any]:

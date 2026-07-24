@@ -258,16 +258,21 @@ class ForgettingEngine:
     # -- helpers --------------------------------------------------------------
 
     def _days_since_accessed(self, memory: Any) -> float:
-        """Days since the last access, or since creation if never accessed."""
+        """Days since the last access, or since creation if never accessed.
+
+        Reads ``accessed_at`` / ``created_at`` directly from the DB columns
+        (not from ``memory.metadata``, which may be missing these fields
+        depending on which code path built the MemoryRecord).
+        """
         ts = None
-
-        # Prefer the metadata field (set by recall() hit).
-        if memory.metadata:
-            ts = memory.metadata.get("accessed_at")
-
-        # Fall back to created_at.
-        if not ts and memory.metadata:
-            ts = memory.metadata.get("created_at")
+        memory_id = getattr(memory, "id", None)
+        if memory_id:
+            row = self.store.conn.execute(
+                "SELECT accessed_at, created_at FROM memories WHERE id = ?",
+                (memory_id,),
+            ).fetchone()
+            if row:
+                ts = row["accessed_at"] or row["created_at"]
 
         if not ts:
             return 0.0

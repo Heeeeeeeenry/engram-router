@@ -1,681 +1,344 @@
 {
-  "timestamp": "2026-07-23T19:27:28",
+  "timestamp": "2026-07-24T11:35:09",
   "split": "s",
-  "limit": 30,
-  "question_types": null,
+  "limit": 10,
+  "question_types": [
+    "knowledge-update",
+    "multi-session"
+  ],
   "use_judge": false,
   "results": {
-    "naive-vector": {
-      "provider": "naive-vector",
+    "engram/ce+/hyde-": {
+      "provider": "engram/ce+/hyde-",
       "aggregate": {
-        "total_cases": 30,
-        "p_at_1": 0.4333,
-        "p_at_3": 0.6333,
-        "p_at_5": 0.7,
-        "mrr": 0.5475,
-        "ndcg_at_5": 0.5777,
-        "recall_at_5": 0.7,
-        "latency_ms_avg": 35.1,
-        "latency_ms_p95": 71.3
+        "total_cases": 10,
+        "p_at_1": 0.0,
+        "p_at_3": 0.1,
+        "p_at_5": 0.2,
+        "mrr": 0.075,
+        "ndcg_at_5": 0.1132,
+        "recall_at_5": 0.2,
+        "latency_ms_avg": 650.1,
+        "latency_ms_p95": 1797.3
       },
       "by_question_type": {
-        "single-session-user": {
-          "n": 30,
-          "p_at_1": 0.4333,
-          "mrr": 0.5475,
+        "multi-session": {
+          "n": 10,
+          "p_at_1": 0.0,
+          "mrr": 0.075,
           "judge_accuracy": null
         }
       },
       "per_case": [
         {
-          "question_id": "e47becba",
-          "question_type": "single-session-user",
-          "query": "What degree did I graduate with?",
-          "answer": "Business Administration",
-          "num_memories": 273,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 26.0,
-          "top_3": [
-            {
-              "score": 0.7658,
-              "text": "I graduated with a degree in Business Administration, which has definitely helped me in my new role."
-            },
-            {
-              "score": 0.6705,
-              "text": "Do you have any advice on how to handle situations where roommates aren't following agreed-upon rule"
-            },
-            {
-              "score": 0.6416,
-              "text": "I think I'll go with Pinot Grigio and Chianti, they seem like safe choices. Can you give me some tip"
-            }
-          ]
-        },
-        {
-          "question_id": "118b2229",
-          "question_type": "single-session-user",
-          "query": "How long is my daily commute to work?",
-          "answer": "45 minutes each way",
-          "num_memories": 241,
-          "p_at_1": 0.0,
-          "p_at_3": 0.0,
-          "p_at_5": 0.0,
-          "reciprocal_rank": 0.0,
-          "ndcg_at_5": 0.0,
-          "recall_at_5": 0.0,
-          "latency_ms": 18.7,
-          "top_3": [
-            {
-              "score": 0.7108,
-              "text": "If you don't have access to real-time information on recent disasters, what good are you then? I cou"
-            },
-            {
-              "score": 0.696,
-              "text": "I'm looking for some advice on how to take care of my leather boots. I've been wearing my new boots "
-            },
-            {
-              "score": 0.6901,
-              "text": "I'll definitely follow those tips to keep my office chair in good condition. Speaking of productivit"
-            }
-          ]
-        },
-        {
-          "question_id": "51a45a95",
-          "question_type": "single-session-user",
-          "query": "Where did I redeem a $5 coupon on coffee creamer?",
-          "answer": "Target",
-          "num_memories": 263,
-          "p_at_1": 0.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 0.3333333333333333,
-          "ndcg_at_5": 0.5,
-          "recall_at_5": 1.0,
-          "latency_ms": 23.6,
-          "top_3": [
-            {
-              "score": 0.8312,
-              "text": "I actually redeemed a $5 coupon on coffee creamer last Sunday, which was a nice surprise since I did"
-            },
-            {
-              "score": 0.667,
-              "text": "Do you have any tips for reducing food waste in households during the holiday season?"
-            },
-            {
-              "score": 0.6242,
-              "text": "I shop at Target pretty frequently, maybe every other week. I like buying household items, toiletrie"
-            }
-          ]
-        },
-        {
-          "question_id": "58bf7951",
-          "question_type": "single-session-user",
-          "query": "What play did I attend at the local community theater?",
-          "answer": "The Glass Menagerie",
-          "num_memories": 305,
-          "p_at_1": 0.0,
-          "p_at_3": 0.0,
-          "p_at_5": 0.0,
-          "reciprocal_rank": 0.0,
-          "ndcg_at_5": 0.0,
-          "recall_at_5": 0.0,
-          "latency_ms": 27.9,
-          "top_3": [
-            {
-              "score": 0.7223,
-              "text": "These all sound great! Which one do you think is the easiest to learn for someone who has never play"
-            },
-            {
-              "score": 0.6798,
-              "text": "Can you provide any information on the overall success of the athletes at the 2014 Commonwealth Game"
-            },
-            {
-              "score": 0.6701,
-              "text": "How did the performances of the athletes at the 2014 Commonwealth Games compare to those at other in"
-            }
-          ]
-        },
-        {
-          "question_id": "1e043500",
-          "question_type": "single-session-user",
-          "query": "What is the name of the playlist I created on Spotify?",
-          "answer": "Summer Vibes",
-          "num_memories": 253,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 43.4,
-          "top_3": [
-            {
-              "score": 0.6991,
-              "text": "What's a good music streaming service that can help me discover new music and artists, especially in"
-            },
-            {
-              "score": 0.631,
-              "text": "I'm trying to organize my digital life, can you help me generate a checklist for updating my online "
-            },
-            {
-              "score": 0.6277,
-              "text": "I'm actually going through this process right now after a recent divorce and name change. I was prev"
-            }
-          ]
-        },
-        {
-          "question_id": "c5e8278d",
-          "question_type": "single-session-user",
-          "query": "What was my last name before I changed it?",
-          "answer": "Johnson",
-          "num_memories": 233,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 31.3,
-          "top_3": [
-            {
-              "score": 0.7172,
-              "text": "I need to update my address with my health insurance provider. Can you walk me through the process o"
-            },
-            {
-              "score": 0.71,
-              "text": "I think I'll call them, it's easier to get it done quickly. Do you know how long it usually takes fo"
-            },
-            {
-              "score": 0.6809,
-              "text": "I'm also wondering, do I need to update my credit report with the three major credit bureaus (Experi"
-            }
-          ]
-        },
-        {
-          "question_id": "6ade9755",
-          "question_type": "single-session-user",
-          "query": "Where do I take yoga classes?",
-          "answer": "Serenity Yoga",
-          "num_memories": 252,
-          "p_at_1": 0.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 0.5,
-          "ndcg_at_5": 0.6509209298071326,
-          "recall_at_5": 1.0,
-          "latency_ms": 23.9,
-          "top_3": [
-            {
-              "score": 0.6791,
-              "text": "I'll try searching online for healthy brunch spots near my place. By the way, do you know any good y"
-            },
-            {
-              "score": 0.6726,
-              "text": "I'm trying to plan a self-care day and was thinking of doing a morning yoga practice at home, then m"
-            },
-            {
-              "score": 0.6627,
-              "text": "I've definitely noticed that my yoga practice has influenced my relationships, especially with my be"
-            }
-          ]
-        },
-        {
-          "question_id": "6f9b354f",
-          "question_type": "single-session-user",
-          "query": "What color did I repaint my bedroom walls?",
-          "answer": "a lighter shade of gray",
-          "num_memories": 247,
-          "p_at_1": 0.0,
-          "p_at_3": 0.0,
-          "p_at_5": 0.0,
-          "reciprocal_rank": 0.14285714285714285,
-          "ndcg_at_5": 0.0,
-          "recall_at_5": 0.0,
-          "latency_ms": 23.3,
-          "top_3": [
-            {
-              "score": 0.6849,
-              "text": "I'm considering a pendant light above the desk and some table lamps for task lighting. I've been eye"
-            },
-            {
-              "score": 0.6517,
-              "text": "What is the length of the Great Wall of China, and how long did it take to build?"
-            },
-            {
-              "score": 0.6422,
-              "text": "What a waste of human life and resources, all for a wall. I wonder if the benefits it provided were "
-            }
-          ]
-        },
-        {
-          "question_id": "58ef2f1c",
-          "question_type": "single-session-user",
-          "query": "When did I volunteer at the local animal shelter's fundraising dinner?",
-          "answer": "February 14th",
-          "num_memories": 256,
-          "p_at_1": 0.0,
-          "p_at_3": 0.0,
-          "p_at_5": 0.0,
-          "reciprocal_rank": 0.0,
-          "ndcg_at_5": 0.0,
-          "recall_at_5": 0.0,
-          "latency_ms": 41.3,
-          "top_3": [
-            {
-              "score": 0.6722,
-              "text": "I'm most passionate about animal welfare and children's health, so anything related to those causes "
-            },
-            {
-              "score": 0.6531,
-              "text": "I'm planning to host a dinner party soon and I want to make some traditional Indian dishes. Can you "
-            },
-            {
-              "score": 0.638,
-              "text": "Those snack ideas sound great! I'm especially interested in the no-bake energy balls and homemade gr"
-            }
-          ]
-        },
-        {
-          "question_id": "f8c5f88b",
-          "question_type": "single-session-user",
-          "query": "Where did I buy my new tennis racket from?",
-          "answer": "the sports store downtown",
-          "num_memories": 241,
-          "p_at_1": 0.0,
-          "p_at_3": 0.0,
-          "p_at_5": 0.0,
-          "reciprocal_rank": 0.0,
-          "ndcg_at_5": 0.0,
-          "recall_at_5": 0.0,
-          "latency_ms": 49.4,
-          "top_3": [
-            {
-              "score": 0.7651,
-              "text": "I'm planning to buy new tennis balls this weekend. Do you know any good brands or types of tennis ba"
-            },
-            {
-              "score": 0.7555,
-              "text": "I'll definitely do those exercises before playing tennis. By the way, I'm really happy with my new t"
-            },
-            {
-              "score": 0.6985,
-              "text": "I'll consider getting a tennis ball machine, but for now, I think I'll focus on improving my game wi"
-            }
-          ]
-        },
-        {
-          "question_id": "5d3d2817",
-          "question_type": "single-session-user",
-          "query": "What was my previous occupation?",
-          "answer": "Marketing specialist at a small startup",
-          "num_memories": 251,
-          "p_at_1": 0.0,
-          "p_at_3": 0.0,
-          "p_at_5": 0.0,
-          "reciprocal_rank": 0.0,
-          "ndcg_at_5": 0.0,
-          "recall_at_5": 0.0,
-          "latency_ms": 38.5,
-          "top_3": [
-            {
-              "score": 0.6322,
-              "text": "That's a great question."
-            },
-            {
-              "score": 0.6311,
-              "text": "what is a LPC Associate."
-            },
-            {
-              "score": 0.621,
-              "text": "I'm excited to try them out during my next cultural immersion experience."
-            }
-          ]
-        },
-        {
-          "question_id": "7527f7e2",
-          "question_type": "single-session-user",
-          "query": "How much did I spend on a designer handbag?",
-          "answer": "$800",
-          "num_memories": 243,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 51.2,
-          "top_3": [
-            {
-              "score": 0.7196,
-              "text": "I think I'd like to start tracking my expenses. Can you recommend any good budgeting apps? I've been"
-            },
-            {
-              "score": 0.6985,
-              "text": "I'm looking for some interior design tips to make my bedroom feel more cohesive. I just got a beauti"
-            },
-            {
-              "score": 0.6806,
-              "text": "I like the idea of designating zones on my desk. Can you give me some suggestions on how to set up a"
-            }
-          ]
-        },
-        {
-          "question_id": "c960da58",
-          "question_type": "single-session-user",
-          "query": "How many playlists do I have on Spotify?",
-          "answer": "20",
-          "num_memories": 250,
+          "question_id": "0a995998",
+          "question_type": "multi-session",
+          "query": "How many items of clothing do I need to pick up or return from a store?",
+          "answer": "3",
+          "num_memories": 242,
           "p_at_1": 0.0,
           "p_at_3": 1.0,
           "p_at_5": 1.0,
           "reciprocal_rank": 0.5,
           "ndcg_at_5": 0.6309297535714574,
           "recall_at_5": 1.0,
-          "latency_ms": 98.2,
+          "latency_ms": 1797.3,
           "top_3": [
             {
-              "score": 0.7364,
-              "text": "That's a great idea about using emojis or keywords in playlist names. I think I'll start doing that "
+              "score": 89.7,
+              "text": "I think I'll use some boxes I have at home to store my winter clothes. By the way, I just exchanged "
             },
             {
-              "score": 0.7055,
-              "text": "I've been listening to a mix of Lo-Fi hip hop beats and Tameca Jones' album on repeat lately, and I "
+              "score": 68.49,
+              "text": "Assuming that I am keeping the sentences that I find interesting in a note app, please provide me wi"
             },
             {
-              "score": 0.682,
-              "text": "I'll definitely check out those artists and songs for my new relaxing playlist. I think I'll organiz"
+              "score": 58.15,
+              "text": "I think the thread organization system is a great idea. I've already sorted my embroidery floss and "
             }
           ]
         },
         {
-          "question_id": "3b6f954b",
-          "question_type": "single-session-user",
-          "query": "Where did I attend for my study abroad program?",
-          "answer": "University of Melbourne in Australia",
-          "num_memories": 232,
-          "p_at_1": 0.0,
-          "p_at_3": 0.0,
-          "p_at_5": 0.0,
-          "reciprocal_rank": 0.0,
-          "ndcg_at_5": 0.0,
-          "recall_at_5": 0.0,
-          "latency_ms": 44.4,
-          "top_3": [
-            {
-              "score": 0.7027,
-              "text": "Can you tell me more about how to find these career transition programs and which ones are the most "
-            },
-            {
-              "score": 0.6974,
-              "text": "Are there any industries that commonly offer career transition programs or training?"
-            },
-            {
-              "score": 0.6861,
-              "text": "How do the athletic facilities compare to those at other universities in Canada? Is there anything d"
-            }
-          ]
-        },
-        {
-          "question_id": "726462e0",
-          "question_type": "single-session-user",
-          "query": "What was the discount I got on my first purchase from the new clothing brand?",
-          "answer": "10%",
+          "question_id": "6d550036",
+          "question_type": "multi-session",
+          "query": "How many projects have I led or am currently leading?",
+          "answer": "2",
           "num_memories": 249,
           "p_at_1": 0.0,
           "p_at_3": 0.0,
           "p_at_5": 1.0,
           "reciprocal_rank": 0.25,
-          "ndcg_at_5": 0.4306765580733931,
+          "ndcg_at_5": 0.5012658353418872,
           "recall_at_5": 1.0,
-          "latency_ms": 40.7,
+          "latency_ms": 293.0,
           "top_3": [
             {
-              "score": 0.6964,
-              "text": "What was the journey of the founder from youth to building the company up? How did the founder end u"
+              "score": 36.73,
+              "text": "Answer the following quesiton in a better way.\nHow does your project differ from similar ones?\\*\nWe "
             },
             {
-              "score": 0.6917,
-              "text": "I think I'll go with the Oxyfresh Pet Toothbrush. I've heard good things about the brand and the ult"
+              "score": 31.23,
+              "text": "I'm planning to launch a new product feature in June and I need to create a project timeline. Can yo"
             },
             {
-              "score": 0.6895,
-              "text": "I'm looking to learn more about camera straps. I recently got a new one that I really like, but I'm "
+              "score": 30.02,
+              "text": "I'll use a combination of these methods to estimate the duration of each task. Since I've been leadi"
             }
           ]
         },
         {
-          "question_id": "94f70d80",
-          "question_type": "single-session-user",
-          "query": "How long did it take me to assemble the IKEA bookshelf?",
-          "answer": "4 hours",
-          "num_memories": 254,
-          "p_at_1": 0.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 0.5,
-          "ndcg_at_5": 0.6309297535714574,
-          "recall_at_5": 1.0,
-          "latency_ms": 36.9,
-          "top_3": [
-            {
-              "score": 0.7798,
-              "text": "I think I'll also stop by IKEA while I'm out to check out their coffee tables with storage, since I "
-            },
-            {
-              "score": 0.7124,
-              "text": "I've been leaning towards a wooden top, but now I'm considering the glass top option too. Do you thi"
-            },
-            {
-              "score": 0.6803,
-              "text": "I'm thinking of getting a custom-made necklace with a charm representing my astrological sign, Scorp"
-            }
-          ]
-        },
-        {
-          "question_id": "66f24dbb",
-          "question_type": "single-session-user",
-          "query": "What did I buy for my sister's birthday gift?",
-          "answer": "a yellow dress",
-          "num_memories": 252,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 32.2,
-          "top_3": [
-            {
-              "score": 0.8005,
-              "text": "For my sister's birthday, I got her a yellow dress and a pair of earrings to match."
-            },
-            {
-              "score": 0.7588,
-              "text": "Now that I have a good idea for the gift, do you think I should include a personal message or a birt"
-            },
-            {
-              "score": 0.7558,
-              "text": "Here's a start - I've bought gifts for my sister's birthday, my mom, my neighbor Mrs. Johnson, cowor"
-            }
-          ]
-        },
-        {
-          "question_id": "ad7109d1",
-          "question_type": "single-session-user",
-          "query": "What speed is my new internet plan?",
-          "answer": "500 Mbps",
-          "num_memories": 232,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 71.3,
-          "top_3": [
-            {
-              "score": 0.6776,
-              "text": "I did notice that my internet speed has been really good lately, especially when I'm streaming movie"
-            },
-            {
-              "score": 0.6191,
-              "text": "I'm thinking of adding some live plants to my new 20-gallon tank, which currently has 10 neon tetras"
-            },
-            {
-              "score": 0.6088,
-              "text": "In what ways can I use data and research to craft headlines that speak to my target audience and mak"
-            }
-          ]
-        },
-        {
-          "question_id": "af8d2e46",
-          "question_type": "single-session-user",
-          "query": "How many shirts did I pack for my 5-day trip to Costa Rica?",
-          "answer": "7",
-          "num_memories": 246,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 42.7,
-          "top_3": [
-            {
-              "score": 0.7568,
-              "text": "That's really helpful! I've been trying to get better at packing, but I still tend to overpack. Like"
-            },
-            {
-              "score": 0.7454,
-              "text": "I'm trying to get better at packing for my trips. Can you help me come up with a list of essentials "
-            },
-            {
-              "score": 0.6725,
-              "text": "I'm still trying to figure out how to pack clothes more strategically. Do you have any tips on how t"
-            }
-          ]
-        },
-        {
-          "question_id": "dccbc061",
-          "question_type": "single-session-user",
-          "query": "What was my previous stance on spirituality?",
-          "answer": "A staunch atheist",
-          "num_memories": 250,
+          "question_id": "gpt4_59c863d7",
+          "question_type": "multi-session",
+          "query": "How many model kits have I worked on or bought?",
+          "answer": "I have worked on or bought five model kits. The scales of the models are: Revell F-15 Eagle (scale not mentioned), Tamiya 1/48 scale Spitfire Mk.V, 1/16 scale German Tiger I tank, 1/72 scale B-29 bomber, and 1/24 scale '69 Camaro.",
+          "num_memories": 239,
           "p_at_1": 0.0,
           "p_at_3": 0.0,
           "p_at_5": 0.0,
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 30.0,
+          "latency_ms": 453.1,
           "top_3": [
             {
-              "score": 0.716,
-              "text": "I always get anxious before my performance review, but these tips will definitely help me prepare be"
+              "score": 37.44,
+              "text": "I'm planning to start working on the engine wiring and fuel lines for my '69 Camaro model. Do you ha"
             },
             {
-              "score": 0.7068,
-              "text": "What's the best way to prepare for a Q&A session after my screening?"
+              "score": 37.44,
+              "text": "I've been thinking about adding some wire details to my 1/24 scale '69 Camaro model as well. Do you "
             },
             {
-              "score": 0.7022,
-              "text": "I'm trying to find some books on synchronicity and its connection to spirituality. Can you recommend"
+              "score": 36.23,
+              "text": "I've also been thinking about trying out some wire details on my B-29 model. Do you have any tips on"
             }
           ]
         },
         {
-          "question_id": "c8c3f81d",
-          "question_type": "single-session-user",
-          "query": "What brand are my favorite running shoes?",
-          "answer": "Nike",
+          "question_id": "b5ef892d",
+          "question_type": "multi-session",
+          "query": "How many days did I spend on camping trips in the United States this year?",
+          "answer": "8 days.",
+          "num_memories": 257,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 448.1,
+          "top_3": [
+            {
+              "score": 64.36,
+              "text": "for this product: \"Amazon Essentials Boys and Toddlers' Fleece Pullover Hoodie Sweatshirts\" with thi"
+            },
+            {
+              "score": 43.94,
+              "text": "I'm looking for some new hiking boots. Do you have any recommendations for waterproof boots that are"
+            },
+            {
+              "score": 43.44,
+              "text": "I'm planning a trip to Moab, Utah and was wondering if you could recommend some must-see attractions"
+            }
+          ]
+        },
+        {
+          "question_id": "e831120c",
+          "question_type": "multi-session",
+          "query": "How many weeks did it take me to watch all the Marvel Cinematic Universe movies and the main Star Wars films?",
+          "answer": "3.5 weeks",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 1110.1,
+          "top_3": [
+            {
+              "score": 90.99,
+              "text": "Summarize the following.\nTitle: \"(88) 'Prometheus Rising' by Robert Anton Wilson - Chapter 7, with A"
+            },
+            {
+              "score": 81.7,
+              "text": "I'm trying to keep track of all the movies I've watched recently. Can you help me organize them in a"
+            },
+            {
+              "score": 71.78,
+              "text": "I'm trying to organize my movie watching history, can you help me create a list or something? By the"
+            }
+          ]
+        },
+        {
+          "question_id": "3a704032",
+          "question_type": "multi-session",
+          "query": "How many plants did I acquire in the last month?",
+          "answer": "3",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 290.7,
+          "top_3": [
+            {
+              "score": 35.52,
+              "text": "I'm thinking of selling my old bike rack online. Can you give me some tips on how to take good photo"
+            },
+            {
+              "score": 34.31,
+              "text": "I've been thinking of canceling my HBO subscription because I haven't been watching it as much as I "
+            },
+            {
+              "score": 30.23,
+              "text": "It's heartbreaking to hear that so many animals were affected by the bushfires. How can we prevent s"
+            }
+          ]
+        },
+        {
+          "question_id": "gpt4_d84a3211",
+          "question_type": "multi-session",
+          "query": "How much total money have I spent on bike-related expenses since the start of the year?",
+          "answer": "$185",
+          "num_memories": 245,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 729.1,
+          "top_3": [
+            {
+              "score": 63.86,
+              "text": "I've been keeping track of my bike mileage, and as of last week, I've clocked 347 miles since the st"
+            },
+            {
+              "score": 63.86,
+              "text": "I've been keeping track of my bike mileage, and as of last week, I've clocked 347 miles since the st"
+            },
+            {
+              "score": 56.65,
+              "text": "I've been keeping track of my bike mileage and I'm currently at 347 miles since the start of the yea"
+            }
+          ]
+        },
+        {
+          "question_id": "aae3761f",
+          "question_type": "multi-session",
+          "query": "How many hours in total did I spend driving to my three road trip destinations combined?",
+          "answer": "15 hours for getting to the three destinations (or 30 hours for the round trip)",
           "num_memories": 241,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 0.9197207891481876,
-          "recall_at_5": 1.0,
-          "latency_ms": 51.4,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 507.7,
           "top_3": [
             {
-              "score": 0.795,
-              "text": "Nike has been my favourite brand so far for running shoes. I'm looking for a new pair running shoes,"
+              "score": 51.15,
+              "text": "I think I'll go with Tybee Island. I've heard great things about the surfing there. By the way, I've"
             },
             {
-              "score": 0.7366,
-              "text": "I was just cleaning out my closet and realized I need to get some new casual shoes too, maybe someth"
+              "score": 49.65,
+              "text": "Consider the similarities and content gaps. I will provide you with my own content about \"Title of t"
             },
             {
-              "score": 0.7077,
-              "text": "I'm actually looking for a new pair of Nike running shoes, I've been using them for my daily 5K runs"
+              "score": 45.36,
+              "text": "I'm planning another road trip and I'm thinking of going to a coastal town. Do you have any recommen"
             }
           ]
         },
         {
-          "question_id": "8ebdbe50",
-          "question_type": "single-session-user",
-          "query": "What certification did I complete last month?",
-          "answer": "Data Science",
-          "num_memories": 241,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 31.9,
+          "question_id": "gpt4_f2262a51",
+          "question_type": "multi-session",
+          "query": "How many different doctors did I visit?",
+          "answer": "I visited three different doctors: a primary care physician, an ENT specialist, and a dermatologist.",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 544.1,
           "top_3": [
             {
-              "score": 0.7883,
-              "text": "I need to add my latest certification in Data Science, which I completed last month, to my profile. "
+              "score": 19.52,
+              "text": "Please correct my grammar below, the message below are from We (\"As Clinic\") to the service provider"
             },
             {
-              "score": 0.6818,
-              "text": "I'd like to know more about the food safety certification program. How long does it take to complete"
+              "score": 18.52,
+              "text": "I think I'll go with the Spinach and Artichoke Dip. How long does it take to prepare and how many pe"
             },
             {
-              "score": 0.6705,
-              "text": "How can I find out what makes these topics distinct?"
+              "score": 18.31,
+              "text": "I think practicing with different partners is really helpful. I've had the chance to dance with a fe"
             }
           ]
         },
         {
-          "question_id": "6b168ec8",
-          "question_type": "single-session-user",
-          "query": "How many bikes do I own?",
-          "answer": "three",
-          "num_memories": 241,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 0.9197207891481876,
-          "recall_at_5": 1.0,
-          "latency_ms": 31.0,
+          "question_id": "dd2973ad",
+          "question_type": "multi-session",
+          "query": "What time did I go to bed on the day before I had a doctor's appointment?",
+          "answer": "2 AM",
+          "num_memories": 255,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 327.2,
           "top_3": [
             {
-              "score": 0.6631,
-              "text": "I'm thinking of getting a bike lock with GPS tracking that integrates with my bike, so I can keep an"
+              "score": 64.15,
+              "text": "I apologize for the cut-off. It seems like I got a bit carried away with the response. Here's a revi"
             },
             {
-              "score": 0.6518,
-              "text": "I'm planning a long ride this weekend and want to make sure I'm prepared. Can you remind me what kin"
+              "score": 62.86,
+              "text": "I need some help with planning my day on Tuesday. I have a yoga class in the evening, and I want to "
             },
             {
-              "score": 0.6515,
-              "text": "I've been doing some research on carbon fiber wheels and I think I'll make the purchase in the next "
+              "score": 58.94,
+              "text": "I need help with meal planning. I just got my blood test results back and my cholesterol levels are "
             }
           ]
-        },
+        }
+      ]
+    },
+    "naive-vector": {
+      "provider": "naive-vector",
+      "aggregate": {
+        "total_cases": 10,
+        "p_at_1": 0.0,
+        "p_at_3": 0.0,
+        "p_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "latency_ms_avg": 16.9,
+        "latency_ms_p95": 25.3
+      },
+      "by_question_type": {
+        "multi-session": {
+          "n": 10,
+          "p_at_1": 0.0,
+          "mrr": 0.0,
+          "judge_accuracy": null
+        }
+      },
+      "per_case": [
         {
-          "question_id": "75499fd8",
-          "question_type": "single-session-user",
-          "query": "What breed is my dog?",
-          "answer": "Golden Retriever",
+          "question_id": "0a995998",
+          "question_type": "multi-session",
+          "query": "How many items of clothing do I need to pick up or return from a store?",
+          "answer": "3",
           "num_memories": 242,
           "p_at_1": 0.0,
           "p_at_3": 0.0,
@@ -683,187 +346,271 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 22.2,
+          "latency_ms": 17.5,
           "top_3": [
             {
-              "score": 0.6147,
-              "text": "I will definitely check out those platforms. Do you think a dog walker would be able to handle Max's"
+              "score": 0.8274,
+              "text": "I think I'll use some boxes I have at home to store my winter clothes. By the way, I just exchanged "
             },
             {
-              "score": 0.6118,
-              "text": "I'm also thinking of getting Max a new toy, something that can keep him engaged during the day while"
+              "score": 0.774,
+              "text": "I'm going to start being more mindful of how I store and dispose of my eco-friendly items. Do you ha"
             },
             {
-              "score": 0.5878,
-              "text": "I need help finding a good dog walker in my area. Do you have any recommendations or a list of servi"
+              "score": 0.7379,
+              "text": "I need to return some boots to Zara, actually. I got them on February 5th, but they were too small, "
             }
           ]
         },
         {
-          "question_id": "21436231",
-          "question_type": "single-session-user",
-          "query": "How many largemouth bass did I catch on my fishing trip to Lake Michigan?",
-          "answer": "12",
-          "num_memories": 254,
-          "p_at_1": 0.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 0.5,
-          "ndcg_at_5": 0.6309297535714574,
-          "recall_at_5": 1.0,
-          "latency_ms": 6.1,
-          "top_3": [
-            {
-              "score": 0.843,
-              "text": "I'm planning a fishing trip to Lake Michigan with my friends and I was wondering if you can give me "
-            },
-            {
-              "score": 0.8234,
-              "text": "By the way, I've had some experience with fishing in Lake Michigan, and I've found that spinner lure"
-            },
-            {
-              "score": 0.7106,
-              "text": "I'm actually thinking of organizing a fly fishing trip to Montana or Colorado next summer, do you ha"
-            }
-          ]
-        },
-        {
-          "question_id": "95bcc1c8",
-          "question_type": "single-session-user",
-          "query": "How many amateur comedians did I watch perform at the open mic night?",
-          "answer": "10",
-          "num_memories": 242,
+          "question_id": "6d550036",
+          "question_type": "multi-session",
+          "query": "How many projects have I led or am currently leading?",
+          "answer": "2",
+          "num_memories": 249,
           "p_at_1": 0.0,
           "p_at_3": 0.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 0.2,
-          "ndcg_at_5": 0.38685280723454163,
-          "recall_at_5": 1.0,
-          "latency_ms": 20.9,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 17.4,
           "top_3": [
             {
-              "score": 0.7357,
-              "text": "I was really exhausted that morning, probably because I was up late the night before binge-watching "
+              "score": 0.6826,
+              "text": "I think I'll cover the project's goals and objectives at the beginning of the meeting, and then move"
             },
             {
-              "score": 0.7056,
-              "text": "I've been meaning to watch \"Altered Carbon\" for a while now. I've heard great things about it. By th"
+              "score": 0.6765,
+              "text": "I'm planning to launch a new product feature in June and I need to create a project timeline. Can yo"
             },
             {
-              "score": 0.7015,
-              "text": "I think I'll take my time to watch \"Game of Thrones\" then. By the way, do you have any recommendatio"
+              "score": 0.67,
+              "text": "how to price a web design project for a large company?"
             }
           ]
         },
         {
-          "question_id": "0862e8bf",
-          "question_type": "single-session-user",
-          "query": "What is the name of my cat?",
-          "answer": "Luna",
-          "num_memories": 243,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 21.1,
-          "top_3": [
-            {
-              "score": 0.7537,
-              "text": "By the way, my cat's name is Luna, and she's been such a sweetie throughout all the changes we've be"
-            },
-            {
-              "score": 0.6664,
-              "text": "I'm having some issues with my cat's digestive health and I was wondering if you could recommend som"
-            },
-            {
-              "score": 0.6569,
-              "text": "I've been meaning to get my cat microchipped for a while now, especially since we've been having som"
-            }
-          ]
-        },
-        {
-          "question_id": "853b0a1d",
-          "question_type": "single-session-user",
-          "query": "How old was I when my grandma gave me the silver necklace?",
-          "answer": "18",
-          "num_memories": 252,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 22.6,
-          "top_3": [
-            {
-              "score": 0.7267,
-              "text": "I'm going to start by adding the silver necklace my grandma gave me on my 18th birthday. I'll write "
-            },
-            {
-              "score": 0.6981,
-              "text": "I think I'll add the gold chain with the tiny diamond cross pendant that I borrowed from my mom. I n"
-            },
-            {
-              "score": 0.6667,
-              "text": "How about a park or garden? My grandma loves flowers and nature, and it would be great to capture so"
-            }
-          ]
-        },
-        {
-          "question_id": "a06e4cfe",
-          "question_type": "single-session-user",
-          "query": "What is my preferred gin-to-vermouth ratio for a classic gin martini?",
-          "answer": "3:1",
-          "num_memories": 265,
-          "p_at_1": 1.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 1.0,
-          "ndcg_at_5": 1.0,
-          "recall_at_5": 1.0,
-          "latency_ms": 28.3,
-          "top_3": [
-            {
-              "score": 0.7966,
-              "text": "That's really helpful, thanks. I've actually been experimenting with different gin-to-vermouth ratio"
-            },
-            {
-              "score": 0.6846,
-              "text": "I'll definitely try those tips out, thanks for the help. I've also been experimenting with different"
-            },
-            {
-              "score": 0.6262,
-              "text": "These recipes sound delicious and easy to make. I think my aunt will appreciate the variety of optio"
-            }
-          ]
-        },
-        {
-          "question_id": "37d43f65",
-          "question_type": "single-session-user",
-          "query": "How much RAM did I upgrade my laptop to?",
-          "answer": "16GB",
-          "num_memories": 265,
+          "question_id": "gpt4_59c863d7",
+          "question_type": "multi-session",
+          "query": "How many model kits have I worked on or bought?",
+          "answer": "I have worked on or bought five model kits. The scales of the models are: Revell F-15 Eagle (scale not mentioned), Tamiya 1/48 scale Spitfire Mk.V, 1/16 scale German Tiger I tank, 1/72 scale B-29 bomber, and 1/24 scale '69 Camaro.",
+          "num_memories": 239,
           "p_at_1": 0.0,
-          "p_at_3": 1.0,
-          "p_at_5": 1.0,
-          "reciprocal_rank": 0.5,
-          "ndcg_at_5": 0.6309297535714574,
-          "recall_at_5": 1.0,
-          "latency_ms": 21.9,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 17.6,
           "top_3": [
             {
-              "score": 0.729,
-              "text": "I'm having some issues with my laptop's battery life, can you help me troubleshoot the problem? By t"
+              "score": 0.7399,
+              "text": "I'm looking for some tips on weathering techniques for my model kits. I've been getting back into mo"
             },
             {
-              "score": 0.706,
-              "text": "My laptop is a Dell Inspiron 15 5000 series from 2018, and I've been using it as my primary work lap"
+              "score": 0.7178,
+              "text": "I'm planning to start working on the engine wiring and fuel lines for my '69 Camaro model. Do you ha"
             },
             {
-              "score": 0.6415,
-              "text": "I'm trying to get back on track with my writing routine after a bit of a disruption. I was out of to"
+              "score": 0.7103,
+              "text": "I'm looking for some advice on painting metal surfaces for a model kit. I recently finished a Tamiya"
+            }
+          ]
+        },
+        {
+          "question_id": "b5ef892d",
+          "question_type": "multi-session",
+          "query": "How many days did I spend on camping trips in the United States this year?",
+          "answer": "8 days.",
+          "num_memories": 257,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16.2,
+          "top_3": [
+            {
+              "score": 0.6963,
+              "text": "I'm planning a 10-day trek in New Zealand in November and I'll be hiking on varying terrain, includi"
+            },
+            {
+              "score": 0.6945,
+              "text": "I've been dealing with a lingering cough for the past three weeks, which started after I caught a co"
+            },
+            {
+              "score": 0.6925,
+              "text": "I'm planning a trip to Moab, Utah and was wondering if you could recommend some must-see attractions"
+            }
+          ]
+        },
+        {
+          "question_id": "e831120c",
+          "question_type": "multi-session",
+          "query": "How many weeks did it take me to watch all the Marvel Cinematic Universe movies and the main Star Wars films?",
+          "answer": "3.5 weeks",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16.9,
+          "top_3": [
+            {
+              "score": 0.7887,
+              "text": "I'm trying to keep track of all the movies I've watched recently. Can you help me organize them in a"
+            },
+            {
+              "score": 0.783,
+              "text": "I think the simple list would be fine. And yeah, I'll add those Star Wars movies to the list. I also"
+            },
+            {
+              "score": 0.7749,
+              "text": "I watched all the MCU movies, all 22 of them. I did it in about two weeks, it was a lot but worth it"
+            }
+          ]
+        },
+        {
+          "question_id": "3a704032",
+          "question_type": "multi-session",
+          "query": "How many plants did I acquire in the last month?",
+          "answer": "3",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 20.3,
+          "top_3": [
+            {
+              "score": 0.7383,
+              "text": "I asked for a lecture plan for the 10th round of digital literacy, and he made a detailed lesson pla"
+            },
+            {
+              "score": 0.7085,
+              "text": "I was also thinking of getting a humidifier for my plants, especially the fern. Do you have any reco"
+            },
+            {
+              "score": 0.6736,
+              "text": "I think I'll wait a bit before repotting my snake plant then. I want to make sure it really needs it"
+            }
+          ]
+        },
+        {
+          "question_id": "gpt4_d84a3211",
+          "question_type": "multi-session",
+          "query": "How much total money have I spent on bike-related expenses since the start of the year?",
+          "answer": "$185",
+          "num_memories": 245,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 7.7,
+          "top_3": [
+            {
+              "score": 0.7142,
+              "text": "I've been meaning to get my bike tuned up again, it's been a month since the last time. Do you have "
+            },
+            {
+              "score": 0.6986,
+              "text": "I've been keeping track of my bike mileage and I'm currently at 347 miles since the start of the yea"
+            },
+            {
+              "score": 0.696,
+              "text": "I've been using my bike for my daily commutes to work, which is about 10 miles round trip. Do you th"
+            }
+          ]
+        },
+        {
+          "question_id": "aae3761f",
+          "question_type": "multi-session",
+          "query": "How many hours in total did I spend driving to my three road trip destinations combined?",
+          "answer": "15 hours for getting to the three destinations (or 30 hours for the round trip)",
+          "num_memories": 241,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 25.3,
+          "top_3": [
+            {
+              "score": 0.759,
+              "text": "I'm planning a new road trip and need some help with route planning. I've had some great experiences"
+            },
+            {
+              "score": 0.742,
+              "text": "I'm planning a camping trip and need some advice on what gear to bring. I've had some experience wit"
+            },
+            {
+              "score": 0.7245,
+              "text": "I'm planning another road trip and I'm thinking of going to a coastal town. Do you have any recommen"
+            }
+          ]
+        },
+        {
+          "question_id": "gpt4_f2262a51",
+          "question_type": "multi-session",
+          "query": "How many different doctors did I visit?",
+          "answer": "I visited three different doctors: a primary care physician, an ENT specialist, and a dermatologist.",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 22.8,
+          "top_3": [
+            {
+              "score": 0.6602,
+              "text": "I'm not sure how to upload my documents. Can you explain that part in more detail?"
+            },
+            {
+              "score": 0.64,
+              "text": "That's a great list of questions to ask my doctor. I think I'll also ask about any specific dietary "
+            },
+            {
+              "score": 0.637,
+              "text": "And any scenic drives or lookouts in particular we should be sure to visit?"
+            }
+          ]
+        },
+        {
+          "question_id": "dd2973ad",
+          "question_type": "multi-session",
+          "query": "What time did I go to bed on the day before I had a doctor's appointment?",
+          "answer": "2 AM",
+          "num_memories": 255,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 7.0,
+          "top_3": [
+            {
+              "score": 0.7395,
+              "text": "I'd like to ask about the process of preparing for an audition. What are some tips on how to prepare"
+            },
+            {
+              "score": 0.7334,
+              "text": "I need some help with planning my day on Tuesday. I have a yoga class in the evening, and I want to "
+            },
+            {
+              "score": 0.7314,
+              "text": "I wake up at 6:30 am on weekdays, so I usually have some time to myself before taking care of my dai"
             }
           ]
         }

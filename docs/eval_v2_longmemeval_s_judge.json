@@ -1,0 +1,1925 @@
+{
+  "timestamp": "2026-07-24T12:07:04",
+  "split": "s",
+  "limit": 30,
+  "question_types": [
+    "knowledge-update",
+    "multi-session"
+  ],
+  "use_judge": true,
+  "results": {
+    "engram/ce+/hyde-": {
+      "provider": "engram/ce+/hyde-",
+      "aggregate": {
+        "total_cases": 30,
+        "p_at_1": 0.0333,
+        "p_at_3": 0.1667,
+        "p_at_5": 0.2,
+        "mrr": 0.1158,
+        "ndcg_at_5": 0.1366,
+        "recall_at_5": 0.2,
+        "latency_ms_avg": 14563.0,
+        "latency_ms_p95": 23093.1,
+        "judge_accuracy": 0.2667,
+        "judge_latency_ms_avg": 11027.9
+      },
+      "by_question_type": {
+        "multi-session": {
+          "n": 30,
+          "p_at_1": 0.0333,
+          "mrr": 0.1158,
+          "judge_accuracy": 0.2667
+        }
+      },
+      "per_case": [
+        {
+          "question_id": "0a995998",
+          "question_type": "multi-session",
+          "query": "How many items of clothing do I need to pick up or return from a store?",
+          "answer": "3",
+          "num_memories": 242,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "latency_ms": 19780.2,
+          "top_3": [
+            {
+              "score": 0.8197,
+              "text": "I think I'll use some boxes I have at home to store my winter clothes. By the way, I just exchanged "
+            },
+            {
+              "score": 0.7699,
+              "text": "Assuming that I am keeping the sentences that I find interesting in a note app, please provide me wi"
+            },
+            {
+              "score": 0.7465,
+              "text": "I'll definitely look into customer service software and designate a team to handle customer inquirie"
+            }
+          ],
+          "generated_answer": "One item: the exchanged pair of boots from Zara that you still need to pick up.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says one item but the reference answer is three."
+        },
+        {
+          "question_id": "6d550036",
+          "question_type": "multi-session",
+          "query": "How many projects have I led or am currently leading?",
+          "answer": "2",
+          "num_memories": 249,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6240505200038378,
+          "recall_at_5": 1.0,
+          "latency_ms": 7765.7,
+          "top_3": [
+            {
+              "score": 0.8145,
+              "text": "Answer the following quesiton in a better way.\nHow does your project differ from similar ones?\\*\nWe "
+            },
+            {
+              "score": 0.6727,
+              "text": "I'm really excited to try out the mop brush, especially after seeing that amazing installation of re"
+            },
+            {
+              "score": 0.657,
+              "text": "I'm looking to learn more about portrait photography and how to take better photos of people. I rece"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate said 'I don't know' which is considered incorrect despite the reference being trivial."
+        },
+        {
+          "question_id": "gpt4_59c863d7",
+          "question_type": "multi-session",
+          "query": "How many model kits have I worked on or bought?",
+          "answer": "I have worked on or bought five model kits. The scales of the models are: Revell F-15 Eagle (scale not mentioned), Tamiya 1/48 scale Spitfire Mk.V, 1/16 scale German Tiger I tank, 1/72 scale B-29 bomber, and 1/24 scale '69 Camaro.",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 10844.2,
+          "top_3": [
+            {
+              "score": 0.6912,
+              "text": "what about the prince of slaves"
+            },
+            {
+              "score": 0.6855,
+              "text": "who were the heaths in surrey virgina and halifax north carolina"
+            },
+            {
+              "score": 0.6842,
+              "text": "Aylen develops a test to ensure she's actually in the real world (kind of like in Inception) and the"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate refused to answer, but the reference clearly states five model kits."
+        },
+        {
+          "question_id": "b5ef892d",
+          "question_type": "multi-session",
+          "query": "How many days did I spend on camping trips in the United States this year?",
+          "answer": "8 days.",
+          "num_memories": 257,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16376.7,
+          "top_3": [
+            {
+              "score": 0.8144,
+              "text": "for this product: \"Amazon Essentials Boys and Toddlers' Fleece Pullover Hoodie Sweatshirts\" with thi"
+            },
+            {
+              "score": 0.7915,
+              "text": "I'm planning a trip to Moab, Utah and was wondering if you could recommend some must-see attractions"
+            },
+            {
+              "score": 0.7642,
+              "text": "I'm looking for some new hiking boots. Do you have any recommendations for waterproof boots that are"
+            }
+          ],
+          "generated_answer": "8 days",
+          "judge_correct": 1,
+          "judge_reason": "Exact match with the reference answer."
+        },
+        {
+          "question_id": "e831120c",
+          "question_type": "multi-session",
+          "query": "How many weeks did it take me to watch all the Marvel Cinematic Universe movies and the main Star Wars films?",
+          "answer": "3.5 weeks",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 15249.1,
+          "top_3": [
+            {
+              "score": 0.6479,
+              "text": "I'm trying to keep track of all the movies I've watched recently. Can you help me organize them in a"
+            },
+            {
+              "score": 0.6355,
+              "text": "Summarize the following.\nTitle: \"(88) 'Prometheus Rising' by Robert Anton Wilson - Chapter 7, with A"
+            },
+            {
+              "score": 0.6351,
+              "text": "I think the simple list would be fine. And yeah, I'll add those Star Wars movies to the list. I also"
+            }
+          ],
+          "generated_answer": "Three and a half weeks.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer 'Three and a half weeks' is a paraphrase of '3.5 weeks'."
+        },
+        {
+          "question_id": "3a704032",
+          "question_type": "multi-session",
+          "query": "How many plants did I acquire in the last month?",
+          "answer": "3",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 8747.3,
+          "top_3": [
+            {
+              "score": 0.5867,
+              "text": "I'll definitely try out these tips and see how my basil plant responds. Can you tell me more about t"
+            },
+            {
+              "score": 0.5862,
+              "text": "I've been thinking of canceling my HBO subscription because I haven't been watching it as much as I "
+            },
+            {
+              "score": 0.5859,
+              "text": "I actually use a mixture of water and fertilizer when I water my plants, which I got from the nurser"
+            }
+          ],
+          "generated_answer": "2",
+          "judge_correct": 0,
+          "judge_reason": "The candidate states 2 plants, but the reference says 3."
+        },
+        {
+          "question_id": "gpt4_d84a3211",
+          "question_type": "multi-session",
+          "query": "How much total money have I spent on bike-related expenses since the start of the year?",
+          "answer": "$185",
+          "num_memories": 245,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 15079.1,
+          "top_3": [
+            {
+              "score": 0.6505,
+              "text": "I've been keeping track of my bike mileage and I'm currently at 347 miles since the start of the yea"
+            },
+            {
+              "score": 0.6478,
+              "text": "I've been keeping track of my bike mileage, and as of last week, I've clocked 347 miles since the st"
+            },
+            {
+              "score": 0.6375,
+              "text": "I've been keeping track of my bike mileage, and as of last week, I've clocked 347 miles since the st"
+            }
+          ],
+          "generated_answer": "$40",
+          "judge_correct": 0,
+          "judge_reason": "The candidate answer states $40, which does not match the reference of $185."
+        },
+        {
+          "question_id": "aae3761f",
+          "question_type": "multi-session",
+          "query": "How many hours in total did I spend driving to my three road trip destinations combined?",
+          "answer": "15 hours for getting to the three destinations (or 30 hours for the round trip)",
+          "num_memories": 241,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 14238.4,
+          "top_3": [
+            {
+              "score": 0.6505,
+              "text": "I think I'll go with Tybee Island. I've heard great things about the surfing there. By the way, I've"
+            },
+            {
+              "score": 0.6428,
+              "text": "I'm thinking of stopping at Topsail Island, NC for a quick lunch break and maybe a short walk on the"
+            },
+            {
+              "score": 0.6181,
+              "text": "I'm planning another road trip and I'm thinking of going to a coastal town. Do you have any recommen"
+            }
+          ],
+          "generated_answer": "15 hours.",
+          "judge_correct": 1,
+          "judge_reason": "Candidate answer matches the one-way total mentioned in the reference."
+        },
+        {
+          "question_id": "gpt4_f2262a51",
+          "question_type": "multi-session",
+          "query": "How many different doctors did I visit?",
+          "answer": "I visited three different doctors: a primary care physician, an ENT specialist, and a dermatologist.",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 9276.0,
+          "top_3": [
+            {
+              "score": 0.7681,
+              "text": "I think I'll try eBay and Facebook Marketplace first, and see how it goes. Thanks for the tips!"
+            },
+            {
+              "score": 0.7563,
+              "text": "That's really helpful! I think I'll start with an air blower and see if that does the trick. By the "
+            },
+            {
+              "score": 0.7448,
+              "text": "That's really helpful, thanks! I think I'll look into the Pelican Cases and Stack-On Cabinets. By th"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate refused to answer with 'I don't know', which is considered incorrect regardless of the reference."
+        },
+        {
+          "question_id": "dd2973ad",
+          "question_type": "multi-session",
+          "query": "What time did I go to bed on the day before I had a doctor's appointment?",
+          "answer": "2 AM",
+          "num_memories": 255,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 20587.9,
+          "top_3": [
+            {
+              "score": 0.8144,
+              "text": "I need some help with planning my day on Tuesday. I have a yoga class in the evening, and I want to "
+            },
+            {
+              "score": 0.8066,
+              "text": "I apologize for the cut-off. It seems like I got a bit carried away with the response. Here's a revi"
+            },
+            {
+              "score": 0.7775,
+              "text": "I need help with meal planning. I just got my blood test results back and my cholesterol levels are "
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate refused to answer, which is considered incorrect per the rules."
+        },
+        {
+          "question_id": "c4a1ceb8",
+          "question_type": "multi-session",
+          "query": "How many different types of citrus fruits have I used in my cocktail recipes?",
+          "answer": "3",
+          "num_memories": 243,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.125,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 14182.0,
+          "top_3": [
+            {
+              "score": 0.7846,
+              "text": "I'll definitely try out some of those garnish ideas. Speaking of experimentation, I've been thinking"
+            },
+            {
+              "score": 0.756,
+              "text": "I'm also considering making a few pitchers of Sangria to serve alongside the Paella and tapas. I was"
+            },
+            {
+              "score": 0.756,
+              "text": "I'd like to try making a citrus and spice honey syrup using orange and cinnamon. Can you tell me mor"
+            }
+          ],
+          "generated_answer": "You have used one type of citrus fruit in your cocktail recipes, namely orange.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says 1 type, but the reference says 3."
+        },
+        {
+          "question_id": "gpt4_a56e767c",
+          "question_type": "multi-session",
+          "query": "How many movie festivals that I attended?",
+          "answer": "I attended four movie festivals.",
+          "num_memories": 236,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 11089.9,
+          "top_3": [
+            {
+              "score": 0.6505,
+              "text": "That's a great point about the cinematography in \"Joker\"! I completely agree that the mix of camera "
+            },
+            {
+              "score": 0.5513,
+              "text": "SEC. 2. DEFINITIONS.\n\n In this Act:\n (1) Classified national security information.--The term \n ``cla"
+            },
+            {
+              "score": 0.5246,
+              "text": "When To File?\nGenerally, a Form I-129 petition may not be filed more than 6 months prior to the date"
+            }
+          ],
+          "generated_answer": "Three.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says three, but the reference answer states four."
+        },
+        {
+          "question_id": "6cb6f249",
+          "question_type": "multi-session",
+          "query": "How many days did I take social media breaks in total?",
+          "answer": "17 days",
+          "num_memories": 232,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 13346.0,
+          "top_3": [
+            {
+              "score": 0.635,
+              "text": "Honestly, I feel like social media companies are more interested in profiting off of engagement than"
+            },
+            {
+              "score": 0.6329,
+              "text": "It's worrying to think about how much power social media companies have over our daily lives and men"
+            },
+            {
+              "score": 0.6211,
+              "text": "How do you address the issue of cyberbullying on social media platforms? It seems like a significant"
+            }
+          ],
+          "generated_answer": "17 days.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the reference answer exactly."
+        },
+        {
+          "question_id": "46a3abf7",
+          "question_type": "multi-session",
+          "query": "How many tanks do I currently have, including the one I set up for my friend's kid?",
+          "answer": "3",
+          "num_memories": 248,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 18406.2,
+          "top_3": [
+            {
+              "score": 0.7945,
+              "text": "This is an information about repudiating a building contract. Limit your response to “acknowledged” "
+            },
+            {
+              "score": 0.7544,
+              "text": "Based on our previous conversation, can you help me write the content for section 2 about What is Me"
+            },
+            {
+              "score": 0.7415,
+              "text": "Wow, I had no idea there were so many ways to use cherries! I'm really excited to try out some of th"
+            }
+          ],
+          "generated_answer": "You have 2 tanks: a 20-gallon community tank and a 1-gallon tank you set up for your friend's kid.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says 2 tanks, but the reference answer is 3, so the number is incorrect."
+        },
+        {
+          "question_id": "36b9f61e",
+          "question_type": "multi-session",
+          "query": "What is the total amount I spent on luxury items in the past few months?",
+          "answer": "$2,500",
+          "num_memories": 243,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 13685.1,
+          "top_3": [
+            {
+              "score": 0.812,
+              "text": "I'd love to get that expense tracker template. And yeah, I'd say I splurge on luxury items every few"
+            },
+            {
+              "score": 0.7819,
+              "text": "I think I tend to splurge on high-end accessories like handbags and shoes, but also occasional luxur"
+            },
+            {
+              "score": 0.7518,
+              "text": "I'm trying to get a better handle on my spending habits and was wondering if you can help me track m"
+            }
+          ],
+          "generated_answer": "$2,500",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer exactly matches the reference."
+        },
+        {
+          "question_id": "28dc39ac",
+          "question_type": "multi-session",
+          "query": "How many hours have I spent playing games in total?",
+          "answer": "140 hours",
+          "num_memories": 215,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 11449.7,
+          "top_3": [
+            {
+              "score": 0.7945,
+              "text": "I'm glad you mentioned Uncharted 4's cinematic approach. It's definitely one of the game's strongest"
+            },
+            {
+              "score": 0.7247,
+              "text": "I haven't played any of those games, but I've heard great things about What Remains of Edith Finch a"
+            },
+            {
+              "score": 0.6944,
+              "text": "I think I'll start with Polygon and Kotaku for written articles, and then check out some YouTube cha"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate refused to answer despite reference providing the specific number."
+        },
+        {
+          "question_id": "gpt4_2f8be40d",
+          "question_type": "multi-session",
+          "query": "How many weddings have I attended in this year?",
+          "answer": "I attended three weddings. The couples were Rachel and Mike, Emily and Sarah, and Jen and Tom.",
+          "num_memories": 236,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 20635.5,
+          "top_3": [
+            {
+              "score": 0.8197,
+              "text": "summarize this article:\nWASHINGTON, Dec 12 (Reuters) - Splits between U.S. Department of Justice pro"
+            },
+            {
+              "score": 0.7716,
+              "text": "I'm planning to participate in more charity events this year. Can you suggest some popular charity w"
+            },
+            {
+              "score": 0.7336,
+              "text": "I think I've got a good idea of how to keep the conversation light and fun. Thanks for the tips! By "
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says they don't know, but the reference clearly states three weddings."
+        },
+        {
+          "question_id": "2e6d26dc",
+          "question_type": "multi-session",
+          "query": "How many babies were born to friends and family members in the last few months?",
+          "answer": "5",
+          "num_memories": 244,
+          "p_at_1": 1.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "recall_at_5": 1.0,
+          "latency_ms": 26808.2,
+          "top_3": [
+            {
+              "score": 0.6481,
+              "text": "Write me the start of a script for a movie scene, with dialogue, based on the below information:\n\nTw"
+            },
+            {
+              "score": 0.6452,
+              "text": "I've got a few more friends and family members to add to the calendar. Can I add a note or descripti"
+            },
+            {
+              "score": 0.6253,
+              "text": "I think I'll go with the digital calendar option, specifically Google Calendar. I already use it for"
+            }
+          ],
+          "generated_answer": "Five babies were born to friends and family members in recent months: Max, Charlotte, Ava, Lily, and Jasper.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer correctly states five babies, matching the reference number exactly, and adds extra detail (names) which is acceptable."
+        },
+        {
+          "question_id": "gpt4_15e38248",
+          "question_type": "multi-session",
+          "query": "How many pieces of furniture did I buy, assemble, sell, or fix in the past few months?",
+          "answer": "4",
+          "num_memories": 233,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 18331.5,
+          "top_3": [
+            {
+              "score": 0.6186,
+              "text": "I'm looking for some advice on cat-proofing my home. I just set up a new area for my kitten Luna to "
+            },
+            {
+              "score": 0.568,
+              "text": "My living room has a modern feel, and the dominant color scheme is a mix of neutral tones like beige"
+            },
+            {
+              "score": 0.5643,
+              "text": "Très bien, fait moi une liste de toutes les problématiques explicitement évoquées dans le texte et a"
+            }
+          ],
+          "generated_answer": "You bought a coffee table, assembled a bookshelf, and fixed a kitchen table — three pieces of furniture.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate answer states three pieces, but the reference answer is four."
+        },
+        {
+          "question_id": "88432d0a",
+          "question_type": "multi-session",
+          "query": "How many times did I bake something in the past two weeks?",
+          "answer": "4",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "latency_ms": 15007.8,
+          "top_3": [
+            {
+              "score": 0.76,
+              "text": "I see! Thanks for the tips. I'll definitely try the dry brine method and baking powder trick. Do you"
+            },
+            {
+              "score": 0.6774,
+              "text": "Please provide me with the relevant information that needed to be address during a presentation of t"
+            },
+            {
+              "score": 0.5833,
+              "text": "How does the University of Michigan involve students in research and other academic endeavors outsid"
+            }
+          ],
+          "generated_answer": "2",
+          "judge_correct": 0,
+          "judge_reason": "Candidate states 2 times, but reference indicates 4 times."
+        },
+        {
+          "question_id": "80ec1f4f",
+          "question_type": "multi-session",
+          "query": "How many different museums or galleries did I visit in the month of February?",
+          "answer": "2",
+          "num_memories": 242,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 23093.1,
+          "top_3": [
+            {
+              "score": 0.747,
+              "text": "I actually met the curator, Rachel Lee, at the opening night of The Art Cube on 15th February, and s"
+            },
+            {
+              "score": 0.7365,
+              "text": "Wait, I think I might have misspoken earlier. Since I met the curator, Rachel Lee, at the opening ni"
+            },
+            {
+              "score": 0.7281,
+              "text": "That's great, I'll definitely check out those resources! I've always been fascinated by the process "
+            }
+          ],
+          "generated_answer": "1",
+          "judge_correct": 0,
+          "judge_reason": "Candidate answer is 1, but the reference answer is 2."
+        },
+        {
+          "question_id": "d23cf73b",
+          "question_type": "multi-session",
+          "query": "How many different cuisines have I learned to cook or tried out in the past few months?",
+          "answer": "4",
+          "num_memories": 255,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.1,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 9968.1,
+          "top_3": [
+            {
+              "score": 0.6109,
+              "text": "I'm looking for some ideas on meal prep for the week. I've been trying to cook more at home, and I w"
+            },
+            {
+              "score": 0.6063,
+              "text": "My project is a marketing campaign for a new product launch, and the objective is to increase brand "
+            },
+            {
+              "score": 0.5581,
+              "text": "That's really helpful, thanks! I've been wanting to try to incorporate more fermented foods into my "
+            }
+          ],
+          "generated_answer": "Two: Korean (bibimbap) and vegan (lasagna).",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says 2 cuisines, but the reference specifies 4."
+        },
+        {
+          "question_id": "gpt4_7fce9456",
+          "question_type": "multi-session",
+          "query": "How many properties did I view before making an offer on the townhouse in the Brookside neighborhood?",
+          "answer": "I viewed four properties before making an offer on the townhouse in the Brookside neighborhood. The reasons I didn't make an offer on them were: the kitchen of the bungalow needed serious renovation, the property in Cedar Creek was out of my budget, the noise from the highway was a deal-breaker for the 1-bedroom condo, and my offer on the 2-bedroom condo was rejected due to a higher bid.",
+          "num_memories": 244,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 15064.1,
+          "top_3": [
+            {
+              "score": 0.6557,
+              "text": "I forgot to mention that I saw the 3-bedroom townhouse in the Brookside neighborhood on February 22n"
+            },
+            {
+              "score": 0.6452,
+              "text": "Hi! I'm in the process of buying a house and I need help with some calculations. I recently put in a"
+            },
+            {
+              "score": 0.6275,
+              "text": "I'm actually still in the process of finalizing the purchase of the townhouse in Brookside, but I wa"
+            }
+          ],
+          "generated_answer": "You viewed four properties: Cedar Creek on Feb 1, a 1-bedroom condo on Feb 10, a 2-bedroom condo on Feb 15, and the Brookside townhouse on Feb 22.",
+          "judge_correct": 0,
+          "judge_reason": "The reference lists the four properties viewed before the offer as the bungalow, Cedar Creek property, 1-bedroom condo, and 2-bedroom condo, excluding the Brookside townhouse. The candidate includes t"
+        },
+        {
+          "question_id": "d682f1a2",
+          "question_type": "multi-session",
+          "query": "How many different types of food delivery services have I used recently?",
+          "answer": "3",
+          "num_memories": 231,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 12040.7,
+          "top_3": [
+            {
+              "score": 0.8043,
+              "text": "I'm looking for some healthy recipe ideas for lunch. Do you have any suggestions? By the way, I've b"
+            },
+            {
+              "score": 0.7965,
+              "text": "I'm looking for some new vegan recipes to try out. I recently tried this amazing vegan mac and chees"
+            },
+            {
+              "score": 0.7942,
+              "text": "I'm looking for some healthy meal ideas for my busy weekdays. Do you have any recommendations? By th"
+            }
+          ],
+          "generated_answer": "You've used two: Fresh Fusion and Domino's Pizza.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate states 2 instead of the correct number 3."
+        },
+        {
+          "question_id": "7024f17c",
+          "question_type": "multi-session",
+          "query": "How many hours of jogging and yoga did I do last week?",
+          "answer": "0.5 hours",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 13419.6,
+          "top_3": [
+            {
+              "score": 0.812,
+              "text": "I've been trying to get more organized with my time, so I was wondering if you could suggest some ap"
+            },
+            {
+              "score": 0.8091,
+              "text": "I'm looking for some new music festival outfits for the upcoming summer season. Do you have any sugg"
+            },
+            {
+              "score": 0.7913,
+              "text": "I actually just got back from Lyon last weekend, and I had a great time exploring the city. I tried "
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate refused to answer, which is considered incorrect per grading rules."
+        },
+        {
+          "question_id": "gpt4_5501fe77",
+          "question_type": "multi-session",
+          "query": "Which social media platform did I gain the most followers on over the past month?",
+          "answer": "TikTok",
+          "num_memories": 258,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.7122630665145961,
+          "recall_at_5": 1.0,
+          "latency_ms": 15003.5,
+          "top_3": [
+            {
+              "score": 0.8041,
+              "text": "I'm trying to optimize my social media strategy and I was wondering if you could help me analyze my "
+            },
+            {
+              "score": 0.802,
+              "text": "I'm looking to create a content calendar for my social media platforms. I've been posting quite regu"
+            },
+            {
+              "score": 0.7768,
+              "text": "That's really helpful. I'll definitely try out some of those ideas to grow my TikTok following. I've"
+            }
+          ],
+          "generated_answer": "TikTok (around 200 followers gained over the past three weeks).",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly identifies TikTok as the platform, and the extra detail does not contradict the reference."
+        },
+        {
+          "question_id": "gpt4_2ba83207",
+          "question_type": "multi-session",
+          "query": "Which grocery store did I spend the most money at in the past month?",
+          "answer": "Thrive Market",
+          "num_memories": 247,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "ndcg_at_5": 0.5012658353418872,
+          "recall_at_5": 1.0,
+          "latency_ms": 11466.7,
+          "top_3": [
+            {
+              "score": 0.6332,
+              "text": "I'm trying to plan my meals for the upcoming week and was wondering if you could help me with some r"
+            },
+            {
+              "score": 0.6034,
+              "text": "I'm glad you helped me with the meal plan and grocery list. I think I'll stick to Instacart for this"
+            },
+            {
+              "score": 0.5939,
+              "text": "That's a great list, thanks! I think I'll try the Chicken Fajitas and Spaghetti Bolognese this week."
+            }
+          ],
+          "generated_answer": "Thrive Market",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the reference exactly."
+        },
+        {
+          "question_id": "2318644b",
+          "question_type": "multi-session",
+          "query": "How much more did I spend on accommodations per night in Hawaii compared to Tokyo?",
+          "answer": "$270",
+          "num_memories": 260,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 17811.1,
+          "top_3": [
+            {
+              "score": 0.7726,
+              "text": "Thank you for the information. I stayed in a hostel in Tokyo that cost around $30 per night when I w"
+            },
+            {
+              "score": 0.703,
+              "text": "I'll probably need to add some more songs to the playlist, can you recommend any songs that are simi"
+            },
+            {
+              "score": 0.699,
+              "text": "I think I'll check out some of those playlists and see if I can find some inspiration for my own pla"
+            }
+          ],
+          "generated_answer": "You spent over $270 more per night, with Tokyo at $30 and Hawaii's resort over $300.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate hallucinates specific nightly costs ($30 and over $300) not present in the reference."
+        },
+        {
+          "question_id": "2ce6a0f2",
+          "question_type": "multi-session",
+          "query": "How many different art-related events did I attend in the past month?",
+          "answer": "4",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 6206.1,
+          "top_3": [
+            {
+              "score": 0.6288,
+              "text": "I didn't know I could find local art events on social media. I'll definitely check that out. I was p"
+            },
+            {
+              "score": 0.5931,
+              "text": "I'm in the city of Los Angeles. I know there's a lot of street art in the downtown area, but I'm not"
+            },
+            {
+              "score": 0.5717,
+              "text": "I'll definitely check out the Modern Art Museum's website and social media to stay updated on their "
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate refused to answer but the reference answer is 4."
+        },
+        {
+          "question_id": "gpt4_d12ceb0e",
+          "question_type": "multi-session",
+          "query": "What is the average age of me, my parents, and my grandparents?",
+          "answer": "59.6",
+          "num_memories": 236,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 11930.8,
+          "top_3": [
+            {
+              "score": 0.6452,
+              "text": "I'm trying to get healthier and wondering if you can recommend some exercises that are suitable for "
+            },
+            {
+              "score": 0.6266,
+              "text": "Ok. In terms of team structure and the execution of work, at the outset it would be just myself. I h"
+            },
+            {
+              "score": 0.6233,
+              "text": "That's great to know! I'll definitely check out some of those resources. I've actually been thinking"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate answered 'I don't know' which is considered incorrect per the rules."
+        }
+      ]
+    },
+    "naive-vector": {
+      "provider": "naive-vector",
+      "aggregate": {
+        "total_cases": 30,
+        "p_at_1": 0.0,
+        "p_at_3": 0.0667,
+        "p_at_5": 0.0667,
+        "mrr": 0.0389,
+        "ndcg_at_5": 0.0427,
+        "recall_at_5": 0.0667,
+        "latency_ms_avg": 21.3,
+        "latency_ms_p95": 29.8,
+        "judge_accuracy": 0.4667,
+        "judge_latency_ms_avg": 14273.8
+      },
+      "by_question_type": {
+        "multi-session": {
+          "n": 30,
+          "p_at_1": 0.0,
+          "mrr": 0.0389,
+          "judge_accuracy": 0.4667
+        }
+      },
+      "per_case": [
+        {
+          "question_id": "0a995998",
+          "question_type": "multi-session",
+          "query": "How many items of clothing do I need to pick up or return from a store?",
+          "answer": "3",
+          "num_memories": 242,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 17.6,
+          "top_3": [
+            {
+              "score": 0.8274,
+              "text": "I think I'll use some boxes I have at home to store my winter clothes. By the way, I just exchanged "
+            },
+            {
+              "score": 0.774,
+              "text": "I'm going to start being more mindful of how I store and dispose of my eco-friendly items. Do you ha"
+            },
+            {
+              "score": 0.7379,
+              "text": "I need to return some boots to Zara, actually. I got them on February 5th, but they were too small, "
+            }
+          ],
+          "generated_answer": "One pair of boots.",
+          "judge_correct": 0,
+          "judge_reason": "The reference states 3 items, but the candidate says one pair of boots, which is only 1 item."
+        },
+        {
+          "question_id": "6d550036",
+          "question_type": "multi-session",
+          "query": "How many projects have I led or am currently leading?",
+          "answer": "2",
+          "num_memories": 249,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 26.1,
+          "top_3": [
+            {
+              "score": 0.6826,
+              "text": "I think I'll cover the project's goals and objectives at the beginning of the meeting, and then move"
+            },
+            {
+              "score": 0.6765,
+              "text": "I'm planning to launch a new product feature in June and I need to create a project timeline. Can yo"
+            },
+            {
+              "score": 0.67,
+              "text": "how to price a web design project for a large company?"
+            }
+          ],
+          "generated_answer": "Two. You led the data analysis team on a Marketing Research class project, and you are currently leading a team of five engineers as a senior software engineer.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answers 'Two' which matches the reference '2', and the added details are consistent and acceptable."
+        },
+        {
+          "question_id": "gpt4_59c863d7",
+          "question_type": "multi-session",
+          "query": "How many model kits have I worked on or bought?",
+          "answer": "I have worked on or bought five model kits. The scales of the models are: Revell F-15 Eagle (scale not mentioned), Tamiya 1/48 scale Spitfire Mk.V, 1/16 scale German Tiger I tank, 1/72 scale B-29 bomber, and 1/24 scale '69 Camaro.",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16.4,
+          "top_3": [
+            {
+              "score": 0.7399,
+              "text": "I'm looking for some tips on weathering techniques for my model kits. I've been getting back into mo"
+            },
+            {
+              "score": 0.7178,
+              "text": "I'm planning to start working on the engine wiring and fuel lines for my '69 Camaro model. Do you ha"
+            },
+            {
+              "score": 0.7103,
+              "text": "I'm looking for some advice on painting metal surfaces for a model kit. I recently finished a Tamiya"
+            }
+          ],
+          "generated_answer": "You have worked on or bought five model kits: a Revell F-15 Eagle, a '69 Camaro, a Tamiya 1/48 Spitfire Mk.V, a 1/72 B-29 bomber, and a 1/16 Tiger I tank.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly states the number of model kits and lists the same models as the reference."
+        },
+        {
+          "question_id": "b5ef892d",
+          "question_type": "multi-session",
+          "query": "How many days did I spend on camping trips in the United States this year?",
+          "answer": "8 days.",
+          "num_memories": 257,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16.0,
+          "top_3": [
+            {
+              "score": 0.6963,
+              "text": "I'm planning a 10-day trek in New Zealand in November and I'll be hiking on varying terrain, includi"
+            },
+            {
+              "score": 0.6945,
+              "text": "I've been dealing with a lingering cough for the past three weeks, which started after I caught a co"
+            },
+            {
+              "score": 0.6925,
+              "text": "I'm planning a trip to Moab, Utah and was wondering if you could recommend some must-see attractions"
+            }
+          ],
+          "generated_answer": "8 days (5 days in Yellowstone and 3 days in Big Sur).",
+          "judge_correct": 1,
+          "judge_reason": "Candidate provides the correct number of days with additional accurate detail."
+        },
+        {
+          "question_id": "e831120c",
+          "question_type": "multi-session",
+          "query": "How many weeks did it take me to watch all the Marvel Cinematic Universe movies and the main Star Wars films?",
+          "answer": "3.5 weeks",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 15.3,
+          "top_3": [
+            {
+              "score": 0.7887,
+              "text": "I'm trying to keep track of all the movies I've watched recently. Can you help me organize them in a"
+            },
+            {
+              "score": 0.783,
+              "text": "I think the simple list would be fine. And yeah, I'll add those Star Wars movies to the list. I also"
+            },
+            {
+              "score": 0.7749,
+              "text": "I watched all the MCU movies, all 22 of them. I did it in about two weeks, it was a lot but worth it"
+            }
+          ],
+          "generated_answer": "It took about 3.5 weeks total: two weeks for the MCU and a week and a half for the main Star Wars films.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer gives the same total of 3.5 weeks, with a breakdown that adds correct extra detail."
+        },
+        {
+          "question_id": "3a704032",
+          "question_type": "multi-session",
+          "query": "How many plants did I acquire in the last month?",
+          "answer": "3",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 19.7,
+          "top_3": [
+            {
+              "score": 0.7383,
+              "text": "I asked for a lecture plan for the 10th round of digital literacy, and he made a detailed lesson pla"
+            },
+            {
+              "score": 0.7085,
+              "text": "I was also thinking of getting a humidifier for my plants, especially the fern. Do you have any reco"
+            },
+            {
+              "score": 0.6736,
+              "text": "I think I'll wait a bit before repotting my snake plant then. I want to make sure it really needs it"
+            }
+          ],
+          "generated_answer": "You acquired three plants: a snake plant from your sister last month, and a peace lily and a succulent from a nursery two weeks ago.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly states 'three plants', matching the reference answer, and adds extra detail."
+        },
+        {
+          "question_id": "gpt4_d84a3211",
+          "question_type": "multi-session",
+          "query": "How much total money have I spent on bike-related expenses since the start of the year?",
+          "answer": "$185",
+          "num_memories": 245,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 16.9,
+          "top_3": [
+            {
+              "score": 0.7142,
+              "text": "I've been meaning to get my bike tuned up again, it's been a month since the last time. Do you have "
+            },
+            {
+              "score": 0.6986,
+              "text": "I've been keeping track of my bike mileage and I'm currently at 347 miles since the start of the yea"
+            },
+            {
+              "score": 0.696,
+              "text": "I've been using my bike for my daily commutes to work, which is about 10 miles round trip. Do you th"
+            }
+          ],
+          "generated_answer": "$65 (chain replacement for $25 and bike lights for $40, both on April 20th).",
+          "judge_correct": 0,
+          "judge_reason": "The reference total is $185, but the candidate states $65, which is a different amount."
+        },
+        {
+          "question_id": "aae3761f",
+          "question_type": "multi-session",
+          "query": "How many hours in total did I spend driving to my three road trip destinations combined?",
+          "answer": "15 hours for getting to the three destinations (or 30 hours for the round trip)",
+          "num_memories": 241,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 19.3,
+          "top_3": [
+            {
+              "score": 0.759,
+              "text": "I'm planning a new road trip and need some help with route planning. I've had some great experiences"
+            },
+            {
+              "score": 0.742,
+              "text": "I'm planning a camping trip and need some advice on what gear to bring. I've had some experience wit"
+            },
+            {
+              "score": 0.7245,
+              "text": "I'm planning another road trip and I'm thinking of going to a coastal town. Do you have any recommen"
+            }
+          ],
+          "generated_answer": "15 hours",
+          "judge_correct": 1,
+          "judge_reason": "Matches the reference answer for driving to the three destinations."
+        },
+        {
+          "question_id": "gpt4_f2262a51",
+          "question_type": "multi-session",
+          "query": "How many different doctors did I visit?",
+          "answer": "I visited three different doctors: a primary care physician, an ENT specialist, and a dermatologist.",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 22.8,
+          "top_3": [
+            {
+              "score": 0.6602,
+              "text": "I'm not sure how to upload my documents. Can you explain that part in more detail?"
+            },
+            {
+              "score": 0.64,
+              "text": "That's a great list of questions to ask my doctor. I think I'll also ask about any specific dietary "
+            },
+            {
+              "score": 0.637,
+              "text": "And any scenic drives or lookouts in particular we should be sure to visit?"
+            }
+          ],
+          "generated_answer": "Two.",
+          "judge_correct": 0,
+          "judge_reason": "The reference states three doctors, but the candidate says two."
+        },
+        {
+          "question_id": "dd2973ad",
+          "question_type": "multi-session",
+          "query": "What time did I go to bed on the day before I had a doctor's appointment?",
+          "answer": "2 AM",
+          "num_memories": 255,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 8.1,
+          "top_3": [
+            {
+              "score": 0.7395,
+              "text": "I'd like to ask about the process of preparing for an audition. What are some tips on how to prepare"
+            },
+            {
+              "score": 0.7334,
+              "text": "I need some help with planning my day on Tuesday. I have a yoga class in the evening, and I want to "
+            },
+            {
+              "score": 0.7314,
+              "text": "I wake up at 6:30 am on weekdays, so I usually have some time to myself before taking care of my dai"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says 'I don't know' but the reference provides a specific time (2 AM), so it is incorrect according to the rules."
+        },
+        {
+          "question_id": "c4a1ceb8",
+          "question_type": "multi-session",
+          "query": "How many different types of citrus fruits have I used in my cocktail recipes?",
+          "answer": "3",
+          "num_memories": 243,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 21.8,
+          "top_3": [
+            {
+              "score": 0.731,
+              "text": "I'm thinking of serving some small bites along with the cocktails. Do you have any recommendations f"
+            },
+            {
+              "score": 0.7286,
+              "text": "I'm looking for some new cocktail recipes to try out. I've been experimenting with bitters lately an"
+            },
+            {
+              "score": 0.7218,
+              "text": "What are some popular types of creamy sauces I can try out, and do you have any recipes you can reco"
+            }
+          ],
+          "generated_answer": "Two: orange (orange bitters) and lime (Cucumber Gimlet).",
+          "judge_correct": 0,
+          "judge_reason": "Candidate says two citrus types, but reference says three; the count is incorrect."
+        },
+        {
+          "question_id": "gpt4_a56e767c",
+          "question_type": "multi-session",
+          "query": "How many movie festivals that I attended?",
+          "answer": "I attended four movie festivals.",
+          "num_memories": 236,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 25.1,
+          "top_3": [
+            {
+              "score": 0.7351,
+              "text": "I'm looking for some film recommendations that explore themes of social justice and identity. I've r"
+            },
+            {
+              "score": 0.72,
+              "text": "I'd like to know more about the casting process for both films. How did the directors and casting di"
+            },
+            {
+              "score": 0.7195,
+              "text": "I'm looking for some recommendations for independent films that explore themes of social justice and"
+            }
+          ],
+          "generated_answer": "4",
+          "judge_correct": 1,
+          "judge_reason": "Candidate correctly states the number of movie festivals attended as 4."
+        },
+        {
+          "question_id": "6cb6f249",
+          "question_type": "multi-session",
+          "query": "How many days did I take social media breaks in total?",
+          "answer": "17 days",
+          "num_memories": 232,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 22.0,
+          "top_3": [
+            {
+              "score": 0.7207,
+              "text": "I'm trying to track my screen time and social media usage. Can you suggest some apps or tools that c"
+            },
+            {
+              "score": 0.7036,
+              "text": "Honestly, I feel like social media companies are more interested in profiting off of engagement than"
+            },
+            {
+              "score": 0.6981,
+              "text": "How do you think social media affects our mental health and what can individuals do to protect thems"
+            }
+          ],
+          "generated_answer": "17 days",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the reference exactly."
+        },
+        {
+          "question_id": "46a3abf7",
+          "question_type": "multi-session",
+          "query": "How many tanks do I currently have, including the one I set up for my friend's kid?",
+          "answer": "3",
+          "num_memories": 248,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 20.6,
+          "top_3": [
+            {
+              "score": 0.7486,
+              "text": "I've also been taking care of a small 1-gallon tank that I set up for a friend's kid, which has a fe"
+            },
+            {
+              "score": 0.7452,
+              "text": "I'm thinking about setting up a separate quarantine tank for my new fish before introducing them to "
+            },
+            {
+              "score": 0.7418,
+              "text": "I'm having some issues with the nitrite levels in my tank. I've been doing partial water changes, bu"
+            }
+          ],
+          "generated_answer": "Two",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says 'Two' (2) but the reference is 3, so the number is wrong."
+        },
+        {
+          "question_id": "36b9f61e",
+          "question_type": "multi-session",
+          "query": "What is the total amount I spent on luxury items in the past few months?",
+          "answer": "$2,500",
+          "num_memories": 243,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 26.8,
+          "top_3": [
+            {
+              "score": 0.7383,
+              "text": "I think I'll try using a spreadsheet to track my expenses. I've been noticing that I tend to splurge"
+            },
+            {
+              "score": 0.7088,
+              "text": "I'd love to get that expense tracker template. And yeah, I'd say I splurge on luxury items every few"
+            },
+            {
+              "score": 0.6933,
+              "text": "I'm trying to get a better handle on my spending habits and was wondering if you can help me track m"
+            }
+          ],
+          "generated_answer": "$2,500",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer exactly matches the reference."
+        },
+        {
+          "question_id": "28dc39ac",
+          "question_type": "multi-session",
+          "query": "How many hours have I spent playing games in total?",
+          "answer": "140 hours",
+          "num_memories": 215,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 22.2,
+          "top_3": [
+            {
+              "score": 0.7807,
+              "text": "I'm looking for some recommendations on new games to play. I've been playing a lot of action-adventu"
+            },
+            {
+              "score": 0.7604,
+              "text": "I'm trying to find some new indie games to play on my Switch. Can you recommend any games similar to"
+            },
+            {
+              "score": 0.7564,
+              "text": "I'm looking for some recommendations on games similar to The Last of Us Part II. By the way, I just "
+            }
+          ],
+          "generated_answer": "70 hours",
+          "judge_correct": 0,
+          "judge_reason": "The candidate answer states 70 hours, but the reference answer is 140 hours."
+        },
+        {
+          "question_id": "gpt4_2f8be40d",
+          "question_type": "multi-session",
+          "query": "How many weddings have I attended in this year?",
+          "answer": "I attended three weddings. The couples were Rachel and Mike, Emily and Sarah, and Jen and Tom.",
+          "num_memories": 236,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 22.4,
+          "top_3": [
+            {
+              "score": 0.7588,
+              "text": "How do Gurkhas traditionally celebrate weddings and what are the customs involved?"
+            },
+            {
+              "score": 0.7576,
+              "text": "I'm getting married soon and I'm looking for some wedding venue ideas. I've been to a few weddings r"
+            },
+            {
+              "score": 0.7301,
+              "text": "I'm planning my own wedding and I was wondering if you could give me some tips on how to choose the "
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "Refusal to answer is considered incorrect; the reference states three weddings."
+        },
+        {
+          "question_id": "2e6d26dc",
+          "question_type": "multi-session",
+          "query": "How many babies were born to friends and family members in the last few months?",
+          "answer": "5",
+          "num_memories": 244,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 5.7,
+          "top_3": [
+            {
+              "score": 0.6678,
+              "text": "I think I'll add a few more birthdays to the calendar, including my cousin Rachel's son Max, who was"
+            },
+            {
+              "score": 0.6615,
+              "text": "I like that idea of asking friends about their preferences beforehand. I'll definitely include that "
+            },
+            {
+              "score": 0.6591,
+              "text": "I'm planning a get-together with some friends soon and I want to make sure I have all the latest upd"
+            }
+          ],
+          "generated_answer": "Five babies: Max (cousin Rachel's son), Charlotte (Mike and Emma's daughter), Ava and Lily (aunt's twins), and Jasper (David's son).",
+          "judge_correct": 1,
+          "judge_reason": "Candidate provides 'Five', matching the reference number, and adds correct extra detail."
+        },
+        {
+          "question_id": "gpt4_15e38248",
+          "question_type": "multi-session",
+          "query": "How many pieces of furniture did I buy, assemble, sell, or fix in the past few months?",
+          "answer": "4",
+          "num_memories": 233,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 22.0,
+          "top_3": [
+            {
+              "score": 0.6858,
+              "text": "That's really helpful, thanks! I've been tracking my collection's growth and expenses in a spreadshe"
+            },
+            {
+              "score": 0.67,
+              "text": "I'm planning to visit some art galleries this weekend and I was wondering if you could recommend any"
+            },
+            {
+              "score": 0.6674,
+              "text": "I'm also considering flying with Norwegian Air, but I'm hesitant due to their recent financial issue"
+            }
+          ],
+          "generated_answer": "You assembled one IKEA bookshelf for your home office about two months ago.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate only mentions one assembled piece, missing the total number of 4 from the reference."
+        },
+        {
+          "question_id": "88432d0a",
+          "question_type": "multi-session",
+          "query": "How many times did I bake something in the past two weeks?",
+          "answer": "4",
+          "num_memories": 238,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 23.6,
+          "top_3": [
+            {
+              "score": 0.6904,
+              "text": "I'm looking for some bike trails near my new apartment. I finally fix my bike today, after it had be"
+            },
+            {
+              "score": 0.6546,
+              "text": "I've had good results with the convection setting on my oven, like when I used it to bake a batch of"
+            },
+            {
+              "score": 0.6472,
+              "text": "I'm excited to try out this teriyaki sauce recipe. By the way, I've been experimenting with breakfas"
+            }
+          ],
+          "generated_answer": "Three times.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate answer says 'Three times', which differs from the reference answer of 4."
+        },
+        {
+          "question_id": "80ec1f4f",
+          "question_type": "multi-session",
+          "query": "How many different museums or galleries did I visit in the month of February?",
+          "answer": "2",
+          "num_memories": 242,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714574,
+          "recall_at_5": 1.0,
+          "latency_ms": 24.4,
+          "top_3": [
+            {
+              "score": 0.752,
+              "text": "I'm looking for some art inspiration. Can you suggest any local art museums or galleries that offer "
+            },
+            {
+              "score": 0.7485,
+              "text": "I'm looking for some art supply stores in the city. Do you have any recommendations? By the way, I t"
+            },
+            {
+              "score": 0.7453,
+              "text": "I'll definitely try those keywords and online marketplaces. Do you know if there are any art galleri"
+            }
+          ],
+          "generated_answer": "You visited two: the Natural History Museum on February 8 and The Art Cube gallery on February 15.",
+          "judge_correct": 1,
+          "judge_reason": "Candidate correctly states two museums with extra detail."
+        },
+        {
+          "question_id": "d23cf73b",
+          "question_type": "multi-session",
+          "query": "How many different cuisines have I learned to cook or tried out in the past few months?",
+          "answer": "4",
+          "num_memories": 255,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 25.9,
+          "top_3": [
+            {
+              "score": 0.7474,
+              "text": "I'm looking for some ideas on meal prep for the week. I've been trying to cook more at home, and I w"
+            },
+            {
+              "score": 0.7425,
+              "text": "I'm mostly looking for general kitchen tasks, like cooking and prep work. I've been using my old ute"
+            },
+            {
+              "score": 0.7341,
+              "text": "I'm planning a dinner party for this weekend and I need some help with menu planning. I'm thinking o"
+            }
+          ],
+          "generated_answer": "Three.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate says three, but the reference states four."
+        },
+        {
+          "question_id": "gpt4_7fce9456",
+          "question_type": "multi-session",
+          "query": "How many properties did I view before making an offer on the townhouse in the Brookside neighborhood?",
+          "answer": "I viewed four properties before making an offer on the townhouse in the Brookside neighborhood. The reasons I didn't make an offer on them were: the kitchen of the bungalow needed serious renovation, the property in Cedar Creek was out of my budget, the noise from the highway was a deal-breaker for the 1-bedroom condo, and my offer on the 2-bedroom condo was rejected due to a higher bid.",
+          "num_memories": 244,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 39.5,
+          "top_3": [
+            {
+              "score": 0.7585,
+              "text": "I'm actually still in the process of finalizing the purchase of the townhouse in Brookside, but I wa"
+            },
+            {
+              "score": 0.7441,
+              "text": "I actually had a home inspection done on the 3-bedroom townhouse I'm buying in the Brookside neighbo"
+            },
+            {
+              "score": 0.7315,
+              "text": "Hi! I'm in the process of buying a house and I need help with some calculations. I recently put in a"
+            }
+          ],
+          "generated_answer": "You viewed 4 properties: a bungalow in Oakwood on January 22, a property in Cedar Creek on February 1, a 2-bedroom condo on February 15, and the Brookside townhouse itself on February 22.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate incorrectly includes the townhouse as one of the four properties viewed prior to making an offer, and omits the 1-bedroom condo mentioned in the reference."
+        },
+        {
+          "question_id": "d682f1a2",
+          "question_type": "multi-session",
+          "query": "How many different types of food delivery services have I used recently?",
+          "answer": "3",
+          "num_memories": 231,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 27.9,
+          "top_3": [
+            {
+              "score": 0.74,
+              "text": "I'm looking for some healthy recipe ideas for lunch. Do you have any suggestions? By the way, I've b"
+            },
+            {
+              "score": 0.7308,
+              "text": "I'm looking for some healthy meal ideas for my busy weekdays. Do you have any recommendations? By th"
+            },
+            {
+              "score": 0.7135,
+              "text": "I'm planning to make a Korean-style BBQ beef recipe for dinner tonight, but I want to try a differen"
+            }
+          ],
+          "generated_answer": "2",
+          "judge_correct": 0,
+          "judge_reason": "The number does not match the reference answer of 3."
+        },
+        {
+          "question_id": "7024f17c",
+          "question_type": "multi-session",
+          "query": "How many hours of jogging and yoga did I do last week?",
+          "answer": "0.5 hours",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 29.8,
+          "top_3": [
+            {
+              "score": 0.8046,
+              "text": "I think I'll try to schedule my yoga practice for Monday, Wednesday, and Friday mornings at 7:00 am."
+            },
+            {
+              "score": 0.7636,
+              "text": "That's really helpful, thanks! I think I'll definitely try to set realistic goals and find a yoga bu"
+            },
+            {
+              "score": 0.7562,
+              "text": "I think I'll start with the \"Foundations of Yoga\" series on Down Dog. How can I make sure I stick to"
+            }
+          ],
+          "generated_answer": "I don't know based on my memories.",
+          "judge_correct": 0,
+          "judge_reason": "Candidate answered 'I don't know' while the reference provides a specific answer."
+        },
+        {
+          "question_id": "gpt4_5501fe77",
+          "question_type": "multi-session",
+          "query": "Which social media platform did I gain the most followers on over the past month?",
+          "answer": "TikTok",
+          "num_memories": 258,
+          "p_at_1": 0.0,
+          "p_at_3": 1.0,
+          "p_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6509209298071326,
+          "recall_at_5": 1.0,
+          "latency_ms": 22.3,
+          "top_3": [
+            {
+              "score": 0.7703,
+              "text": "I'm trying to optimize my social media strategy and I was wondering if you could help me analyze my "
+            },
+            {
+              "score": 0.7508,
+              "text": "I'm looking to create a content calendar for my social media platforms. I've been posting quite regu"
+            },
+            {
+              "score": 0.7377,
+              "text": "That's great to know. Do they also use social media to promote their content and engage with their a"
+            }
+          ],
+          "generated_answer": "Twitter, with a gain of 120 followers.",
+          "judge_correct": 0,
+          "judge_reason": "The candidate named Twitter instead of TikTok, which is a different platform."
+        },
+        {
+          "question_id": "gpt4_2ba83207",
+          "question_type": "multi-session",
+          "query": "Which grocery store did I spend the most money at in the past month?",
+          "answer": "Thrive Market",
+          "num_memories": 247,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.16666666666666666,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 22.1,
+          "top_3": [
+            {
+              "score": 0.7243,
+              "text": "I'm glad you helped me with the meal plan and grocery list. I think I'll stick to Instacart for this"
+            },
+            {
+              "score": 0.7115,
+              "text": "I actually got the food bowl at a local pet store downtown, and it was around $15. I remember the st"
+            },
+            {
+              "score": 0.6897,
+              "text": "I'm trying to plan my meals for the upcoming week and was wondering if you could help me with some r"
+            }
+          ],
+          "generated_answer": "Thrive Market.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate answer matches the reference exactly."
+        },
+        {
+          "question_id": "2318644b",
+          "question_type": "multi-session",
+          "query": "How much more did I spend on accommodations per night in Hawaii compared to Tokyo?",
+          "answer": "$270",
+          "num_memories": 260,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 25.8,
+          "top_3": [
+            {
+              "score": 0.7552,
+              "text": "Thank you for the information. I stayed in a hostel in Tokyo that cost around $30 per night when I w"
+            },
+            {
+              "score": 0.6746,
+              "text": "I'm planning a trip to Japan and I'm looking for some affordable accommodation options. I've heard t"
+            },
+            {
+              "score": 0.6496,
+              "text": "I'm planning to visit the Meiji Shrine and then head to the nearby Takeshita-dori Street, which I've"
+            }
+          ],
+          "generated_answer": "You spent at least $270 more per night in Hawaii (over $300) than in Tokyo ($30).",
+          "judge_correct": 1,
+          "judge_reason": "The candidate correctly states the $270 difference and provides additional consistent details."
+        },
+        {
+          "question_id": "2ce6a0f2",
+          "question_type": "multi-session",
+          "query": "How many different art-related events did I attend in the past month?",
+          "answer": "4",
+          "num_memories": 239,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 23.3,
+          "top_3": [
+            {
+              "score": 0.7564,
+              "text": "I didn't know I could find local art events on social media. I'll definitely check that out. I was p"
+            },
+            {
+              "score": 0.7381,
+              "text": "I'm looking for some information on local art events and exhibitions. Can you recommend any upcoming"
+            },
+            {
+              "score": 0.7111,
+              "text": "I'm looking for some art supplies for a project I'm working on. Do you have any recommendations for "
+            }
+          ],
+          "generated_answer": "3",
+          "judge_correct": 0,
+          "judge_reason": "The candidate answer states 3 events, but the reference answer is 4."
+        },
+        {
+          "question_id": "gpt4_d12ceb0e",
+          "question_type": "multi-session",
+          "query": "What is the average age of me, my parents, and my grandparents?",
+          "answer": "59.6",
+          "num_memories": 236,
+          "p_at_1": 0.0,
+          "p_at_3": 0.0,
+          "p_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "recall_at_5": 0.0,
+          "latency_ms": 8.2,
+          "top_3": [
+            {
+              "score": 0.7658,
+              "text": "I'm trying to get healthier and wondering if you can recommend some exercises that are suitable for "
+            },
+            {
+              "score": 0.7124,
+              "text": "I'm considering going back to school to get a master's degree, but I'm not sure what field I want to"
+            },
+            {
+              "score": 0.6859,
+              "text": "What a great question! I actually remember one episode where Alex gets into a debate with his sister"
+            }
+          ],
+          "generated_answer": "59.6 years.",
+          "judge_correct": 1,
+          "judge_reason": "The candidate adds 'years' but conveys the identical numerical age."
+        }
+      ]
+    }
+  },
+  "skipped": {}
+}

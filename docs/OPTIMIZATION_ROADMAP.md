@@ -690,3 +690,39 @@
   - P0: 跑 `_s` split 中 multi-session + knowledge-update 各 30 题(而不是 single-session-user),这些才匹配 engram 独家能力
   - P1: 修 vector/FAISS: `_s` 每 case ~250 vectors 触发 FAISS IVF 问题,目前 ENGRAM_SKIP_VECTOR=1;修好后再复跑
   - P2: 为上述 4 个 case 写 targeted judge harness,验证 Persona/Timeline/Corrections 是否真的拉高 answer quality
+
+### 2026-07-23 · Round 1 · 6 项 bug 修复 + 优化
+
+- **审计驱动**: 四路并行 Agent 审计了 recall pipeline、eval 系统、Phase 3 模块和设计文档，共发现 30+ 个问题。本轮选 6 个最高 ROI 的 bug/优化。
+
+- **Fix 1: `ENGRAM_SKIP_VECTOR` 不应禁用 CE** (`store.py:266-269`)
+  - 删除 `or os.environ.get("ENGRAM_SKIP_VECTOR") == "1"` —— 两个独立模块不应耦合
+  - 1 行删除
+
+- **Fix 2: `ForgettingEngine._days_since_accessed()` 始终返回 0.0** (`forgetting.py:260`)
+  - `_days_since_accessed()` 读 `memory.metadata.get("accessed_at")`，但 `accessed_at` 是 SQL 列而非 metadata JSON 字段
+  - 修复: 直接从 DB 列读取 `accessed_at` / `created_at`
+  - ~5 行修改
+
+- **Fix 3: 三次重复 `embedding_engine.encode(query)` → 一次** (`store.py:1697/1756/1922`)
+  - 在 `_build_recall_response` 入口处编码一次 → `_query_vec`，Phase 2 (RRF) + Phase 3.5 (fallback) 复用
+  - ~10 行修改，省 2× encode 推理
+
+- **Fix 4: CE 后向量 fallback 阈值语义错误** (`store.py:1918`)
+  - `score <= 0.1` 在 CE 归一化后无意义（[0,1] 区间的 0.1 可能是第 2 名）
+  - 修复: 保存 pre-CE flag `_had_meaningful_hits`，替代 score threshold
+
+- **Fix 5: HyDE 浪费 LLM 调用在 embedding 缺失时** (`hyde.py:341-345`)
+  - `expand_and_recall()` 先调 LLM (300-600ms)，再检查 `if embedding is None`
+  - 修复: 检查前置到 `generate()` 之前（两者都缺失才跳过，保留单边缺失场景的 LLM 调用）
+  - 2 行挪动
+
+- **Fix 6: 10 个魔法数字提升到 RecallWeights** (`store.py` 多处)
+  - 新增 `RecallWeights` 字段: `rrf_keyword_weight` (0.4) / `rrf_vector_weight` (0.6) / `rrf_score_boost` (10.0) / `rrf_new_insert_score_scale` (60.0) / `vector_fallback_base` (0.55) / `vector_fallback_sim_scale` (0.2) / `recent_fallback_score` (0.5) / `hyde_skip_vector_penalty` (0.8) / `hyde_only_penalty` (0.7)
+  - 所有 inline literal 替换为 `self.weights.xxx` 引用 → 权重可配置、A/B 可调
+  - ~30 行
+
+- **回归**: `pytest -q` 83 passed / 3 skipped，零破坏
+
+- **下一步**: 本次修了 6 个低风险、高影响的问题。下一轮应做 **store.py 拆解 Step 1 (query_intent.py)** 或 **LongMemEval `_s` split 首轮**。
+  - `_s` split 优先: 含 40 session/题的 distractor 场景是 engram 首次真正能证明多层召回价值的测试
