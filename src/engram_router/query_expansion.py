@@ -555,15 +555,33 @@ class QueryExpander:
 
         try:
             raw = self._rewriter._client.chat(messages, temperature=0.3)
-            parsed = _parse_json_response(raw)
+            raw_cleaned = raw.strip()
+            # Strip markdown fences (same as _parse_json_response).
+            raw_cleaned = re.sub(r"```(?:json)?\s*", "", raw_cleaned)
+            raw_cleaned = re.sub(r"\s*```", "", raw_cleaned)
+
+            parsed = _parse_json_response(raw_cleaned)
 
             # The response should be a JSON array directly, or may be wrapped
             # in an object like {"variants": [...]}.
+            # _parse_json_response only returns dicts, but LLM may also return
+            # a plain JSON array — handle both inline.
             variants: list[str] = []
-            if isinstance(parsed, list):
-                variants = [str(v) for v in parsed]
-            elif isinstance(parsed, dict):
-                variants = [str(v) for v in parsed.get("variants", [])]
+            if isinstance(parsed, dict):
+                for_key = parsed.get("variants", [])
+                if isinstance(for_key, list):
+                    variants = [str(v) for v in for_key]
+            # If _parse_json_response returned a non-dict or variants list is
+            # still empty, try parsing the cleaned text directly as an array.
+            if not variants:
+                try:
+                    direct = json.loads(raw_cleaned)
+                    if isinstance(direct, list):
+                        variants = [str(v) for v in direct]
+                    elif isinstance(direct, dict) and isinstance(direct.get("variants"), list):
+                        variants = [str(v) for v in direct["variants"]]
+                except json.JSONDecodeError:
+                    pass
 
             # Remove the original query if present.
             variants = [v for v in variants if v.strip() != query.strip()]
@@ -584,6 +602,13 @@ class QueryExpander:
         except Exception:
             logger.exception("Multi-query expansion failed for: %.60s", query)
             return []
+
+    def expand_sync(self, query: str) -> ExpandedQuery:
+        """Synchronous expansion with blocking LLM call (for testing/debugging).
+
+        Warning: may take 500ms–2s if LLM is called.
+        """
+        return self.expand(query, async_llm=False)
 
     def prewarm(self, queries: list[str]) -> None:
         """Pre-warm the cache by triggering async LLM rewrites for a batch of queries.

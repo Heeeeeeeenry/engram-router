@@ -72,6 +72,16 @@ def should_inject(query: str) -> bool:
     return False
 
 
+# ── Intent helper: use classifier when available, fall back to regex ──
+
+def _asks_identity(store: Any, query: str) -> bool:
+    """Check if query is an identity question, using classifier if available."""
+    classifier = getattr(store, 'intent_classifier', None)
+    if classifier and classifier.available and store.weights.intent_classifier_enabled:
+        return classifier.classify(query).identity > 0.5
+    return query_intent.asks_identity(query)
+
+
 # ---------------------------------------------------------------------------
 # _apply_salience_decay
 # ---------------------------------------------------------------------------
@@ -243,9 +253,17 @@ def build_scored_candidates(
         query_entity_objs = []
 
     # Pre-compute query context once for the whole batch.
-    asks_brand = query_intent.asks_brand(query)
-    asks_identity = query_intent.asks_identity(query)
-    asks_eval = query_intent.asks_eval(query)
+    # Use LLM intent classifier when available and enabled, fall back to regex.
+    intent_classifier = getattr(store, 'intent_classifier', None)
+    if intent_classifier and intent_classifier.available and store.weights.intent_classifier_enabled:
+        intent = intent_classifier.classify(query)
+        asks_brand = intent.brand > 0.5
+        asks_identity = intent.identity > 0.5
+        asks_eval = intent.eval > 0.5
+    else:
+        asks_brand = query_intent.asks_brand(query)
+        asks_identity = query_intent.asks_identity(query)
+        asks_eval = query_intent.asks_eval(query)
 
     scored: list[tuple[float, str, Any]] = []
     for row in rows:
@@ -841,7 +859,7 @@ def recall_single(
     query_topics = {e["name"] for e in query_entity_objs if e["kind"] == "topic"}
     query_identity_subjects = _identity_subjects(query_entity_objs)
 
-    if query_intent.asks_identity(query) and not query_identity_subjects:
+    if _asks_identity(store, query) and not query_identity_subjects:
         for r in store.conn.execute(
             "SELECT name, kind FROM entities"
         ).fetchall():
@@ -930,7 +948,23 @@ def recall(
                 existing.add(key)
 
         # 4. If there are variants, run multi-path recall → RRF fusion.
-        if eq.variants:
+        has_multi_query = (
+            store.weights.multi_query_enabled
+            and query_expander is not None
+        )
+        # Collect multi-query variants if enabled (separate from LLM rewrite).
+        mq_variants: list[str] = []
+        if has_multi_query:
+            mq_variants = query_expander.expand_multi_query(
+                query, num_variants=store.weights.multi_query_num_variants,
+            )
+
+        # Build the full variant set: LLM rewrite variants + multi-query variants.
+        all_variants = list(dict.fromkeys(
+            list(eq.variants) + mq_variants
+        ))  # dict.fromkeys preserves order and deduplicates
+
+        if all_variants:
             all_results: list[list[tuple[str, float]]] = []
 
             # Primary: recall with original query + expanded terms/entities.
@@ -941,7 +975,7 @@ def recall(
             all_results.append([(r.id, r.score) for r in primary])
 
             # Each variant gets its own recall path.
-            for variant in eq.variants:
+            for variant in all_variants:
                 v_terms = list(dict.fromkeys(scoring.terms(variant)))
                 v_entities = [
                     e for e in extract_entities(variant)
@@ -960,7 +994,13 @@ def recall(
                 all_results.append([(r.id, r.score) for r in v_results])
 
             # RRF fuse all recall paths.
-            merged = reciprocal_rank_fusion(all_results, k=60)
+            # Primary results get weight 1.0; variant results get lower weight.
+            fusion_weights: list[float] = [1.0]  # primary weight
+            for _ in all_variants:
+                # LLM rewrite variants: weight 0.8; multi-query variants: lower weight
+                fusion_weights.append(store.weights.multi_query_fusion_weight)
+
+            merged = reciprocal_rank_fusion(all_results, k=60, weights=fusion_weights)
 
             # Sort merged results by RRF score.
             scored: list[tuple[float, str, Any]] = []
@@ -1004,7 +1044,7 @@ def recall(
     # fall back to scanning the DB for entity names that appear in the
     # query text.  Without this, "咪咪几岁了" would leak 妈妈's age
     # because no query entity is extracted → scope check never fires.
-    if query_intent.asks_identity(query) and not query_identity_subjects:
+    if _asks_identity(store, query) and not query_identity_subjects:
         for r in store.conn.execute(
             "SELECT name, kind FROM entities"
         ).fetchall():
