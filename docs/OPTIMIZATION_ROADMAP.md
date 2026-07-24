@@ -1,5 +1,30 @@
 
 
+
+### 2026-07-24 · L1.1 三通道检索 + learned fusion
+
+- **本次改动**（三路多智能体并行实施）:
+  - Agent A: 新增 `store/channels.py`（249 行）
+    - `fts_channel()`: FTS5 + entity scoring + edge expansion → top-N by keyword score
+    - `vector_channel()`: pure bi-encoder FAISS retrieval → top-N by cosine sim
+    - `hyde_channel()`: HyDE LLM expansion → top-N (gated on hyde_enabled)
+    - `run_channels()`: orchestrator, pre-computes query prep once, runs all available channels
+    - Each channel independent, uniform `(id, score, reason, metadata)` format
+    - Default `top_n=50` per channel (configurable to 100 for full coverage)
+  - Agent B: 升级 `fusion.py`（+~130 行）
+    - `FusionMethod` enum: rrf / isf / rbf / weighted_sum / learned_isf
+    - `inverse_score_fusion()`: preserves score magnitudes vs RRF which discards them
+    - `rbf_fusion()`: Reciprocal Best Fusion — max per doc, precision-oriented
+    - `learned_fusion_weights()`: coordinate-ascent grid search on training data
+    - `fuse()`: unified dispatcher
+  - Agent C: 集成 + 测试
+    - `RecallWeights` 新增 6 字段: channel_top_n / channel_fts_weight / channel_vector_weight / channel_hyde_weight / fusion_method / fusion_k
+    - `build_recall_response()` 接线三通道融合（Phase 2），graceful fallback 保留旧路径
+    - `tests/test_channels.py`（10 cases）+ `tests/test_fusion_upgrade.py`（17 cases）
+- **回归**: 416 passed / 4 skipped / 12 xfailed（零破坏）
+- **Commit**: 11ff8a6
+- **L1.1 ✅ 全部完成**（三通道 + learned fusion + CE 精排）
+
 ### 2026-07-24 · L4.2 类型化 pipeline + L4.3 可观测性
 
 - **本次改动**（多智能体并行实施）:
@@ -95,9 +120,9 @@
 ### L1 召回架构核心
 
 #### 1.1 召回 → 精排 两段式(**最高 ROI**)
-- [ ] 三通道(FTS / 图 / 向量)各取 top 50-100 做 candidate set
+- [x] 三通道(FTS / 图 / 向量)各取 top 50-100 做 candidate set — `store/channels.py`(fts/vector/hyde 三通道)
 - [x] cross-encoder(bge-reranker-v2-m3 或 mxbai-rerank)精排 — 已落地,eval_v2 A/B **P@1 0.61 → 0.83(+21.7 pp)**,MRR 0.74 → 0.88
-- [ ] learned fusion 替代 RRF(见 `src/engram_router/fusion.py:21`)
+- [x] learned fusion 替代 RRF — `fusion.py`: ISF / RBF / learned_fusion_weights + FusionMethod 分发器
 
 #### 1.3 查询理解
 - [ ] HyDE:LLM 先生成假想答案 → 用其向量召回 — Phase 2 已落地(设计 `docs/design/rerank_and_hyde.md`),但 A/B 显示单开会降 P@1 0.83→0.80、rejection 1.0→0.67,**默认关闭**,需先修 negative-case 处理再打开
