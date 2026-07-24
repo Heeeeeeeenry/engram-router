@@ -1,9 +1,8 @@
 {
-  "timestamp": "2026-07-24T11:35:09",
+  "timestamp": "2026-07-24T14:41:49",
   "split": "s",
   "limit": 10,
   "question_types": [
-    "knowledge-update",
     "multi-session"
   ],
   "use_judge": false,
@@ -18,8 +17,8 @@
         "mrr": 0.075,
         "ndcg_at_5": 0.1132,
         "recall_at_5": 0.2,
-        "latency_ms_avg": 650.1,
-        "latency_ms_p95": 1797.3
+        "latency_ms_avg": 652.9,
+        "latency_ms_p95": 1759.6
       },
       "by_question_type": {
         "multi-session": {
@@ -42,7 +41,7 @@
           "reciprocal_rank": 0.5,
           "ndcg_at_5": 0.6309297535714574,
           "recall_at_5": 1.0,
-          "latency_ms": 1797.3,
+          "latency_ms": 1759.6,
           "top_3": [
             {
               "score": 89.7,
@@ -70,7 +69,7 @@
           "reciprocal_rank": 0.25,
           "ndcg_at_5": 0.5012658353418872,
           "recall_at_5": 1.0,
-          "latency_ms": 293.0,
+          "latency_ms": 281.5,
           "top_3": [
             {
               "score": 36.73,
@@ -98,7 +97,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 453.1,
+          "latency_ms": 446.8,
           "top_3": [
             {
               "score": 37.44,
@@ -126,7 +125,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 448.1,
+          "latency_ms": 450.0,
           "top_3": [
             {
               "score": 64.36,
@@ -154,7 +153,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 1110.1,
+          "latency_ms": 1108.2,
           "top_3": [
             {
               "score": 90.99,
@@ -182,7 +181,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 290.7,
+          "latency_ms": 432.9,
           "top_3": [
             {
               "score": 35.52,
@@ -210,7 +209,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 729.1,
+          "latency_ms": 717.0,
           "top_3": [
             {
               "score": 63.86,
@@ -238,7 +237,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 507.7,
+          "latency_ms": 491.2,
           "top_3": [
             {
               "score": 51.15,
@@ -266,7 +265,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 544.1,
+          "latency_ms": 526.1,
           "top_3": [
             {
               "score": 19.52,
@@ -294,7 +293,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 327.2,
+          "latency_ms": 315.7,
           "top_3": [
             {
               "score": 64.15,
@@ -322,8 +321,8 @@
         "mrr": 0.0,
         "ndcg_at_5": 0.0,
         "recall_at_5": 0.0,
-        "latency_ms_avg": 16.9,
-        "latency_ms_p95": 25.3
+        "latency_ms_avg": 22.3,
+        "latency_ms_p95": 41.7
       },
       "by_question_type": {
         "multi-session": {
@@ -346,7 +345,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 17.5,
+          "latency_ms": 18.2,
           "top_3": [
             {
               "score": 0.8274,
@@ -374,7 +373,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 17.4,
+          "latency_ms": 17.1,
           "top_3": [
             {
               "score": 0.6826,
@@ -402,7 +401,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 17.6,
+          "latency_ms": 27.2,
           "top_3": [
             {
               "score": 0.7399,
@@ -430,7 +429,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 16.2,
+          "latency_ms": 17.3,
           "top_3": [
             {
               "score": 0.6963,
@@ -458,7 +457,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 16.9,
+          "latency_ms": 16.8,
           "top_3": [
             {
               "score": 0.7887,
@@ -486,7 +485,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 20.3,
+          "latency_ms": 20.0,
           "top_3": [
             {
               "score": 0.7383,
@@ -514,7 +513,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 7.7,
+          "latency_ms": 41.7,
           "top_3": [
             {
               "score": 0.7142,
@@ -542,7 +541,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 25.3,
+          "latency_ms": 27.9,
           "top_3": [
             {
               "score": 0.759,
@@ -570,7 +569,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 22.8,
+          "latency_ms": 30.9,
           "top_3": [
             {
               "score": 0.6602,
@@ -598,7 +597,7 @@
           "reciprocal_rank": 0.0,
           "ndcg_at_5": 0.0,
           "recall_at_5": 0.0,
-          "latency_ms": 7.0,
+          "latency_ms": 5.9,
           "top_3": [
             {
               "score": 0.7395,
