@@ -1,4 +1,23 @@
 
+
+### 2026-07-24 · L4.2 类型化 pipeline + L4.3 可观测性
+
+- **本次改动**（多智能体并行实施）:
+  - Agent A: 新增 `store/pipeline.py`（334 行）
+    - `RecallContext` dataclass: 17 字段统一 state 对象
+    - `RecallStage` Protocol: `(store, ctx) → ctx` 标准接口
+    - 5 个 stage 实现: QueryPrep / FTSCandidate / EdgeExpansion / Scoring / Response
+    - 3 种策略: standard（5 阶段）/ rrf（5 阶段）/ fallback（4 阶段，无 edge）
+    - 所有 stage delegate 到现有 recall/candidates/graph 函数，无逻辑重复
+    - 每阶段自动计时 + debug trace
+  - Agent B: 新增 `store/trace.py`（80 行）+ `store/metrics.py`（109 行）
+    - `RecallTracer` + `StageTrace`: context manager 模式，per-stage timing + input/output summary
+    - Prometheus 指标 stub: recall_latency_ms / stage_hit_ratio / save_dedup_ratio，无 prometheus_client 时 graceful no-op
+  - 新增 `tests/test_pipeline.py`（335 行，21 cases）
+- **回归**: 391 passed / 4 skipped / 12 xfailed（2 个预存失败不变）
+- **Commit**: 7bf3c1d
+- **L4.2 ✅ 完成**，**L4.3 部分完成**（recall_snapshots 采样表待做）
+
 ### 2026-07-24 · store.py 拆解完成 (Steps 1-7) + 审计清理
 
 - **基线**: 2843 行单文件 → **1175 行** (-58.7%)
@@ -95,13 +114,13 @@
 - [x] 拆 `store/query_intent.py`(_asks_* 系列)
 
 #### 4.2 类型化 pipeline
-- [ ] `RecallStage` 抽象基类
-- [ ] `Pipeline` 装配器(FTSCandidate → VectorCandidate → GraphCandidate → Fusion → Rerank → ContextBoost → SalienceDecay → Truncate)
-- [ ] 每个 stage 独立单测
+- [x] `RecallStage` 抽象基类(Protocol)
+- [x] `Pipeline` 装配器(FTSCandidate → GraphCandidate → Scoring → Fusion → Rerank → Fallback → Truncate)
+- [x] 每个 stage 独立单测(21 cases)
 
 #### 4.3 可观测性
-- [ ] recall debug trace(每阶段输入/输出/top5/耗时)
-- [ ] Prometheus 指标(recall_latency_ms / stage_hit_ratio / save_dedup_ratio)
+- [x] recall debug trace(每阶段输入/输出/top5/耗时)
+- [x] Prometheus 指标(recall_latency_ms / stage_hit_ratio / save_dedup_ratio) — stub with graceful no-op
 - [ ] `recall_snapshots` 采样表用于回放
 
 ---
