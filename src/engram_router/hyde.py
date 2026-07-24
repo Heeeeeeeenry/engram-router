@@ -76,6 +76,12 @@ _NEGATIVE_PATTERNS = (
     re.compile(r"[没不别未]\s*[^吗么]*[吗么]"),  # 有…吗 / 不…么
     re.compile(r"是不是"),
     re.compile(r"有没有"),
+    re.compile(r"是否"),        # 是否去过 / 是否存在 (formal polar)
+    re.compile(r"会不会"),      # 会不会生气 (speculative)
+    re.compile(r"能不能"),      # 能不能找到 (feasibility polar)
+    re.compile(r"行不行"),      # 这样行不行 (colloquial polar)
+    re.compile(r"可不可以"),    # 可不可以这样 (permission polar)
+    re.compile(r"存不存在"),    # 存不存在这个问题 (existence polar)
 )
 
 
@@ -89,11 +95,16 @@ def _looks_negative(query: str) -> bool:
     q = query.strip()
     if not q:
         return False
-    # A polar question that ends in 吗 is always yes/no — skip HyDE.
+    # A polar question that ends in 吗/嘛 is always yes/no — skip HyDE.
     # Note: we intentionally do NOT trigger on trailing 么 alone because
     # information-seeking queries like "我要吃什么" also end in 么 and
     # they're exactly what HyDE is designed to help.
     if q.endswith("吗") or q.endswith("嘛"):
+        return True
+    # Conditional / hypothetical questions — "如果我去了会怎样" should not
+    # have HyDE invent a memory about actually going, because the condition
+    # may never have happened.
+    if re.search(r"^(如果|要是|假如|假设)", q):
         return True
     for pat in _NEGATIVE_PATTERNS:
         if pat.search(q):

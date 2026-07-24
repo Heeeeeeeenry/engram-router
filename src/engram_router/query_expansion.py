@@ -211,6 +211,30 @@ Rules:
 _QUERY_REWRITE_USER_TEMPLATE = "User query: {query}"
 
 
+# ── Multi-query expansion prompt (Phase 3 of rerank_and_hyde.md) ────────
+
+_MULTI_QUERY_SYSTEM_PROMPT = """\
+You are a query expansion engine for a personal memory retrieval system.
+Given a user query, rephrase it in several semantically-equivalent ways.
+
+Output ONLY a JSON array of strings. No explanation, no markdown fences.
+
+Example input: "我同事送我的键盘什么牌子"
+Example output: ["同事送给我的键盘是什么品牌", "键盘的品牌和型号", "同事送的键盘 牌子"]
+
+Rules:
+1. Generate {num_variants} semantically-equivalent query variants.
+2. Preserve the core information need exactly — do NOT change what is being asked.
+3. Vary word order, synonyms, formality, and phrasing.
+4. For Chinese queries, keep all variants in Chinese.
+5. Each variant MUST be a complete, searchable phrase.
+6. If the query is very short (< 4 characters) or cannot be meaningfully rephrased, return an empty array [].
+7. Never introduce new entities or information not present in the original query.
+"""
+
+_MULTI_QUERY_USER_TEMPLATE = "Original query: {query}"
+
+
 def _parse_json_response(raw: str) -> dict[str, Any]:
     """Parse LLM JSON response, robust to reasoning text and markdown fences."""
     cleaned = raw.strip()
@@ -494,12 +518,72 @@ class QueryExpander:
 
         return eq
 
-    def expand_sync(self, query: str) -> ExpandedQuery:
-        """Synchronous expansion with blocking LLM call (for testing/debugging).
+    def expand_multi_query(self, query: str, num_variants: int = 3) -> list[str]:
+        """Generate semantically-equivalent variants of the query for parallel recall.
 
-        Warning: may take 500ms–2s if LLM is called.
+        Uses the LLM to rephrase the query in different ways while preserving the
+        core information need. Intended for multi-query recall: each variant runs
+        through the recall pipeline independently, then all results are RRF-fused.
+
+        Design:
+          - Safe to call without LLM configured: returns empty list.
+          - Falls back to an empty list if the LLM call fails or the query is too
+            short to rephrase meaningfully.
+          - Deduplicates identical variants.
+
+        Args:
+            query: The original user query.
+            num_variants: How many variants to generate (3-5 recommended).
+
+        Returns:
+            List of query variant strings, or empty list if unavailable.
         """
-        return self.expand(query, async_llm=False)
+        if not self._enable_llm or not self._rewriter.available:
+            logger.debug("Multi-query skipped: LLM not available")
+            return []
+
+        # Short queries don't benefit from multi-query.
+        if len(query.strip()) < 4:
+            logger.debug("Multi-query skipped: query too short (%d chars)", len(query.strip()))
+            return []
+
+        messages = [
+            {"role": "system", "content": _MULTI_QUERY_SYSTEM_PROMPT.format(
+                num_variants=num_variants)},
+            {"role": "user", "content": _MULTI_QUERY_USER_TEMPLATE.format(query=query)},
+        ]
+
+        try:
+            raw = self._rewriter._client.chat(messages, temperature=0.3)
+            parsed = _parse_json_response(raw)
+
+            # The response should be a JSON array directly, or may be wrapped
+            # in an object like {"variants": [...]}.
+            variants: list[str] = []
+            if isinstance(parsed, list):
+                variants = [str(v) for v in parsed]
+            elif isinstance(parsed, dict):
+                variants = [str(v) for v in parsed.get("variants", [])]
+
+            # Remove the original query if present.
+            variants = [v for v in variants if v.strip() != query.strip()]
+
+            # Deduplicate while preserving order.
+            seen: set[str] = set()
+            unique: list[str] = []
+            for v in variants:
+                key = v.strip().lower()
+                if key and key not in seen:
+                    seen.add(key)
+                    unique.append(v.strip())
+
+            variants = unique[:num_variants]
+            logger.debug("Multi-query generated %d variants for: %.60s",
+                         len(variants), query)
+            return variants
+        except Exception:
+            logger.exception("Multi-query expansion failed for: %.60s", query)
+            return []
 
     def prewarm(self, queries: list[str]) -> None:
         """Pre-warm the cache by triggering async LLM rewrites for a batch of queries.

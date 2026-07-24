@@ -198,6 +198,14 @@ class RecallWeightsConfig:
     # ── scale protection ──
     full_scan_limit: int = 2000
 
+    # ── HyDE (Hypothetical Document Embeddings) ──
+    hyde_rrf_weight: float = 0.25
+    """RRF weight for the HyDE-derived result list (0.25 = 25% of primary channels)."""
+    hyde_skip_vector_penalty: float = 0.8
+    """Multiplier for vector-only hits when HyDE was skipped (negative query)."""
+    hyde_only_penalty: float = 0.7
+    """Multiplier for HyDE-only hits (not in keyword or vector) before CE."""
+
     # ── stop chars ──
     stop_chars: str = "我你他她它的了是在有和与啊吗呢吧那这个什么牌子哪家为么把了和就都也很"
 

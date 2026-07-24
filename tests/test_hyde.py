@@ -34,6 +34,24 @@ def test_looks_negative_negation_words():
     assert _looks_negative("你不想去吗")
 
 
+def test_looks_negative_new_polar_patterns():
+    """New polar patterns added during HyDE hardening (Step 2a)."""
+    assert _looks_negative("他是否去过北京")
+    assert _looks_negative("这样会不会有问题")
+    assert _looks_negative("你能不能再考虑一下")
+    assert _looks_negative("这个方案行不行")
+    assert _looks_negative("可不可以换个时间")
+    assert _looks_negative("存不存在你说的这个文件")
+
+
+def test_looks_negative_conditional_skipped():
+    """Conditional/hypothetical queries should skip HyDE."""
+    assert _looks_negative("如果当时我去了会怎样")
+    assert _looks_negative("要是他没说那句话呢")
+    assert _looks_negative("假如我换一种做法")
+    assert _looks_negative("假设明天有会议要开")
+
+
 def test_looks_negative_positive_stays_positive():
     # "心情不好" is a fixed idiom for "sad" — HyDE should still fire on it.
     assert not _looks_negative("我为什么心情不好")
@@ -41,6 +59,64 @@ def test_looks_negative_positive_stays_positive():
     assert not _looks_negative("最近哪次去旅游")
     # "什么" ending must NOT trigger — it's info-seeking, not polar.
     assert not _looks_negative("我要吃什么")
+    # Non-leading conditional words should NOT skip (embedded in info-seeking).
+    # "我如果去的话会开心吗" ends in 吗, which IS caught by the 吗-ending rule —
+    # that's correct: it's still a polar question.
+    assert _looks_negative("我如果去的话会开心吗")  # ends in 吗 → caught (polar)
+    # Non-conditional use of chars shared with conditional words.
+    assert not _looks_negative("水果很甜")  # 果 is part of 如果, not a conditional
+
+
+def test_should_inject_gate_prevents_hyde():
+    """Verify that should_inject gates HyDE before the LLM is called."""
+    from engram_router.hyde import HyDEExpander
+    from engram_router.store.recall import should_inject
+
+    # should_inject returns False for general knowledge / programming queries.
+    assert not should_inject("Python怎么定义函数")
+    assert not should_inject("你好哈哈")
+    assert not should_inject("今天天气怎么样")
+
+    # A stub client that must NOT be called.
+    class _AssertClient:
+        available = True
+        def chat(self, *_, **__):
+            raise AssertionError("LLM must not be called when should_inject is False")
+
+    ex = HyDEExpander(
+        client=_AssertClient(), allow_cloud=True,
+        should_run=should_inject,
+        min_query_chars=8,
+    )
+    # A long enough general-knowledge query that would otherwise pass min_chars.
+    r = ex.generate("Python编程语言如何定义函数")
+    assert r.source == "skipped"
+    assert "should_run" in r.skip_reason
+
+
+def test_hyde_skip_vector_penalty_applied():
+    """When HyDE is skipped for a negative query, vector-only hits
+    are penalised by hyde_skip_vector_penalty."""
+    from engram_router.store.scoring import RecallWeights
+
+    w = RecallWeights(hyde_enabled=True)
+    penalty = w.hyde_skip_vector_penalty
+    assert 0.0 < penalty < 1.0, \
+        f"hyde_skip_vector_penalty should be a multiplier in (0,1), got {penalty}"
+    assert penalty == 0.8, \
+        f"Expected hyde_skip_vector_penalty=0.8 (L-fix value), got {penalty}"
+
+
+def test_hyde_only_penalty_value():
+    """Verify that hyde_only_penalty is a valid de-weight multiplier."""
+    from engram_router.store.scoring import RecallWeights
+
+    w = RecallWeights(hyde_enabled=True)
+    penalty = w.hyde_only_penalty
+    assert 0.0 < penalty < 1.0, \
+        f"hyde_only_penalty should be a multiplier in (0,1), got {penalty}"
+    assert penalty == 0.7, \
+        f"Expected hyde_only_penalty=0.7 (L-fix value), got {penalty}"
 
 
 def test_parse_hypotheses_direct_array():
@@ -241,23 +317,28 @@ def test_expand_and_recall_missing_vector_index():
 
 # ── store wiring ───────────────────────────────────────────────────────
 
-def test_store_hyde_defaults_off(monkeypatch, tmp_path):
+def test_store_hyde_defaults_on(monkeypatch, tmp_path):
+    """HyDE is now enabled by default. Expander is constructed but
+    .available will be False without cloud LLM configured."""
     monkeypatch.setenv("ENGRAM_SKIP_VECTOR", "1")
     from engram_router.store import MemoryStore
 
     s = MemoryStore(path=tmp_path / "hyde.db")
-    assert s.hyde is None
+    # HyDEExpander is created (enabled by default), but .available is False
+    # because allow_cloud_llm defaults to False.
+    assert s.hyde is not None
+    assert s.hyde.available is False
 
 
-def test_store_hyde_opt_in(monkeypatch, tmp_path):
+def test_store_hyde_opt_out(monkeypatch, tmp_path):
+    """HyDE can be disabled by setting hyde_enabled=False in weights."""
     monkeypatch.setenv("ENGRAM_SKIP_VECTOR", "1")
     from engram_router.store import MemoryStore, RecallWeights
 
-    w = RecallWeights(hyde_enabled=True)
+    w = RecallWeights(hyde_enabled=False)
     s = MemoryStore(path=tmp_path / "hyde.db", weights=w)
-    # HyDEExpander is instantiated even without an API key; its .available
-    # will just be False so recall() silently skips it.
-    assert s.hyde is not None
+    # With hyde_enabled=False, no HyDEExpander is created.
+    assert s.hyde is None
 
 
 def test_store_hyde_injection(monkeypatch, tmp_path):

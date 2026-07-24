@@ -44,6 +44,13 @@ class RecallWeights:
     person_match_boost: float = 2.0
     entity_tie_break_bonus: float = 0.01
 
+    # ── LLM intent classifier (L1.3) ───────────────────────────────────────
+    intent_classifier_enabled: bool = False
+    """Enable LLM-based intent classification in recall().
+    When True and the LLM is available, the intent classifier replaces
+    the regex-based asks_* functions with soft probability outputs.
+    Default is False to avoid latency regression."""
+
     # ── context boosts (_apply_context_boosts) ────────────────────────────
     brand_boost: float = 2.0
     occupation_boost: float = 1.5
@@ -100,9 +107,10 @@ class RecallWeights:
     0.0 disables CE contribution, 1.0 makes CE the sole ordering signal."""
 
     # ── HyDE query expansion (Phase 2 of rerank_and_hyde.md) ──────────────
-    hyde_enabled: bool = False
-    """Enable HyDE (Hypothetical Document Embeddings). Off by default because
-    it requires an LLM key and adds 300–600 ms per fresh query."""
+    hyde_enabled: bool = True
+    """Enable HyDE (Hypothetical Document Embeddings). On by default since
+    2026-07-24 after hardening negative-pattern detection. Falls back
+    gracefully when LLM key / embedding engine / vector index is missing."""
     hyde_num_hypotheses: int = 3
     """How many hypothetical answers to generate per query."""
     hyde_min_query_chars: int = 10
@@ -147,6 +155,17 @@ class RecallWeights:
     """Fusion method: 'rrf', 'isf', 'weighted_sum', 'learned_isf'."""
     fusion_k: int = 60
     """RRF damping constant k."""
+
+    # ── Multi-query recall (Phase 3 of rerank_and_hyde.md) ──────────────
+    multi_query_enabled: bool = False
+    """Enable multi-query expansion: generate 3-5 variants of the query,
+    run independent recall per variant, and RRF-fuse the results.
+    Off by default until verified."""
+    multi_query_num_variants: int = 3
+    """Number of query variants to generate (3-5 recommended)."""
+    multi_query_fusion_weight: float = 0.5
+    """Weight of multi-query result lists vs primary query in fusion.
+    Lower values keep multi-query as a supplement, not the primary signal."""
 
     def __post_init__(self) -> None:
         """Validate weights on construction so misconfiguration is caught early."""
@@ -194,6 +213,10 @@ class RecallWeights:
             raise ValueError(f"fusion_method must be one of rrf/isf/weighted_sum/learned_isf, got {self.fusion_method}")
         if self.fusion_k < 0:
             raise ValueError(f"fusion_k must be >= 0, got {self.fusion_k}")
+        if self.multi_query_num_variants < 1:
+            raise ValueError(f"multi_query_num_variants must be >= 1, got {self.multi_query_num_variants}")
+        if not (0.0 <= self.multi_query_fusion_weight <= 5.0):
+            raise ValueError(f"multi_query_fusion_weight must be in [0, 5], got {self.multi_query_fusion_weight}")
 
 
 def _default_weights() -> RecallWeights:
@@ -221,6 +244,9 @@ def _default_weights() -> RecallWeights:
         assoc_reach_sensory=c.assoc_reach_sensory,
         assoc_reach_event=c.assoc_reach_event,
         full_scan_limit=c.full_scan_limit,
+        hyde_rrf_weight=getattr(c, 'hyde_rrf_weight', 0.25),
+        hyde_skip_vector_penalty=getattr(c, 'hyde_skip_vector_penalty', 0.8),
+        hyde_only_penalty=getattr(c, 'hyde_only_penalty', 0.7),
     )
 
 
