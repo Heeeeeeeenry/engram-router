@@ -37,6 +37,7 @@ class RecallTracer:
         self._traces: list[StageTrace] = []
         self._stage_start: float = 0.0
 
+    @contextmanager
     def trace_stage(self, stage_name: str) -> Generator[StageTrace, None, None]:
         """Context manager that records timing and returns the trace entry.
 

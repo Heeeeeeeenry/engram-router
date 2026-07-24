@@ -9,6 +9,9 @@ import pytest
 
 from engram_router.store import MemoryStore
 
+# Skip resource-intensive optional components in test runs.
+os.environ.setdefault("ENGRAM_SKIP_CE", "1")
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
