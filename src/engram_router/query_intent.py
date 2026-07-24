@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 
-REASON_MARKERS = ("因为", "原因", "所以", "导致", "出于", "由于")
+REASON_MARKERS = ("因为", "原因", "所以", "导致", "出于", "由于", "为了", "生日")
 
 
 def asks_brand(query: str) -> bool:

@@ -2355,6 +2355,17 @@ class MemoryStore:
     _asks_brand = staticmethod(query_intent.asks_brand)
     _asks_identity = staticmethod(query_intent.asks_identity)
     _asks_eval = staticmethod(query_intent.asks_eval)
+    _asks_reason = staticmethod(query_intent.asks_reason)
+    _asks_person = staticmethod(query_intent.asks_person)
+    _has_reason = staticmethod(query_intent.has_reason)
+    _asks_time = staticmethod(query_intent.asks_time)
+    _asks_location = staticmethod(query_intent.asks_location)
+    _asks_object = staticmethod(query_intent.asks_object)
+    _has_time = staticmethod(query_intent.has_time)
+    _has_location = staticmethod(query_intent.has_location)
+    _has_object = staticmethod(query_intent.has_object)
+    _has_person_like = staticmethod(query_intent.has_person_like)
+    _suggest_question = staticmethod(query_intent.suggest_question)
 
     def gap_check(self, query: str, memories: list[MemoryRecord] | None = None,
                   namespace: str = "default", scan_all: bool = False) -> dict[str, Any]:
@@ -2763,81 +2774,3 @@ class MemoryStore:
             return "matched terms: " + ", ".join(matched[:8])
         return f"fallback score={score:.2f}"
 
-    @staticmethod
-    def _asks_reason(query: str) -> bool:
-        return any(marker in query for marker in ("为什么", "原因", "为啥", "为何"))
-
-    @staticmethod
-    def _asks_person(query: str) -> bool:
-        return any(marker in query for marker in ("谁", "哪位", "哪个人"))
-
-    @classmethod
-    def _has_reason(cls, text: str) -> bool:
-        return any(marker in text for marker in cls.REASON_MARKERS)
-
-    @staticmethod
-    def _has_person_like(text: str) -> bool:
-        """Check for CJK bigram/trigram that looks like a person, excluding
-        known time/topic/object words that would produce false positives."""
-        _NON_PERSON_CJK = {
-            "礼物", "键盘", "鼠标", "手机", "电脑", "前天", "昨天",
-            "今天", "明天", "后天", "上午", "下午", "晚上", "中午",
-            "什么", "怎么", "这个", "那个", "哪个", "因为", "所以",
-            "好吃", "好看", "厉害", "红烧", "觉得", "喜欢", "可以",
-            "什么", "没有", "不是", "还是", "但是", "虽然", "如果",
-        }
-        for m in re.finditer(r"[\u4e00-\u9fff]{2,3}", text):
-            if m.group() not in _NON_PERSON_CJK:
-                return True
-        return False
-
-    @staticmethod
-    def _asks_time(query: str) -> bool:
-        return any(marker in query for marker in ("什么时候", "何时", "几点", "哪天", "哪一天", "几号", "什么时间", "多久", "几点钟"))
-
-    @staticmethod
-    def _has_time(text: str) -> bool:
-        return bool(re.search(
-            r"前[两三四五六七八九十0-9]*天|昨天|今天|明天|前天|后天|"
-            r"上[周月]|这[周月]|下[周月]|最近|\d{4}年|\d{1,2}月\d{1,2}日|上周|下周|这周|上午|下午|晚上|早上|中午",
-            text,
-        ))
-
-    @staticmethod
-    def _asks_location(query: str) -> bool:
-        return any(marker in query for marker in ("哪里", "哪儿", "在哪", "什么地方", "地点", "位置", "哪个城市", "哪个省"))
-
-    @staticmethod
-    def _has_location(text: str) -> bool:
-        return bool(re.search(
-            r"[\u4e00-\u9fff]{2,}(?:市|省|路|街|区|楼|层|室|房间|家附近|公司|办公室|学校|医院|商场|餐厅|公园)",
-            text,
-        ))
-
-    @staticmethod
-    def _asks_object(query: str) -> bool:
-        """Detect object-focused questions.  Strip reason/time phrases first
-        so "为什么" / "什么时候" don't suppress a genuine "什么东西" in the
-        same query."""
-        cleaned = query
-        for phrase in ("为什么", "什么时候", "何时", "几点", "哪天", "多久"):
-            cleaned = cleaned.replace(phrase, "")
-        return any(marker in cleaned for marker in ("什么东西", "什么", "啥", "哪个", "哪种"))
-
-    @staticmethod
-    def _has_object(text: str) -> bool:
-        return bool(re.search(r"[A-Za-z0-9\-]{2,}", text)) or any(
-            obj in text for obj in ("键盘", "鼠标", "耳机", "礼物", "书", "手机", "电脑", "猫", "狗")
-        )
-
-    @staticmethod
-    def _suggest_question(missing: list[str]) -> str:
-        questions: dict[str, str] = {
-            "reason": "你之前有说过为什么/出于什么原因吗？",
-            "person": "你说的是哪一位？",
-            "time": "这大概是什么时候的事？",
-            "location": "这发生在哪里？",
-            "object": "具体是什么东西？",
-        }
-        parts = [questions[m] for m in missing if m in questions]
-        return " ".join(parts) if parts else "这部分记忆不够完整，你能补充一下吗？"
