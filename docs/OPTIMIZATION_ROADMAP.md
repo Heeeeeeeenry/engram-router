@@ -1,20 +1,28 @@
 
-### 2026-07-24 · store.py 拆解 Steps 1-5
+### 2026-07-24 · store.py 拆解完成 (Steps 1-7) + 审计清理
 
-- **基线**: 2843 行单文件 → **2026 行** (-28.7%)
-- **新增模块**:
+- **基线**: 2843 行单文件 → **1175 行** (-58.7%)
+- **store/ 子包结构**:
 
   | 文件 | 行数 | 内容 |
   |---|---|---|
-  |  | 115 | 14 个纯函数: _asks_*/_has_*/_suggest_* |
-  |  | 212 | MemoryRecord + _row_to_record + summary/clean/truncate |
-  |  | 260 | RecallWeights + _default_weights + term/score/match |
-  |  | 327 | FTS5 候选检索 + row access + record_access |
-  |  | 455 | _index_edges + _entity_query_relevance + _edge_expansion (BFS) |
+  | core.py | 1175 | MemoryStore(save/delete/__init__/schema/consolidate) |
+  | recall.py | 980 | recall pipeline(should_inject → recall_single → build_recall_response) |
+  | candidates.py | 327 | FTS5 候选检索 + row access + record_access |
+  | scoring.py | 260 | RecallWeights + _default_weights + term/score/match |
+  | graph.py | 460 | _index_edges + _entity_query_relevance + _edge_expansion (BFS) |
+  | records.py | 212 | MemoryRecord + row_to_record + summarize/clean/truncate |
+  | query_intent.py | 115 | 14 个纯函数: _asks_*/_has_*/_suggest_* |
 
-- **Commit 链**: 10fdfd5 → e5fd0f4 → 86ea26e → 0f0f325 → e730200
-- **验证**: 61+38+14 passed, 全部 smoke tests pass
-- **NOT 完成**: Steps 6-7 (recall.py+pipeline.py/core.py), 这些涉及 recall() 主流程拆分和 store/ 包重组织,风险最高
+- **7-24 审计清理**:
+  - 删除 core.py 中 25 个重复方法体(改为 delegate)
+  - 删除未使用 import (ast/json/dataclass)
+  - 新增 `store/__init__.py`(重导出)
+  - 删除不再需要的 `FILLER_WORDS`/`FILLER_CHARS` 类变量
+  - roadmap L4.1 全部打勾
+- **Commit 链**: 10fdfd5 → e5fd0f4 → 86ea26e → 0f0f325 → 55fd4d1 → 30af810 → a189377 → cc728c8
+- **验证**: test_id_sequences/entities/fts/edges 全部通过
+- **NOT 完成**: L4.2 类型化 pipeline(RecallStage + Pipeline 装配器), L4.3 可观测性
 - **REASON_MARKERS 修复**: query_intent.py 原缺 "为了", "生日" → 已同步为一致集合
 
 # EngramRouter 优化路线图
@@ -80,11 +88,11 @@
 ### L4 工程可观测
 
 #### 4.1 store.py 拆解
-- [ ] 拆 `store/core.py`(save/delete)
-- [ ] 拆 `store/recall.py`(pipeline 装配)
-- [ ] 拆 `store/scoring.py`(RecallWeights + scorers)
-- [ ] 拆 `store/graph.py`(edges + BFS/PPR)
-- [ ] 拆 `store/query_intent.py`(_asks_* 系列)
+- [x] 拆 `store/core.py`(save/delete)
+- [x] 拆 `store/recall.py`(pipeline 装配)
+- [x] 拆 `store/scoring.py`(RecallWeights + scorers)
+- [x] 拆 `store/graph.py`(edges + BFS/PPR)
+- [x] 拆 `store/query_intent.py`(_asks_* 系列)
 
 #### 4.2 类型化 pipeline
 - [ ] `RecallStage` 抽象基类

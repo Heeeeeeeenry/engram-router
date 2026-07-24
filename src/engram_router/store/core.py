@@ -6,13 +6,10 @@ memories are retrieval aids, not replacements for raw evidence.
 
 from __future__ import annotations
 
-import ast
-import json
 import logging
 import os
 import re
 import sqlite3
-from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +17,7 @@ from ..config import config
 from .scoring import RecallWeights, _default_weights
 from . import candidates
 from . import graph
+from . import records
 from . import scoring
 from ..cross_encoder import CrossEncoderReranker
 from ..embedding import EmbeddingEngine
@@ -619,17 +617,8 @@ class MemoryStore:
 
     @staticmethod
     def _parse_metadata(raw: str | None) -> dict[str, Any]:
-        if not raw:
-            return {}
-        try:
-            parsed = json.loads(raw)
-        except json.JSONDecodeError:
-            try:
-                parsed = ast.literal_eval(raw)
-            except (SyntaxError, ValueError):
-                logger.warning("Could not parse memory metadata; returning empty metadata")
-                return {}
-        return parsed if isinstance(parsed, dict) else {}
+        """Delegate to records.parse_metadata."""
+        return parse_metadata(raw)
 
     def entities_for(self, memory_id: str) -> list[dict[str, Any]]:
         rows = self.conn.execute(
@@ -643,11 +632,8 @@ class MemoryStore:
         return [dict(r) for r in rows]
 
     def _entity_names_for(self, memory_id: str) -> set[str]:
-        rows = self.conn.execute(
-            "SELECT e.name FROM memory_entities me JOIN entities e ON e.id = me.entity_id WHERE me.memory_id = ?",
-            (memory_id,),
-        ).fetchall()
-        return {r["name"] for r in rows}
+        """Delegate to graph._entity_names_for."""
+        return graph._entity_names_for(self.conn, memory_id)
 
     def _entities_for(self, memory_id: str) -> list[dict[str, Any]]:
         # salience_class is read from memory_entities (per-memory framing), not
@@ -973,43 +959,10 @@ class MemoryStore:
         evidence_refs: list[str] | None = None,
         raw_refs: list[str] | None = None,
     ) -> MemoryRecord:
-        """Convert a database row to a MemoryRecord.
-
-        When ``evidence_refs`` / ``raw_refs`` are provided (pre-fetched by
-        ``_build_recall_response``), the N+1 queries are skipped.
-        """
-        if evidence_refs is None:
-            evidence_refs = [
-                r["id"]
-                for r in self.conn.execute(
-                    "SELECT id FROM evidence WHERE memory_id = ? ORDER BY id",
-                    (row["id"],),
-                ).fetchall()
-            ]
-        if raw_refs is None:
-            raw_refs = [
-                r["raw_log_id"]
-                for r in self.conn.execute(
-                    "SELECT raw_log_id FROM distilled_memories WHERE memory_id = ? ORDER BY id",
-                    (row["id"],),
-                ).fetchall()
-            ]
-        metadata = self._parse_metadata(row["metadata"])
-        metadata.update({"source": row["source"], "created_at": row["created_at"]})
-        # Phase 3: surface access/forgetting columns for the forgetting engine.
-        if row["accessed_at"] is not None:
-            metadata["accessed_at"] = row["accessed_at"]
-        metadata["access_count"] = int(row["access_count"]) if row["access_count"] is not None else 0
-        metadata["forgotten"] = bool(row["forgotten"])
-        return MemoryRecord(
-            id=row["id"],
-            raw_text=row["raw_text"],
-            summary=row["summary"],
-            confidence=float(row["confidence"]),
-            metadata=metadata,
-            evidence_refs=evidence_refs + raw_refs,
-            score=score,
-            match_reason=match_reason,
+        """Delegate to records.row_to_record."""
+        return records.row_to_record(
+            self.conn, row, score, match_reason,
+            evidence_refs=evidence_refs, raw_refs=raw_refs,
         )
 
     # Tables whose ids carry an "<prefix>_<n>" numeric tail, so we can recover
@@ -1088,79 +1041,18 @@ class MemoryStore:
 
     @staticmethod
     def _clean_sentence(text: str) -> str:
-        """Remove Chinese filler words / discourse markers.
-
-        Longer phrases are removed first so partial matches don't leave
-        orphan fragments behind.  Single-char fillers are stripped from
-        leading / trailing positions and between punctuation boundaries.
-        """
-        result = text
-        for filler in sorted(MemoryStore.FILLER_WORDS, key=len, reverse=True):
-            result = result.replace(filler, "")
-
-        # Strip leading/trailing filler chars (they are noise at edges).
-        filler_set: frozenset[str] = MemoryStore.FILLER_CHARS
-        while result and result[0] in filler_set:
-            result = result[1:]
-        while result and result[-1] in filler_set:
-            result = result[:-1]
-
-        # Remove filler chars that sit between whitespace / punctuation.
-        # We rebuild character-by-character to avoid regex engine issues
-        # (Python's re forbids variable-width look-behind).
-        boundary: set[str] = {" ", "\t", "，", ",", "。", ".", "！",
-                               "!", "？", "?", "\n"}
-        chars: list[str] = []
-        n = len(result)
-        for i, ch in enumerate(result):
-            if ch in filler_set:
-                left_ok = i == 0 or result[i - 1] in boundary
-                right_ok = i == n - 1 or result[i + 1] in boundary
-                if left_ok and right_ok:
-                    continue  # skip isolated filler
-            chars.append(ch)
-        result = "".join(chars)
-
-        # Collapse repeated punctuation / whitespace created by removal.
-        result = re.sub(r"[，,]{2,}", "，", result)
-        result = re.sub(r"[。.!！?？]{2,}", "。", result)
-        result = re.sub(r"\s{2,}", " ", result)
-        return result.strip()
+        """Delegate to records.clean_sentence."""
+        return records.clean_sentence(text)
 
     @staticmethod
     def _truncate_cjk(text: str, max_chars: int = 120) -> str:
-        """Truncate *text* to at most *max_chars*, never cutting inside a
-        CJK code-point.
-
-        Python 3 ``str`` slicing already operates on code-points so CJK
-        characters are inherently safe.  This method strips trailing
-        whitespace / punctuation so the result reads cleanly.
-        """
-        if len(text) <= max_chars:
-            return text
-        return text[:max_chars].rstrip()
+        """Delegate to records.truncate_cjk."""
+        return records.truncate_cjk(text, max_chars)
 
     @staticmethod
     def _summarize(text: str) -> str:
-        """Distil the first sentence into a lossless-leaning summary.
-
-        Strategy:
-        1. Isolate the first sentence (best-effort, CJK + ASCII end marks).
-        2. Remove filler / discourse-marker noise.
-        3. Truncate to ≤ 120 characters on a CJK-safe boundary.
-
-        This keeps entities, numbers and proper nouns intact — pure
-        character-count truncation would chop them, violating the
-        project's anti-lossy-summary philosophy.
-        """
-        m = re.search(r"[。！？!?\n]", text)
-        first = text[: m.start() + 1] if m else text
-
-        cleaned = MemoryStore._clean_sentence(first)
-        if not cleaned.strip():
-            cleaned = first  # fallback: cleaning stripped everything
-
-        return MemoryStore._truncate_cjk(cleaned, 120)
+        """Delegate to records.summarize."""
+        return records.summarize(text)
 
     @staticmethod
     def _terms(query: str) -> list[str]:
