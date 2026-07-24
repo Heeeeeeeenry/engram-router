@@ -134,6 +134,20 @@ class RecallWeights:
     hyde_only_penalty: float = 0.7
     """Multiplier for HyDE-only hits (not in keyword or vector) before CE."""
 
+    # ── Three-channel retrieval (L1.1) ──
+    channel_top_n: int = 50
+    """Number of candidates each channel retrieves before fusion."""
+    channel_fts_weight: float = 0.4
+    """Weight for the FTS+entity+edge channel in fusion."""
+    channel_vector_weight: float = 0.6
+    """Weight for the vector bi-encoder channel in fusion."""
+    channel_hyde_weight: float = 0.25
+    """Weight for the HyDE channel in fusion (lower = less influence)."""
+    fusion_method: str = "rrf"
+    """Fusion method: 'rrf', 'isf', 'weighted_sum', 'learned_isf'."""
+    fusion_k: int = 60
+    """RRF damping constant k."""
+
     def __post_init__(self) -> None:
         """Validate weights on construction so misconfiguration is caught early."""
         if not (0 < self.recall_decay <= 1):
@@ -168,6 +182,18 @@ class RecallWeights:
             raise ValueError(f"hyde_skip_vector_penalty must be in [0,1], got {self.hyde_skip_vector_penalty}")
         if not (0.0 <= self.hyde_only_penalty <= 1.0):
             raise ValueError(f"hyde_only_penalty must be in [0,1], got {self.hyde_only_penalty}")
+        if self.channel_top_n < 1:
+            raise ValueError(f"channel_top_n must be >= 1, got {self.channel_top_n}")
+        if self.channel_fts_weight < 0:
+            raise ValueError(f"channel_fts_weight must be >= 0, got {self.channel_fts_weight}")
+        if self.channel_vector_weight < 0:
+            raise ValueError(f"channel_vector_weight must be >= 0, got {self.channel_vector_weight}")
+        if self.channel_hyde_weight < 0:
+            raise ValueError(f"channel_hyde_weight must be >= 0, got {self.channel_hyde_weight}")
+        if self.fusion_method not in ("rrf", "isf", "weighted_sum", "learned_isf"):
+            raise ValueError(f"fusion_method must be one of rrf/isf/weighted_sum/learned_isf, got {self.fusion_method}")
+        if self.fusion_k < 0:
+            raise ValueError(f"fusion_k must be >= 0, got {self.fusion_k}")
 
 
 def _default_weights() -> RecallWeights:

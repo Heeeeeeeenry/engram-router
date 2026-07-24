@@ -485,7 +485,100 @@ def build_recall_response(
             )
         )
 
+    # ── Phase 2: Three-channel fusion (L1.1) ──
+    # When channels module is available and store has vector_index,
+    # run independent channels and fuse them.
+    _three_channel_records: list[MemoryRecord] | None = None
+    _channel_merged_ids: set[str] = set()
+    try:
+        from . import channels as _channels
+        _vector_enabled_ch = getattr(store, '_vector_enabled', True)
+        _vector_index_ch = getattr(store, 'vector_index', None)
+        _embedding_engine_ch = getattr(store, 'embedding_engine', None)
+        if _vector_enabled_ch and _vector_index_ch and _embedding_engine_ch and query:
+            channel_results = _channels.run_channels(
+                store, query, top_n=store.weights.channel_top_n)
+            if channel_results:
+                # channel_results is a list of per-channel lists:
+                #   [(id, score, reason, metadata), ...]
+                # Build result_lists for fusion: each channel becomes a list
+                # of (id, score) tuples.
+                result_lists: list[list[tuple[str, float]]] = []
+                channel_weights: list[float] = []
+                for ch_name, ch_list in channel_results:
+                    result_lists.append([(cid, cscore) for cid, cscore, _, _ in ch_list])
+                    if ch_name == "fts":
+                        channel_weights.append(store.weights.channel_fts_weight)
+                    elif ch_name == "vector":
+                        channel_weights.append(store.weights.channel_vector_weight)
+                    elif ch_name == "hyde":
+                        channel_weights.append(store.weights.channel_hyde_weight)
+                    else:
+                        channel_weights.append(1.0)
+
+                if result_lists:
+                    from ..fusion import fuse as _fuse
+                    fused = _fuse(
+                        store.weights.fusion_method,
+                        result_lists,
+                        weights=channel_weights,
+                        k=store.weights.fusion_k,
+                    )
+                    # Merge channel-fused results with existing keyword-scored records
+                    existing_ids = {r.id for r in records}
+                    _channel_merged_ids = {mid for mid, _ in fused}
+                    _three_channel_records = []
+                    # Boost keyword records that also appear in channel fusion
+                    for r in records:
+                        ch_score = next(
+                            (s for mid, s in fused if mid == r.id), None)
+                        if ch_score is not None:
+                            new_score = r.score + ch_score * 10.0
+                            new_reason = (r.match_reason + " · channel-boost"
+                                          if r.match_reason else "channel-boost").strip("·")
+                            _three_channel_records.append(MemoryRecord(
+                                id=r.id, raw_text=r.raw_text, summary=r.summary,
+                                confidence=r.confidence, metadata=r.metadata,
+                                evidence_refs=r.evidence_refs,
+                                score=new_score, match_reason=new_reason,
+                            ))
+                        else:
+                            _three_channel_records.append(r)
+                    # Add new candidates from channels not already in keyword results
+                    for mid, fused_score in fused:
+                        if mid not in existing_ids and len(_three_channel_records) < top_k * 2:
+                            row_list = candidates.rows_by_ids(
+                                store.conn, [mid], namespace=namespace)
+                            if row_list:
+                                rw = row_list[0]
+                                rw_summary = (
+                                    rw["summary"] if rw["summary"]
+                                    else rw["raw_text"][:160]
+                                )
+                                _three_channel_records.append(MemoryRecord(
+                                    id=mid, raw_text=rw["raw_text"],
+                                    summary=rw_summary,
+                                    confidence=rw["confidence"]
+                                    if rw["confidence"] is not None else 1.0,
+                                    metadata=parse_metadata(rw["metadata"]),
+                                    evidence_refs=[],
+                                    score=fused_score * 60.0,
+                                    match_reason="three-channel fusion",
+                                ))
+                    _three_channel_records.sort(key=lambda x: x.score, reverse=True)
+    except ImportError:
+        pass  # channels module not yet available
+    except Exception as exc:
+        logger.debug("Three-channel fusion skipped: %s", exc)
+
     # ── Phase 2: Vector-search fusion ──
+    # If three-channel fusion produced results, use those and skip the
+    # standard vector fusion path.  Otherwise fall through to the existing
+    # keyword+vector+hyde RRF path.
+    if _three_channel_records is not None:
+        records = _three_channel_records
+        _query_vec = None  # skip standard vector fusion below
+
     # Pre-compute the query vector once — used by RRF fusion (Phase 2)
     # and post-CE fallback (Phase 3.5) below.
     _query_vec: Any = None
