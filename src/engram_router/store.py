@@ -13,12 +13,13 @@ import os
 import re
 import sqlite3
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 from .config import config
 from .scoring import RecallWeights, _default_weights
+from . import candidates
+from . import graph
 from . import scoring
 from .cross_encoder import CrossEncoderReranker
 from .embedding import EmbeddingEngine
@@ -355,75 +356,16 @@ class MemoryStore:
         )
 
     def _init_indices(self) -> None:
-        """Indices for the hot recall paths (entity<->memory map, edge hops).
-
-        These only speed up the existing queries; they do not change results.
-        """
-        self.conn.executescript(
-            """
-            CREATE INDEX IF NOT EXISTS idx_edges_src ON edges(src_id);
-            CREATE INDEX IF NOT EXISTS idx_edges_dst ON edges(dst_id);
-            CREATE INDEX IF NOT EXISTS idx_edges_src_cover
-                ON edges(src_id, dst_id, relation, confidence);
-            CREATE INDEX IF NOT EXISTS idx_me_entity ON memory_entities(entity_id);
-            CREATE INDEX IF NOT EXISTS idx_me_memory ON memory_entities(memory_id);
-            CREATE INDEX IF NOT EXISTS idx_entities_name_kind ON entities(name, kind);
-            CREATE INDEX IF NOT EXISTS idx_memories_namespace ON memories(namespace);
-            CREATE INDEX IF NOT EXISTS idx_memories_ns_created
-                ON memories(namespace, created_at DESC, id DESC);
-            CREATE INDEX IF NOT EXISTS idx_evidence_memory ON evidence(memory_id);
-            CREATE INDEX IF NOT EXISTS idx_distilled_memory ON distilled_memories(memory_id);
-            CREATE INDEX IF NOT EXISTS idx_timed_events_sort
-                ON timed_events(sort_order, created_at DESC);
-            CREATE INDEX IF NOT EXISTS idx_timed_events_person
-                ON timed_events(person_name);
-            """
-        )
+        """Delegates to candidates.init_indices."""
+        candidates.init_indices(self.conn)
 
     def _init_fts(self) -> None:
-        """Create the FTS5 trigram virtual table used as a candidate source.
-
-        FTS5 is a *candidate* retrieval path, not the ranker. The trigram
-        tokenizer matches substrings of ≥3 characters (ASCII brands like HHKB,
-        and CJK words of ≥3 chars such as 机械键盘). It cannot match 2-char CJK
-        queries (键盘/张三 -> 0 hits, trigram needs ≥3 chars), so recall falls
-        back to the weighted ranker over all rows when FTS yields nothing. We
-        probe support once; if the build lacks FTS5/trigram we degrade silently
-        to the full-scan path (correctness is unchanged, only the candidate
-        pre-filter is skipped).
-        """
-        self._fts_enabled = False
-        try:
-            self.conn.execute(
-                "CREATE VIRTUAL TABLE IF NOT EXISTS memories_fts "
-                "USING fts5(memory_id UNINDEXED, content, tokenize='trigram')"
-            )
-            self._fts_enabled = True
-            # P0-6: FTS5 ghost entries after delete are harmless — the recall
-            # pipeline (_fts_candidates, line ~557) re-queries memories to
-            # confirm every FTS5 hit exists.  FTS5 content-mode 'delete' is
-            # not available without an external content table, so we rely on
-            # the pipeline filter instead.  Bulk rebuild on demand if ghost
-            # count grows large.  See REVIEW_FINDINGS_2026-06-30_v2.md §P0-6.
-        except sqlite3.OperationalError:
-            self._fts_enabled = False
+        """Delegates to candidates.init_fts; stores _fts_enabled on self."""
+        self._fts_enabled = candidates.init_fts(self.conn)
 
     def _fts_remove(self, memory_id: str) -> None:
-        """Best-effort FTS5 cleanup stub.
-
-        FTS5 content-mode 'delete' requires an external content table to
-        work (the standalone virtual table does not support the 'delete'
-        special command).  Instead, the recall pipeline naturally filters
-        ghost entries: _fts_candidates() re-queries memories to confirm
-        every FTS5 hit exists (line ~559).
-
-        When FTS5 is rebuilt (e.g. after a bulk delete), this method can
-        be replaced with a full table rebuild.
-        """
-        # Currently a no-op: ghost entries are harmless because the recall
-        # pipeline cross-checks every FTS5 candidate against the memories
-        # table.  See _fts_candidates() lines 557-563.
-        pass
+        """Delegates to candidates.fts_remove."""
+        candidates.fts_remove(memory_id)
 
     MAX_TEXT_BYTES = 49152  # 48KB — raised from 10KB for LongMemEval _s split (0.09% of memories exceed 10KB, mostly tokenization artifacts)
 
@@ -536,106 +478,12 @@ class MemoryStore:
 
     def _index_edges(self, memory_id: str, indexed: list[dict[str, Any]],
                      text: str = "") -> None:
-        """Write typed relations between the entities co-occurring in one memory.
-
-        Causal-edge hard boundary:
-          - Co-occurrence inside a memory is an *inference*, so it is only ever
-            written as CO_OCCURS_WITH at low confidence (0.4) and must never be
-            promoted to a fact without evidence (≥3 confirmations or an explicit
-            user statement).
-          - A *user-stated* cause -- surfaced as a ``reason`` entity from a
-            causal marker (因为/由于/...) in this very turn -- is the user
-            asserting causation. We honour that as a CAUSED_BY edge at high
-            confidence (0.95), pointing from each non-reason entity to the
-            reason (effect -> cause).
-          - When LLM extraction is enabled, LLM-typed edges (HAS_ATTRIBUTE,
-            REPLACES, PREFERS, etc.) are merged in with source=llm confidence.
-
-        Every edge's ``evidence_ref`` points back to the memory it was drawn
-        from, so the inference is always auditable / revocable.
-        """
-        # Deduplicate entity ids within this memory while keeping kind/name.
-        # Exclude cjk_ngram entities from edge creation to prevent noise.
-        uniq: list[dict[str, Any]] = []
-        seen_ids: set[str] = set()
-        for ent in indexed:
-            if ent["id"] in seen_ids:
-                continue
-            if ent.get("kind") == "cjk_ngram":
-                continue  # cjk_ngram is for shared-entity scoring only, not edges
-            seen_ids.add(ent["id"])
-            uniq.append(ent)
-        if len(uniq) < 2:
-            return
-
-        reasons = [e for e in uniq if e["kind"] == "reason"]
-        nonreason = [e for e in uniq if e["kind"] != "reason"]
-
-        written: set[tuple[str, str, str]] = set()
-
-        def _add_edge(src: str, dst: str, relation: str, confidence: float) -> None:
-            if src == dst:
-                return
-            key = (src, dst, relation)
-            if key in written:
-                return
-            written.add(key)
-            edge_id = self._next_id("edges", "edge")
-            self.conn.execute(
-                "INSERT INTO edges (id, src_id, dst_id, relation, confidence, evidence_ref) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (edge_id, src, dst, relation, confidence, memory_id),
-            )
-
-        # CO_OCCURS_WITH: every unordered pair, written once as a directed edge
-        # from the earlier-indexed entity to the later one (low confidence).
-        for i in range(len(uniq)):
-            for j in range(i + 1, len(uniq)):
-                _add_edge(uniq[i]["id"], uniq[j]["id"], "CO_OCCURS_WITH", 0.4)
-
-        # CAUSED_BY: user-stated causation (effect -> cause). The reason entity
-        # is the cause; connect it only to the nearest non-reason entities
-        # (capped at 3 per reason) to avoid the all-to-all noise problem.
-        # High confidence because the user said so.
-        for cause in reasons:
-            nearby = nonreason[:3]
-            for effect in nearby:
-                _add_edge(effect["id"], cause["id"], "CAUSED_BY", 0.95)
-
-        # DESCRIBES: product→topic (e.g. HHKB → 键盘).  When both a product
-        # alias and its topic appear in the same memory, create a high-confidence
-        # directed edge so recall can follow the semantic link.
-        for ent in uniq:
-            topic = config.entities.object_topic_aliases.get(ent["name"])
-            if topic is None:
-                continue
-            topic_ent = next((e for e in uniq if e["name"] == topic), None)
-            if topic_ent is not None:
-                _add_edge(ent["id"], topic_ent["id"], "DESCRIBES", 0.9)
-
-        # LLM-typed edges: supplement rule-based edges with LLM-annotated
-        # relations (HAS_ATTRIBUTE, REPLACES, PREFERS, etc.).  LLM edges use
-        # lower confidence (×0.8) and are tagged source=llm in evidence_ref
-        # for auditability.
-        if self.llm_extractor is not None and self.llm_extractor.available and text:
-            name_to_id: dict[str, str] = {e["name"]: e["id"] for e in uniq}
-            for edge in extract_edges_llm(text):
-                src_id = name_to_id.get(edge.get("src", ""))
-                dst_id = name_to_id.get(edge.get("dst", ""))
-                if src_id is None or dst_id is None:
-                    continue
-                relation = edge.get("relation", "CO_OCCURS_WITH")
-                confidence = float(edge.get("confidence", 0.8))
-                # Don't re-write CO_OCCURS_WITH or CAUSED_BY if already handled.
-                if relation in ("CO_OCCURS_WITH", "CAUSED_BY"):
-                    continue
-                edge_id = self._next_id("edges", "edge")
-                self.conn.execute(
-                    "INSERT INTO edges (id, src_id, dst_id, relation, confidence, evidence_ref) "
-                    "VALUES (?, ?, ?, ?, ?, ?)",
-                    (edge_id, src_id, dst_id, relation, confidence,
-                     f"{memory_id}:llm"),
-                )
+        """Delegate to graph.index_edges."""
+        graph.index_edges(
+            self.conn, self._next_id,
+            memory_id=memory_id, indexed=indexed, text=text,
+            llm_extractor=self.llm_extractor,
+        )
 
 
     # ── Phase 3: Persona / Causal / Timeline lazy-init ──
@@ -852,184 +700,36 @@ class MemoryStore:
 
     def _fts_candidates(self, query: str, terms: list[str],
                         namespace: str = "default") -> set[str] | None:
-        """Return the set of memory ids the FTS5 trigram index matches.
+        """Delegates to candidates.fts_candidates."""
+        return candidates.fts_candidates(
+            self.conn, self._fts_enabled, query, terms, namespace,
+        )
 
-        Returns ``None`` (meaning "no usable candidate filter, scan everything")
-        when FTS is unavailable or the query has no trigram-eligible term. The
-        trigram tokenizer needs substrings of ≥3 chars, so 2-char CJK queries
-        (键盘, 张三) and bare single chars produce no FTS terms -> ``None`` ->
-        the weighted full scan + entity/edge fallback handles them. This is the
-        documented Chinese short-query fallback.
-
-        For short mixed tokens (B轮, 20亿) where FTS5 trigram produces no match,
-        a LIKE-based fallback scans for individual terms ≥1 char to recover
-        candidates that would otherwise be missed entirely.
-        """
-        if not self._fts_enabled:
-            return None
-        fts_terms = [t for t in terms if len(t) >= 3]
-        raw_ids: set[str] = set()
-
-        # --- FTS5 trigram path ---
-        if fts_terms:
-            match_expr = " OR ".join('"' + t.replace('"', '""') + '"' for t in fts_terms)
-            try:
-                rows = self.conn.execute(
-                    "SELECT memory_id FROM memories_fts WHERE memories_fts MATCH ?",
-                    (match_expr,),
-                ).fetchall()
-                raw_ids = {r["memory_id"] for r in rows}
-            except sqlite3.OperationalError:
-                pass
-
-        # --- LIKE fallback for short/mixed tokens that FTS5 trigram misses ---
-        # Trigram tokenizer can't match "B轮" (2 chars), "20亿" (split at space),
-        # "5000"(in "5000 万") — LIKE recovers these with substring matching.
-        # Runs always (not gated on raw_ids empty) so it can ADD to FTS results.
-        short_terms = [t for t in terms if 1 <= len(t) < 3]
-        if short_terms:
-            like_clauses = []
-            like_params = []
-            for t in short_terms:
-                like_clauses.append("raw_text LIKE ?")
-                like_params.append(f"%{t}%")
-            if like_clauses:
-                try:
-                    like_rows = self.conn.execute(
-                        f"SELECT id FROM memories WHERE namespace = ? AND ({' OR '.join(like_clauses)})",
-                        (namespace,) + tuple(like_params),
-                    ).fetchall()
-                    raw_ids |= {r["id"] for r in like_rows}
-                except sqlite3.OperationalError:
-                    pass
-
-        # --- Entity-name fallback (second level) ---
-        # Topic aliases add entities (e.g. "钱") to memories whose raw_text
-        # doesn't contain the entity name. LIKE searches raw_text, so recover
-        # these via the entity table. Always merges with existing raw_ids.
-        if short_terms:
-            try:
-                entity_rows = self.conn.execute(
-                    f"""SELECT DISTINCT me.memory_id
-                        FROM memory_entities me
-                        JOIN entities e ON e.id = me.entity_id
-                        JOIN memories m ON m.id = me.memory_id
-                        WHERE m.namespace = ?
-                        AND ({" OR ".join("e.name LIKE ?" for _ in short_terms)})""",
-                    (namespace,) + tuple(f"%{t}%" for t in short_terms),
-                ).fetchall()
-                raw_ids |= {r["memory_id"] for r in entity_rows}
-            except sqlite3.OperationalError:
-                pass
-
-        if raw_ids:
-            placeholders = ",".join("?" for _ in raw_ids)
-            ns_rows = self.conn.execute(
-                f"SELECT id FROM memories WHERE id IN ({placeholders}) AND namespace = ?",
-                tuple(raw_ids) + (namespace,),
-            ).fetchall()
-            return {r["id"] for r in ns_rows}
-        return raw_ids if raw_ids else None
-
-    _SQLITE_IN_BATCH = 900
+    # _SQLITE_IN_BATCH moved to candidates.py; keep as alias for internal callers
+    # that still reference self._SQLITE_IN_BATCH (e.g. _batch_evidence_refs).
+    _SQLITE_IN_BATCH = candidates.SQLITE_IN_BATCH
 
     def _rows_by_ids(self, ids: list[str], ordered: bool = False,
                      namespace: str | None = None) -> list[sqlite3.Row]:
-        if not ids:
-            return []
-        rows: list[sqlite3.Row] = []
-        suffix = " ORDER BY created_at DESC, id DESC" if ordered else ""
-        ns_clause = " AND namespace = ?" if namespace else ""
-        for i in range(0, len(ids), self._SQLITE_IN_BATCH):
-            batch = ids[i : i + self._SQLITE_IN_BATCH]
-            placeholders = ",".join("?" for _ in batch)
-            params = tuple(batch) + ((namespace,) if namespace else ())
-            rows.extend(
-                self.conn.execute(
-                    f"SELECT * FROM memories WHERE id IN ({placeholders}){ns_clause}" + suffix,
-                    params,
-                ).fetchall()
-            )
-        return rows
+        """Delegates to candidates.rows_by_ids."""
+        return candidates.rows_by_ids(self.conn, ids, ordered=ordered, namespace=namespace)
 
     def _row_by_id(self, mem_id: str, namespace: str | None = None) -> sqlite3.Row | None:
-        """Fetch a single memory row by id. Returns None if not found."""
-        if namespace is None:
-            row = self.conn.execute(
-                "SELECT * FROM memories WHERE id = ?", (mem_id,)
-            ).fetchone()
-        else:
-            row = self.conn.execute(
-                "SELECT * FROM memories WHERE id = ? AND namespace = ?",
-                (mem_id, namespace),
-            ).fetchone()
-        return cast("sqlite3.Row | None", row)
+        """Delegates to candidates.row_by_id."""
+        return candidates.row_by_id(self.conn, mem_id, namespace=namespace)
 
     def _memory_rows(self, fts_ids: set[str] | None,
                      namespace: str = "default") -> list[sqlite3.Row]:
-        """Fetch rows to score, using non-empty FTS hits as a candidate filter."""
-        if fts_ids:
-            return self._rows_by_ids(list(fts_ids), ordered=True, namespace=namespace)
-        # Full-scan fallback: cap at a generous limit to bound scoring cost,
-        # then let the Python ranker pick the best top_k.  ORDER BY created_at
-        # DESC ensures recent memories win ties; the composite index
-        # idx_memories_ns_created covers the WHERE + ORDER BY.
-        rows = self.conn.execute(
-            "SELECT * FROM memories WHERE namespace = ? "
-            "ORDER BY created_at DESC, id DESC "
-            "LIMIT ?",
-            (namespace, self.weights.full_scan_limit),
-        ).fetchall()
-        if len(rows) >= self.weights.full_scan_limit:
-            logger.warning(
-                "Full-scan recall hit limit (%d rows) for namespace=%r — "
-                "consider FTS5 or namespace partitioning at scale",
-                self.weights.full_scan_limit, namespace,
-            )
-        return rows
+        """Delegates to candidates.memory_rows."""
+        return candidates.memory_rows(self.conn, self.weights, fts_ids, namespace)
 
     def _entities_for_memories(self, memory_ids: list[str]) -> dict[str, list[dict[str, Any]]]:
-        if not memory_ids:
-            return {}
-        rows: list[sqlite3.Row] = []
-        for i in range(0, len(memory_ids), self._SQLITE_IN_BATCH):
-            batch = memory_ids[i : i + self._SQLITE_IN_BATCH]
-            placeholders = ",".join("?" for _ in batch)
-            rows.extend(
-                self.conn.execute(
-                    "SELECT me.memory_id, e.name, e.kind, me.salience_class "
-                    "FROM memory_entities me JOIN entities e ON e.id = me.entity_id "
-                    f"WHERE me.memory_id IN ({placeholders})",
-                    tuple(batch),
-                ).fetchall()
-            )
-        out: dict[str, list[dict[str, Any]]] = {mid: [] for mid in memory_ids}
-        for r in rows:
-            # Exclude cjk_ngram entities from the entity map — they are
-            # for FTS5 LIKE fallback only, not for scoring or edge expansion.
-            if r["kind"] == "cjk_ngram":
-                continue
-            out.setdefault(r["memory_id"], []).append(
-                {"name": r["name"], "kind": r["kind"], "salience_class": r["salience_class"]}
-            )
-        return out
+        """Delegates to candidates.entities_for_memories."""
+        return candidates.entities_for_memories(self.conn, memory_ids)
 
     def _record_access(self, memory_ids: list[str]) -> None:
-        """Increment access_count and update accessed_at for recalled memories.
-
-        Called at the end of every successful recall so the forgetting engine
-        can see which memories have been recently accessed.
-        """
-        if not memory_ids:
-            return
-        now = datetime.now(timezone.utc).isoformat()
-        for mid in memory_ids:
-            self.conn.execute(
-                "UPDATE memories SET access_count = access_count + 1, "
-                "accessed_at = ? WHERE id = ?",
-                (now, mid),
-            )
-        self.conn.commit()
+        """Delegates to candidates.record_access."""
+        candidates.record_access(self.conn, memory_ids)
 
     def should_inject(self, query: str) -> bool:
         """快速判断查询是否需要记忆注入。
@@ -1869,63 +1569,12 @@ class MemoryStore:
         query_entities: set[str],
         query_entity_objs: list[dict[str, Any]],
     ) -> float:
-        """Score how relevant an expanded entity is to the original query.
-
-        SAG-inspired: at each expansion hop, check if the newly reached entity
-        still connects to the query's semantic intent. If not, prune the branch.
-
-        Scoring factors:
-        1. Direct name overlap with query terms (strongest signal)
-        2. Kind-based relevance multiplier (person/topic > generic noun)
-        3. Substring / partial match with query entities
-
-        Returns 0.0–1.0, where 1.0 = directly mentioned in query.
-        """
-        if not entity_name:
-            return 0.0
-        name_lower = entity_name.lower()
-        score = 0.0
-
-        # 1. Direct term overlap: entity name appears in query terms
-        term_overlap = 0
-        for t in query_terms:
-            if t and (t in name_lower or name_lower in t):
-                term_overlap += 1
-        if term_overlap > 0:
-            # Up to 0.6 for term overlap
-            score = min(0.6, 0.2 * term_overlap)
-
-        # 2. Entity set match: entity is in the query's extracted entities
-        if entity_name in query_entities:
-            score = max(score, 0.9)  # Strong signal: explicitly extracted
-
-        # 3. Kind-based multiplier
-        kind_weights = self.weights.relevance_entity_kind_weights or {
-            "person": 0.9, "topic": 0.8, "object": 0.6,
-            "location": 0.5, "time": 0.4, "number": 0.3,
-            "event": 0.7, "organization": 0.5,
-        }
-        kind_mult = kind_weights.get(entity_kind, 0.3)
-        # Blend: if no term match, fall back to kind weight
-        if score < 0.1:
-            # When query entities are sparse, rely more on kind relevance.
-            # A "time" or "object" entity in a no-entity query still has
-            # structural value for edge traversal, just at a lower weight.
-            if not query_entities:
-                score = kind_mult * 0.5  # Allow traversal through structural entities
-            else:
-                score = kind_mult * 0.4
-        else:
-            # Boost existing score by kind relevance
-            score = score * (0.5 + 0.5 * kind_mult)
-
-        # 4. Bonus: entity name is a substring of a query entity or vice versa
-        for qe in query_entities:
-            if qe and (qe in name_lower or name_lower in qe):
-                score = max(score, 0.7)
-                break
-
-        return min(1.0, score)
+        """Delegate to graph.entity_query_relevance."""
+        return graph.entity_query_relevance(
+            entity_name, entity_kind,
+            query_terms, query_entities, query_entity_objs,
+            weights=self.weights,
+        )
 
     def _edge_expansion(
         self,
@@ -2556,11 +2205,8 @@ class MemoryStore:
         return stats
 
     def _fts_rebuild(self) -> None:
-        """Rebuild FTS5 index to purge ghost entries (deleted memories still in FTS)."""
-        try:
-            self.conn.execute("INSERT INTO memories_fts(memories_fts) VALUES('rebuild')")
-        except sqlite3.OperationalError:
-            pass  # FTS5 table may not exist
+        """Delegates to candidates.fts_rebuild."""
+        candidates.fts_rebuild(self.conn)
 
     def _score(self, query: str, terms: list[str], haystack: str) -> float:
         return scoring.score(
