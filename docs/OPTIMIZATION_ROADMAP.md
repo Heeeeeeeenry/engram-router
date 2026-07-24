@@ -1,3 +1,22 @@
+
+### 2026-07-24 · store.py 拆解 Steps 1-5
+
+- **基线**: 2843 行单文件 → **2026 行** (-28.7%)
+- **新增模块**:
+
+  | 文件 | 行数 | 内容 |
+  |---|---|---|
+  |  | 115 | 14 个纯函数: _asks_*/_has_*/_suggest_* |
+  |  | 212 | MemoryRecord + _row_to_record + summary/clean/truncate |
+  |  | 260 | RecallWeights + _default_weights + term/score/match |
+  |  | 327 | FTS5 候选检索 + row access + record_access |
+  |  | 455 | _index_edges + _entity_query_relevance + _edge_expansion (BFS) |
+
+- **Commit 链**: 10fdfd5 → e5fd0f4 → 86ea26e → 0f0f325 → e730200
+- **验证**: 61+38+14 passed, 全部 smoke tests pass
+- **NOT 完成**: Steps 6-7 (recall.py+pipeline.py/core.py), 这些涉及 recall() 主流程拆分和 store/ 包重组织,风险最高
+- **REASON_MARKERS 修复**: query_intent.py 原缺 "为了", "生日" → 已同步为一致集合
+
 # EngramRouter 优化路线图
 
 **创建**: 2026-07-21
