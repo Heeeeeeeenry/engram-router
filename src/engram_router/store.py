@@ -2461,20 +2461,9 @@ class MemoryStore:
     def _term_weight(self, term: str) -> float:
         """Weight a term by how much retrieval signal it carries.
 
-        - ASCII / alphanumeric tokens (brands like HHKB, dates, numbers) are
-          high-signal and rare -> heaviest weight.
-        - Multi-char CJK words (机械键盘, 同事, 腾讯) are meaningful -> medium.
-        - Single common CJK chars (我, 的, 是) are noise -> near zero.
+        Delegates to scoring.term_weight.
         """
-        if re.fullmatch(r"[A-Za-z0-9_]+", term):
-            # Rare proper nouns / brands / IDs: scale a little with length.
-            return self.weights.ascii_base + min(len(term), self.weights.ascii_per_char_cap) * self.weights.ascii_per_char
-        if len(term) >= 2:
-            return self.weights.cjk_multi_base + (len(term) - 2) * self.weights.cjk_multi_per_char
-        # Single CJK char.
-        if term in MemoryStore.STOP_CHARS:
-            return self.weights.stop_char_weight
-        return self.weights.single_cjk_weight
+        return scoring.term_weight(term, self.weights, MemoryStore.STOP_CHARS)
 
     # --- consolidate ----------------------------------------------------------
 
