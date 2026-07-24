@@ -1,6 +1,28 @@
 
 
 
+### 2026-07-24 · L1.3 HyDE + Multi-query + Intent classifier (三路并行)
+
+- **本次改动**:
+  - Agent A: HyDE 默认开启 + negative-case 加固
+    - `hyde_enabled=True` 默认（原是 False）
+    - `_NEGATIVE_PATTERNS` 新增 6 个模式：是否/会不会/能不能/行不行/可不可以/存不存在
+    - Conditional gate：如果/要是/假如/假设 开头 skip HyDE
+    - +6 测试
+  - Agent B: Multi-query 查询扩展
+    - `QueryExpander.expand_multi_query()`: LLM 生成 3-5 个语义等价变体
+    - RecallWeights: `multi_query_enabled`/`num_variants`/`fusion_weight`
+    - recall.py: variant 加权 RRF fusion（主查询 weight=1.0，变体=0.5）
+    - +12 单元测试 + 8 集成测试
+  - Agent C: LLM intent classifier
+    - `intent_classifier.py`(323 行)：8 类软概率（brand/identity/eval/reason/person/time/location/object）
+    - Regex fallback 始终可用；`intent_classifier_enabled=False`（LLM 有延迟）
+    - recall.py: `_asks_identity()` 桥接函数
+    - +26 测试
+- **回归**: 472 passed / 4 skipped / 12 xfailed
+- **Commit**: 8e04afb
+- **L1.3 ✅ 全部完成**，L1 召回架构核心全部完成
+
 ### 2026-07-24 · L1.1 三通道检索 + learned fusion
 
 - **本次改动**（三路多智能体并行实施）:
@@ -125,9 +147,9 @@
 - [x] learned fusion 替代 RRF — `fusion.py`: ISF / RBF / learned_fusion_weights + FusionMethod 分发器
 
 #### 1.3 查询理解
-- [ ] HyDE:LLM 先生成假想答案 → 用其向量召回 — Phase 2 已落地(设计 `docs/design/rerank_and_hyde.md`),但 A/B 显示单开会降 P@1 0.83→0.80、rejection 1.0→0.67,**默认关闭**,需先修 negative-case 处理再打开
-- [ ] Multi-query:一条 query 展成 3-5 变体并行召回后融合 — 设计见 `docs/design/rerank_and_hyde.md`
-- [ ] Intent classifier 替代 `_asks_brand / _asks_identity / _asks_eval` 正则(`store.py:2136-2149`),输出软概率 — 设计见 `docs/design/rerank_and_hyde.md`
+- [x] HyDE:LLM 先生成假想答案 → 用其向量召回 — 默认开启 (hyde_enabled=True),negative-case 加固 (6 新 pattern + conditional gate)
+- [x] Multi-query:一条 query 展成 3-5 变体并行召回后融合 — QueryExpander.expand_multi_query(), weighted RRF fusion
+- [x] Intent classifier 替代 `_asks_brand / _asks_identity / _asks_eval` 正则 — LLM 8-class soft probability + regex fallback (off by default)
 
 ### L4 工程可观测
 
