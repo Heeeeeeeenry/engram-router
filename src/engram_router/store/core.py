@@ -31,7 +31,7 @@ from ..llm_reranker import LLMReranker
 from ..query_expansion import QueryExpander
 from . import query_intent
 from . import recall as _recall
-from .records import MemoryRecord
+from .records import MemoryRecord, serialize_metadata, parse_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -614,7 +614,8 @@ class MemoryStore:
 
     @staticmethod
     def _serialize_metadata(metadata: dict[str, Any] | None) -> str:
-        return json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True)
+        """Delegate to records.serialize_metadata."""
+        return serialize_metadata(metadata)
 
     @staticmethod
     def _parse_metadata(raw: str | None) -> dict[str, Any]:
