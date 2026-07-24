@@ -15,8 +15,11 @@ from typing import Any
 from .config import config
 from .entities import extract_entities
 from .llm_extractor import extract_edges_llm
-from .scoring import RecallWeights, _default_weights, base_score
+from .scoring import RecallWeights, _default_weights
+from .scoring import base_score as _scoring_base_score
 from .scoring import terms as extract_terms
+
+REASON_MARKERS: tuple[str, ...] = ("因为", "原因", "所以", "导致", "出于", "由于", "为了", "生日")
 
 logger = logging.getLogger(__name__)
 
@@ -261,7 +264,9 @@ def edge_expansion(
     if rows is None:
         rows = []
     if base_score_fn is None:
-        base_score_fn = base_score
+        # Scoring.base_score() requires weights/stop_chars/reason_markers
+        _stop = frozenset(config.recall.stop_chars)
+        base_score_fn = lambda q, t, h: _scoring_base_score(q, t, h, weights, _stop, REASON_MARKERS)
 
     # 1. Find seed memories: those with a positive direct token/entity match.
     query_entity_objs = [
