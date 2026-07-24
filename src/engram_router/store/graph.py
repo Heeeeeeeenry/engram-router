@@ -12,9 +12,9 @@ import sqlite3
 from collections import deque
 from typing import Any
 
-from .config import config
-from .entities import extract_entities
-from .llm_extractor import extract_edges_llm
+from ..config import config
+from ..entities import extract_entities
+from ..llm_extractor import extract_edges_llm
 from .scoring import RecallWeights, _default_weights
 from .scoring import base_score as _scoring_base_score
 from .scoring import terms as extract_terms

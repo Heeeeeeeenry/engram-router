@@ -19,9 +19,9 @@ from . import candidates
 from . import graph
 from . import query_intent
 from . import scoring
-from .config import config
-from .entities import extract_entities
-from .fusion import reciprocal_rank_fusion
+from ..config import config
+from ..entities import extract_entities
+from ..fusion import reciprocal_rank_fusion
 from .records import (
     MemoryRecord,
     parse_metadata,
@@ -811,7 +811,7 @@ def recall(
     5. Sort, truncate, and convert to MemoryRecord with batched refs.
     """
     # ── Phase 2: Query Expansion ───────────────────────────────────
-    from .query_expansion import QueryExpander
+    from ..query_expansion import QueryExpander
 
     query_expander = getattr(store, 'query_expander', None)
     if query_expander is not None:
@@ -892,7 +892,7 @@ def recall(
 
     # LLM query augmentation: supplement rule-based entities with LLM-
     # extracted ones for better recall (e.g., unlisted brands, topics).
-    from .llm_extractor import extract_entities_llm
+    from ..llm_extractor import extract_entities_llm
 
     llm_query_extract = getattr(store, 'llm_query_extract', False)
     llm_extractor = getattr(store, 'llm_extractor', None)

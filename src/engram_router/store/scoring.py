@@ -10,7 +10,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-from .config import config
+from ..config import config
 
 
 # ── RecallWeights (centralised recall scoring knobs) ──────────────────────

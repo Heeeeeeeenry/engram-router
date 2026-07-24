@@ -16,38 +16,25 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from .config import config
+from ..config import config
 from .scoring import RecallWeights, _default_weights
 from . import candidates
 from . import graph
 from . import scoring
-from .cross_encoder import CrossEncoderReranker
-from .embedding import EmbeddingEngine
-from .entities import classify_salience, extract_entities
-from .fusion import reciprocal_rank_fusion
-from .hyde import HyDEExpander
-from .llm_extractor import LLMExtractor, extract_edges_llm, extract_entities_llm
-from .llm_reranker import LLMReranker
-from .query_expansion import QueryExpander
+from ..cross_encoder import CrossEncoderReranker
+from ..embedding import EmbeddingEngine
+from ..entities import classify_salience, extract_entities
+from ..fusion import reciprocal_rank_fusion
+from ..hyde import HyDEExpander
+from ..llm_extractor import LLMExtractor, extract_edges_llm, extract_entities_llm
+from ..llm_reranker import LLMReranker
+from ..query_expansion import QueryExpander
 from . import query_intent
 from . import recall as _recall
+from .records import MemoryRecord
 
 logger = logging.getLogger(__name__)
 
-
-@dataclass(frozen=True)
-class MemoryRecord:
-    id: str
-    raw_text: str
-    summary: str
-    confidence: float = 1.0
-    metadata: dict[str, Any] | None = None
-    evidence_refs: list[str] | None = None
-    score: float = 0.0
-    match_reason: str = ""
-
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
 
 class MemoryStore:
     """Local SQLite memory store.
@@ -161,7 +148,7 @@ class MemoryStore:
                 )
             # Auto-create vector index if not provided
             if self.vector_index is None and self.embedding_engine.available:
-                from .vector_index import VectorIndex
+                from ..vector_index import VectorIndex
                 vec_path = None
                 if path is not None:
                     p = Path(path)
@@ -492,28 +479,28 @@ class MemoryStore:
     @property
     def persona(self):
         if self._persona is None:
-            from .persona import PersonaStore
+            from ..persona import PersonaStore
             self._persona = PersonaStore(self, self.llm_extractor)
         return self._persona
 
     @property
     def causal(self):
         if self._causal is None:
-            from .causal import CausalChain
+            from ..causal import CausalChain
             self._causal = CausalChain(self.conn)
         return self._causal
 
     @property
     def timeline(self):
         if self._timeline is None:
-            from .causal import Timeline
+            from ..causal import Timeline
             self._timeline = Timeline(self.conn)
         return self._timeline
 
     @property
     def forgetting(self):
         if self._forgetting is None:
-            from .forgetting import ForgettingEngine, ForgettingConfig
+            from ..forgetting import ForgettingEngine, ForgettingConfig
             self._forgetting = ForgettingEngine(self, ForgettingConfig())
         return self._forgetting
     def _apply_decay(self, records):
@@ -526,7 +513,7 @@ class MemoryStore:
             pass
     def _update_persona(self, text):
         try:
-            from .entities import extract_entities
+            from ..entities import extract_entities
             for ent in extract_entities(text):
                 name = ent.get("name", "")
                 if ent.get("kind") == "person" and name not in ("我", "你", "他", "她", "它"):
@@ -561,7 +548,7 @@ class MemoryStore:
         Extracts the first person entity (if any) from the same memory to
         attach as ``person_name``.
         """
-        from .causal import _resolve_sort_order
+        from ..causal import _resolve_sort_order
 
         # Find time entities linked to this memory.
         time_rows = self.conn.execute(

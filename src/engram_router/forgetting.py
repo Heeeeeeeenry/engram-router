@@ -357,7 +357,7 @@ class ForgettingEngine:
 
         # Build MemoryRecord list for should_forget inspection.
         candidates: list[str] = []
-        from .records import MemoryRecord  # lazy import — avoid circular dependency
+        from .store.records import MemoryRecord  # lazy import — avoid circular dependency
         for row in rows:
             metadata = self.store._parse_metadata(row["metadata"])
             metadata.setdefault("source", row["source"])
