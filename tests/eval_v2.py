@@ -929,8 +929,6 @@ def stability_report(
     Returns:
         A list of per-case stability dicts suitable for printing or JSON export.
     """
-    import tempfile
-
     rows: list[dict] = []
     for scen in scenarios:
         if store_factory is not None:
