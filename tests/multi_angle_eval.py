@@ -407,7 +407,15 @@ def main():
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(f"\n报告已保存: {out_path}")
 
-    return 0 if report["precision_pct"] >= 85 else 1
+    # ── L0.5 CI gates ──────────────────────────────────────────────────
+    precision_ok = report["precision_pct"] >= 85
+    isolation_ok = report["isolation_pct"] >= 85
+    print(f"\n  CI Gates:")
+    print(f"    Precision >= 85%:   {report['precision_pct']:.1f}%  {'✅ PASS' if precision_ok else '❌ FAIL'}")
+    print(f"    Isolation >= 85%:   {report['isolation_pct']:.1f}%  {'✅ PASS' if isolation_ok else '❌ FAIL'}")
+    print(f"    Overall:            {'✅ PASS' if (precision_ok and isolation_ok) else '❌ FAIL'}")
+
+    return 0 if (precision_ok and isolation_ok) else 1
 
 
 if __name__ == "__main__":

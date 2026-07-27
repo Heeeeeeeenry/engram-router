@@ -32,3 +32,7 @@ eval-adversarial:
 # Multilingual eval.
 eval-multilingual:
 	ENGRAM_SKIP_VECTOR=1 python tests/eval_v2.py --multilingual
+
+# Multi-angle CI gate: precision >= 85%, isolation >= 85%.
+ci-gate-multi:
+	ENGRAM_SKIP_VECTOR=1 python tests/multi_angle_eval.py
