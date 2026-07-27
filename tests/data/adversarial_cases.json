@@ -1,0 +1,140 @@
+[
+  {
+    "id": "adv-brand-01",
+    "query": "张三的键盘是什么牌子",
+    "expected": "HHKB",
+    "near_misses": ["HHKL", "HHKP", "HHK Pro", "Keyboardio"],
+    "memory_texts": [
+      "张三前两天送我一把 HHKB，说是生日礼物",
+      "李四用的键盘是 HHKL 牌子的",
+      "老王的 HHK Pro 键盘很贵",
+      "公司新买了一批 Keyboardio 分体键盘"
+    ],
+    "difficulty": "hard",
+    "confusion_type": "brand"
+  },
+  {
+    "id": "adv-brand-02",
+    "query": "我用的耳机是索尼还是索爱",
+    "expected": "索尼",
+    "near_misses": ["索爱", "索尼爱立信", "Sony"],
+    "memory_texts": [
+      "我去年买了一个索尼 WH-1000XM5 降噪耳机",
+      "同事说索爱的蓝牙耳机性价比很高",
+      "以前索尼爱立信手机很流行"
+    ],
+    "difficulty": "medium",
+    "confusion_type": "brand"
+  },
+  {
+    "id": "adv-name-01",
+    "query": "陈明喜欢什么运动",
+    "expected": "游泳",
+    "near_misses": ["程铭", "陈敏", "陈铭"],
+    "memory_texts": [
+      "陈明每周去三次游泳馆，是游泳达人",
+      "程铭喜欢打篮球，周末经常约球",
+      "陈敏是瑜伽教练，在朝阳区开馆",
+      "陈铭爱跑步，参加了今年的北京马拉松"
+    ],
+    "difficulty": "hard",
+    "confusion_type": "name"
+  },
+  {
+    "id": "adv-name-02",
+    "query": "王磊在哪个部门工作",
+    "expected": "市场部",
+    "near_misses": ["王蕾", "汪磊", "王雷"],
+    "memory_texts": [
+      "王磊在市场部做品牌经理，干了三年了",
+      "王蕾是研发部的测试工程师",
+      "汪磊在销售部，业绩一直很好",
+      "王雷在财务部做会计"
+    ],
+    "difficulty": "hard",
+    "confusion_type": "name"
+  },
+  {
+    "id": "adv-number-01",
+    "query": "我上个月读了几本书",
+    "expected": "四本",
+    "near_misses": ["三本", "五本", "四篇"],
+    "memory_texts": [
+      "上个月我读了四本书，都是推理小说",
+      "这个月计划读五本，但只看了三本",
+      "写了两篇读书笔记，还有四篇没写"
+    ],
+    "difficulty": "medium",
+    "confusion_type": "number"
+  },
+  {
+    "id": "adv-number-02",
+    "query": "年终奖发了几个月的工资",
+    "expected": "3个月",
+    "near_misses": ["2个月", "4个月", "13薪"],
+    "memory_texts": [
+      "今年年终奖发了3个月的工资，比去年多",
+      "去年只发了2个月，大家都不太满意",
+      "听说隔壁部门发了4个月",
+      "公司新政策改成13薪了"
+    ],
+    "difficulty": "medium",
+    "confusion_type": "number"
+  },
+  {
+    "id": "adv-time-01",
+    "query": "我去年几月换的工作",
+    "expected": "八月份",
+    "near_misses": ["七月底", "九月", "八月初"],
+    "memory_texts": [
+      "去年八月份我正式入职了新公司",
+      "七月底的时候还在交接老项目",
+      "九月才开始上手新业务",
+      "八月初就参加了一次团建"
+    ],
+    "difficulty": "hard",
+    "confusion_type": "time"
+  },
+  {
+    "id": "adv-time-02",
+    "query": "上周五的会议几点开始的",
+    "expected": "下午三点",
+    "near_misses": ["下午两点半", "三点半", "上午十点"],
+    "memory_texts": [
+      "上周五下午三点开了项目评审会",
+      "两点半的时候leader说会议推迟到三点",
+      "三点半中场休息了一次",
+      "上周四上午十点也有一场会"
+    ],
+    "difficulty": "medium",
+    "confusion_type": "time"
+  },
+  {
+    "id": "adv-location-01",
+    "query": "上次团建去的哪个区",
+    "expected": "怀柔",
+    "near_misses": ["密云", "延庆", "平谷"],
+    "memory_texts": [
+      "上次团建去的怀柔，住了一个度假村",
+      "之前去过密云水库那边烧烤",
+      "有人提议下次去延庆看冰灯",
+      "平谷的桃子不错，有人想顺路买"
+    ],
+    "difficulty": "medium",
+    "confusion_type": "location"
+  },
+  {
+    "id": "adv-location-02",
+    "query": "我租的房子在几号线附近",
+    "expected": "6号线",
+    "near_misses": ["8号线", "10号线", "6号"],
+    "memory_texts": [
+      "我现在租房在朝阳，靠近6号线青年路站",
+      "之前看房看过8号线附近的",
+      "同事住10号线那边，也很方便",
+      "楼下6号楼的包子很好吃"
+    ],
+    "difficulty": "medium",
+    "confusion_type": "location"
+  }
+]

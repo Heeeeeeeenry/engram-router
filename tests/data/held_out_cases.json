@@ -1,0 +1,1188 @@
+[
+  {
+    "id": "SA-S1",
+    "source": "semantic_audit",
+    "query": "妈妈多大了",
+    "expected_ids_or_texts": [
+      "妈妈今年55岁，已经退休了。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "妈妈今年55岁，已经退休了。",
+      "爸爸今年58岁，还在上班。",
+      "我今年30岁，在一家互联网公司工作。"
+    ],
+    "description": "查询用'多大了'，存储用'55岁'，需语义联想年龄",
+    "note": "查询用口语化'多大了'，期望召回含'55岁'的记忆"
+  },
+  {
+    "id": "SA-S2",
+    "source": "semantic_audit",
+    "query": "HHKB好用吗",
+    "expected_ids_or_texts": [
+      "我最喜欢机械键盘，打字手感特别好。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我最喜欢机械键盘，打字手感特别好。",
+      "鼠标我用的是罗技的无线鼠标。",
+      "显示器是戴尔的27寸4K屏。"
+    ],
+    "description": "查询用'HHKB好用吗'，存储用'机械键盘'，HHKB 应通过别名映射到键盘",
+    "note": "HHKB 在 object_topic_aliases 中映射到'键盘'，'键盘'映射到机械键盘"
+  },
+  {
+    "id": "SA-S3",
+    "source": "semantic_audit",
+    "query": "张三同事的老婆",
+    "expected_ids_or_texts": [
+      "李丽是我的大学同学，张三是我的前同事。",
+      "李丽是家庭主妇，没有上班。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "李丽是我的大学同学，张三是我的前同事。",
+      "李丽是家庭主妇，没有上班。",
+      "王芳在北京协和医院工作。"
+    ],
+    "description": "需要跨两条记忆推理：张三是前同事 → 张三的老婆是李丽 → 李丽是家庭主妇",
+    "note": "跨实体多跳：张三→同事→老婆=李丽→家庭主妇"
+  },
+  {
+    "id": "SA-S4",
+    "source": "semantic_audit",
+    "query": "李四买特斯拉了吗",
+    "expected_ids_or_texts": [
+      "李四最近在考虑买电动车。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "张三上个月买了一辆特斯拉。",
+      "李四最近在考虑买电动车。",
+      "特斯拉最近降价了。"
+    ],
+    "description": "问李四买没买特斯拉，存的是张三买的，应正确区分人物",
+    "note": "人物区分：李四≠张三，应优先召回李四相关"
+  },
+  {
+    "id": "SA-S5",
+    "source": "semantic_audit",
+    "query": "去年发生了什么",
+    "expected_ids_or_texts": [
+      "2025年妈妈退休了，回家种花。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "2025年妈妈退休了，回家种花。",
+      "2024年爸爸换了个新工作。",
+      "我2023年大学毕业。"
+    ],
+    "description": "查询用相对时间'去年'，存储用绝对时间'2025年'",
+    "note": "相对时间→绝对时间映射：'去年'无法直接匹配'2025年'，但'退休'可能通过其他词匹配"
+  },
+  {
+    "id": "SA-S6",
+    "source": "semantic_audit",
+    "query": "谁送我键盘的原因",
+    "expected_ids_or_texts": [
+      "张三送我一把HHKB键盘，因为是生日礼物。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "张三送我一把HHKB键盘，因为是生日礼物。",
+      "李四也送了我一本书，挺好看的。",
+      "我每年生日都会给自己买个礼物。"
+    ],
+    "description": "查询问'原因'，存储含因果标记'因为是生日'",
+    "note": "因果推理：'因为是生日'是原因标记，应被正确召回"
+  },
+  {
+    "id": "SA-S7",
+    "source": "semantic_audit",
+    "query": "我最近胖了",
+    "expected_ids_or_texts": [
+      "我这个月体重增加了5公斤，得减肥了。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我这个月体重增加了5公斤，得减肥了。",
+      "我最近开始跑步，每天跑5公里。",
+      "我换了个新手机，拍照效果不错。"
+    ],
+    "description": "'胖了' vs '体重增加了5公斤'，语义相关但无共享词",
+    "note": "'胖'和'体重增加'是语义相关，但用词完全不同"
+  },
+  {
+    "id": "SA-S8",
+    "source": "semantic_audit",
+    "query": "我为什么心情不好",
+    "expected_ids_or_texts": [
+      "今天在会议室被老板批评了。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "今天在会议室被老板批评了。",
+      "中午吃了红烧肉，味道还行。",
+      "昨天晚上睡得很好。"
+    ],
+    "description": "查询问心情不好的原因，存储是引发负面情绪的事件",
+    "note": "'心情不好'和'被批评'是因果关系，但无表面词匹配"
+  },
+  {
+    "id": "SA-S9",
+    "source": "semantic_audit",
+    "query": "我之前说的那个计划",
+    "expected_ids_or_texts": [
+      "我想明年去日本旅游，看看樱花。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我想明年去日本旅游，看看樱花。",
+      "今天的晚饭还不错。",
+      "Python 3.12 的新特性挺多的。"
+    ],
+    "description": "'计划' vs '想明年去日本旅游'，无重叠词",
+    "note": "'计划'和'想去...旅游'是语义关联，但无直接词重叠"
+  },
+  {
+    "id": "SA-S10",
+    "source": "semantic_audit",
+    "query": "他送我的东西好用吗",
+    "expected_ids_or_texts": [
+      "张三送了我一把HHKB键盘。"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "张三送了我一把HHKB键盘。",
+      "李四说这个键盘不好用。",
+      "我自己买了一个鼠标。"
+    ],
+    "description": "查询用'他'指代，存储用'张三'，需理解指代关系",
+    "note": "人称指代：'他'需关联到送礼人，'东西'需关联到键盘"
+  },
+  {
+    "id": "MA-precision_basic-q0",
+    "source": "multi_angle",
+    "category": "precision",
+    "query": "我表姐叫什么？",
+    "expected_ids_or_texts": [
+      "王芳"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我表姐叫王芳，在北京协和医院当儿科医生。",
+      "她老公是做金融的，在国贸上班。",
+      "我上周末去她家，她做了糖醋排骨。",
+      "她家养了一只金毛，叫豆豆。",
+      "王芳说最近医院很忙，流感季。",
+      "她女儿今年上小学三年级。"
+    ],
+    "description": "基础人名",
+    "tag": "precision_basic"
+  },
+  {
+    "id": "MA-precision_basic-q1",
+    "source": "multi_angle",
+    "category": "precision",
+    "query": "她在哪家医院工作？",
+    "expected_ids_or_texts": [
+      "协和医院"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我表姐叫王芳，在北京协和医院当儿科医生。",
+      "她老公是做金融的，在国贸上班。",
+      "我上周末去她家，她做了糖醋排骨。",
+      "她家养了一只金毛，叫豆豆。",
+      "王芳说最近医院很忙，流感季。",
+      "她女儿今年上小学三年级。"
+    ],
+    "description": "地点",
+    "tag": "precision_basic"
+  },
+  {
+    "id": "MA-precision_basic-q2",
+    "source": "multi_angle",
+    "category": "precision",
+    "query": "她是什么科室的？",
+    "expected_ids_or_texts": [
+      "儿科"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我表姐叫王芳，在北京协和医院当儿科医生。",
+      "她老公是做金融的，在国贸上班。",
+      "我上周末去她家，她做了糖醋排骨。",
+      "她家养了一只金毛，叫豆豆。",
+      "王芳说最近医院很忙，流感季。",
+      "她女儿今年上小学三年级。"
+    ],
+    "description": "职业细节",
+    "tag": "precision_basic"
+  },
+  {
+    "id": "MA-precision_basic-q3",
+    "source": "multi_angle",
+    "category": "precision",
+    "query": "她老公在哪上班？",
+    "expected_ids_or_texts": [
+      "国贸"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我表姐叫王芳，在北京协和医院当儿科医生。",
+      "她老公是做金融的，在国贸上班。",
+      "我上周末去她家，她做了糖醋排骨。",
+      "她家养了一只金毛，叫豆豆。",
+      "王芳说最近医院很忙，流感季。",
+      "她女儿今年上小学三年级。"
+    ],
+    "description": "关联人物",
+    "tag": "precision_basic"
+  },
+  {
+    "id": "MA-precision_basic-q4",
+    "source": "multi_angle",
+    "category": "precision",
+    "query": "她家狗叫什么？",
+    "expected_ids_or_texts": [
+      "豆豆"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我表姐叫王芳，在北京协和医院当儿科医生。",
+      "她老公是做金融的，在国贸上班。",
+      "我上周末去她家，她做了糖醋排骨。",
+      "她家养了一只金毛，叫豆豆。",
+      "王芳说最近医院很忙，流感季。",
+      "她女儿今年上小学三年级。"
+    ],
+    "description": "宠物",
+    "tag": "precision_basic"
+  },
+  {
+    "id": "MA-precision_basic-q5",
+    "source": "multi_angle",
+    "category": "precision",
+    "query": "她女儿几年级？",
+    "expected_ids_or_texts": [
+      "三年级"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我表姐叫王芳，在北京协和医院当儿科医生。",
+      "她老公是做金融的，在国贸上班。",
+      "我上周末去她家，她做了糖醋排骨。",
+      "她家养了一只金毛，叫豆豆。",
+      "王芳说最近医院很忙，流感季。",
+      "她女儿今年上小学三年级。"
+    ],
+    "description": "家人",
+    "tag": "precision_basic"
+  },
+  {
+    "id": "MA-multi_hop-q0",
+    "source": "multi_angle",
+    "category": "multi_hop",
+    "query": "陈总投的什么公司？",
+    "expected_ids_or_texts": [
+      "途灵科技"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我认识一个投资人叫陈总，他在红杉资本。",
+      "陈总投过一家做自动驾驶的公司，叫途灵科技。",
+      "途灵科技的创始人是清华计算机系毕业的。",
+      "他们去年拿了 B 轮，估值 20 亿。",
+      "陈总说他最看好 L4 级别的自动驾驶方案。"
+    ],
+    "description": "1跳",
+    "tag": "multi_hop"
+  },
+  {
+    "id": "MA-multi_hop-q1",
+    "source": "multi_angle",
+    "category": "multi_hop",
+    "query": "途灵科技创始人什么背景？",
+    "expected_ids_or_texts": [
+      "清华",
+      "计算机"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我认识一个投资人叫陈总，他在红杉资本。",
+      "陈总投过一家做自动驾驶的公司，叫途灵科技。",
+      "途灵科技的创始人是清华计算机系毕业的。",
+      "他们去年拿了 B 轮，估值 20 亿。",
+      "陈总说他最看好 L4 级别的自动驾驶方案。"
+    ],
+    "description": "2跳",
+    "tag": "multi_hop"
+  },
+  {
+    "id": "MA-multi_hop-q2",
+    "source": "multi_angle",
+    "category": "multi_hop",
+    "query": "陈总投的公司估值多少？",
+    "expected_ids_or_texts": [
+      "B 轮",
+      "20 亿"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我认识一个投资人叫陈总，他在红杉资本。",
+      "陈总投过一家做自动驾驶的公司，叫途灵科技。",
+      "途灵科技的创始人是清华计算机系毕业的。",
+      "他们去年拿了 B 轮，估值 20 亿。",
+      "陈总说他最看好 L4 级别的自动驾驶方案。"
+    ],
+    "description": "2跳+数值",
+    "tag": "multi_hop"
+  },
+  {
+    "id": "MA-multi_hop-q3",
+    "source": "multi_angle",
+    "category": "multi_hop",
+    "query": "他们拿到哪一轮了？",
+    "expected_ids_or_texts": [
+      "B 轮"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我认识一个投资人叫陈总，他在红杉资本。",
+      "陈总投过一家做自动驾驶的公司，叫途灵科技。",
+      "途灵科技的创始人是清华计算机系毕业的。",
+      "他们去年拿了 B 轮，估值 20 亿。",
+      "陈总说他最看好 L4 级别的自动驾驶方案。"
+    ],
+    "description": "模糊指代",
+    "tag": "multi_hop"
+  },
+  {
+    "id": "MA-isolation-q0",
+    "source": "multi_angle",
+    "category": "isolation",
+    "query": "老张开什么车？",
+    "expected_ids_or_texts": [
+      "宝马",
+      "X5"
+    ],
+    "forbidden_ids_or_texts": [
+      "比亚迪",
+      "海豚"
+    ],
+    "is_negative": false,
+    "memories": [
+      "老张是我们部门的技术主管，干了十年了。",
+      "他之前在华为做过，后来跳过来的。",
+      "老张开一辆黑色宝马 X5。",
+      "他喜欢钓鱼，周末经常去密云水库。",
+      "小李是去年刚来的应届生，做前端的。",
+      "她特别喜欢猫，养了两只英短。",
+      "小李开的是比亚迪海豚，电动车。",
+      "她每天骑共享单车到地铁站。"
+    ],
+    "description": "老张的车≠小李的车",
+    "tag": "isolation"
+  },
+  {
+    "id": "MA-isolation-q1",
+    "source": "multi_angle",
+    "category": "isolation",
+    "query": "小李开什么车？",
+    "expected_ids_or_texts": [
+      "比亚迪",
+      "海豚"
+    ],
+    "forbidden_ids_or_texts": [
+      "宝马",
+      "X5"
+    ],
+    "is_negative": false,
+    "memories": [
+      "老张是我们部门的技术主管，干了十年了。",
+      "他之前在华为做过，后来跳过来的。",
+      "老张开一辆黑色宝马 X5。",
+      "他喜欢钓鱼，周末经常去密云水库。",
+      "小李是去年刚来的应届生，做前端的。",
+      "她特别喜欢猫，养了两只英短。",
+      "小李开的是比亚迪海豚，电动车。",
+      "她每天骑共享单车到地铁站。"
+    ],
+    "description": "小李的车≠老张的车",
+    "tag": "isolation"
+  },
+  {
+    "id": "MA-isolation-q2",
+    "source": "multi_angle",
+    "category": "isolation",
+    "query": "老张有什么爱好？",
+    "expected_ids_or_texts": [
+      "钓鱼"
+    ],
+    "forbidden_ids_or_texts": [
+      "猫",
+      "英短"
+    ],
+    "is_negative": false,
+    "memories": [
+      "老张是我们部门的技术主管，干了十年了。",
+      "他之前在华为做过，后来跳过来的。",
+      "老张开一辆黑色宝马 X5。",
+      "他喜欢钓鱼，周末经常去密云水库。",
+      "小李是去年刚来的应届生，做前端的。",
+      "她特别喜欢猫，养了两只英短。",
+      "小李开的是比亚迪海豚，电动车。",
+      "她每天骑共享单车到地铁站。"
+    ],
+    "description": "爱好隔离",
+    "tag": "isolation"
+  },
+  {
+    "id": "MA-isolation-q3",
+    "source": "multi_angle",
+    "category": "isolation",
+    "query": "小李养了什么宠物？",
+    "expected_ids_or_texts": [
+      "猫",
+      "英短"
+    ],
+    "forbidden_ids_or_texts": [
+      "钓鱼",
+      "金毛"
+    ],
+    "is_negative": false,
+    "memories": [
+      "老张是我们部门的技术主管，干了十年了。",
+      "他之前在华为做过，后来跳过来的。",
+      "老张开一辆黑色宝马 X5。",
+      "他喜欢钓鱼，周末经常去密云水库。",
+      "小李是去年刚来的应届生，做前端的。",
+      "她特别喜欢猫，养了两只英短。",
+      "小李开的是比亚迪海豚，电动车。",
+      "她每天骑共享单车到地铁站。"
+    ],
+    "description": "宠物隔离",
+    "tag": "isolation"
+  },
+  {
+    "id": "MA-isolation-q4",
+    "source": "multi_angle",
+    "category": "isolation",
+    "query": "谁之前在华为做过？",
+    "expected_ids_or_texts": [
+      "华为做过"
+    ],
+    "forbidden_ids_or_texts": [
+      "小李"
+    ],
+    "is_negative": false,
+    "memories": [
+      "老张是我们部门的技术主管，干了十年了。",
+      "他之前在华为做过，后来跳过来的。",
+      "老张开一辆黑色宝马 X5。",
+      "他喜欢钓鱼，周末经常去密云水库。",
+      "小李是去年刚来的应届生，做前端的。",
+      "她特别喜欢猫，养了两只英短。",
+      "小李开的是比亚迪海豚，电动车。",
+      "她每天骑共享单车到地铁站。"
+    ],
+    "description": "经历归因",
+    "tag": "isolation"
+  },
+  {
+    "id": "MA-isolation-q5",
+    "source": "multi_angle",
+    "category": "isolation",
+    "query": "老张养猫吗？",
+    "expected_ids_or_texts": [],
+    "forbidden_ids_or_texts": [
+      "猫"
+    ],
+    "is_negative": false,
+    "memories": [
+      "老张是我们部门的技术主管，干了十年了。",
+      "他之前在华为做过，后来跳过来的。",
+      "老张开一辆黑色宝马 X5。",
+      "他喜欢钓鱼，周末经常去密云水库。",
+      "小李是去年刚来的应届生，做前端的。",
+      "她特别喜欢猫，养了两只英短。",
+      "小李开的是比亚迪海豚，电动车。",
+      "她每天骑共享单车到地铁站。"
+    ],
+    "description": "负样本:老张不养猫",
+    "tag": "isolation"
+  },
+  {
+    "id": "MA-fuzzy-q0",
+    "source": "multi_angle",
+    "category": "fuzzy",
+    "query": "昨晚去的馆子怎么样？",
+    "expected_ids_or_texts": [
+      "正宗",
+      "态度特别"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我昨天晚上去吃了一家川菜馆，在望京那边。",
+      "点了水煮鱼和宫保鸡丁，味道挺正宗的。",
+      "人均大概一百二左右，不算贵。",
+      "服务员态度特别好，还送了果盘。",
+      "我同事推荐的，说他们家的毛血旺更绝。"
+    ],
+    "description": "口语化评价",
+    "tag": "fuzzy"
+  },
+  {
+    "id": "MA-fuzzy-q1",
+    "source": "multi_angle",
+    "category": "fuzzy",
+    "query": "那几个菜？",
+    "expected_ids_or_texts": [
+      "水煮鱼",
+      "宫保鸡丁"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我昨天晚上去吃了一家川菜馆，在望京那边。",
+      "点了水煮鱼和宫保鸡丁，味道挺正宗的。",
+      "人均大概一百二左右，不算贵。",
+      "服务员态度特别好，还送了果盘。",
+      "我同事推荐的，说他们家的毛血旺更绝。"
+    ],
+    "description": "省略主语",
+    "tag": "fuzzy"
+  },
+  {
+    "id": "MA-fuzzy-q2",
+    "source": "multi_angle",
+    "category": "fuzzy",
+    "query": "花了多少钱？",
+    "expected_ids_or_texts": [
+      "一百二"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我昨天晚上去吃了一家川菜馆，在望京那边。",
+      "点了水煮鱼和宫保鸡丁，味道挺正宗的。",
+      "人均大概一百二左右，不算贵。",
+      "服务员态度特别好，还送了果盘。",
+      "我同事推荐的，说他们家的毛血旺更绝。"
+    ],
+    "description": "价格模糊问",
+    "tag": "fuzzy"
+  },
+  {
+    "id": "MA-fuzzy-q3",
+    "source": "multi_angle",
+    "category": "fuzzy",
+    "query": "在哪吃的？",
+    "expected_ids_or_texts": [
+      "望京"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我昨天晚上去吃了一家川菜馆，在望京那边。",
+      "点了水煮鱼和宫保鸡丁，味道挺正宗的。",
+      "人均大概一百二左右，不算贵。",
+      "服务员态度特别好，还送了果盘。",
+      "我同事推荐的，说他们家的毛血旺更绝。"
+    ],
+    "description": "地点",
+    "tag": "fuzzy"
+  },
+  {
+    "id": "MA-negative-q0",
+    "source": "multi_angle",
+    "category": "negative",
+    "query": "我结婚了吗？",
+    "expected_ids_or_texts": [],
+    "forbidden_ids_or_texts": [],
+    "is_negative": true,
+    "memories": [
+      "我大学学的是计算机专业。",
+      "毕业后去了百度做了三年后端。",
+      "现在在一家创业公司做架构。"
+    ],
+    "description": "未提及→空",
+    "tag": "negative"
+  },
+  {
+    "id": "MA-negative-q1",
+    "source": "multi_angle",
+    "category": "negative",
+    "query": "我工资多少？",
+    "expected_ids_or_texts": [],
+    "forbidden_ids_or_texts": [],
+    "is_negative": true,
+    "memories": [
+      "我大学学的是计算机专业。",
+      "毕业后去了百度做了三年后端。",
+      "现在在一家创业公司做架构。"
+    ],
+    "description": "未提及→空",
+    "tag": "negative"
+  },
+  {
+    "id": "MA-negative-q2",
+    "source": "multi_angle",
+    "category": "negative",
+    "query": "我在哪个城市生活？",
+    "expected_ids_or_texts": [],
+    "forbidden_ids_or_texts": [],
+    "is_negative": true,
+    "memories": [
+      "我大学学的是计算机专业。",
+      "毕业后去了百度做了三年后端。",
+      "现在在一家创业公司做架构。"
+    ],
+    "description": "未提及→空",
+    "tag": "negative"
+  },
+  {
+    "id": "MA-negative-q3",
+    "source": "multi_angle",
+    "category": "negative",
+    "query": "我在百度做什么？",
+    "expected_ids_or_texts": [
+      "后端"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我大学学的是计算机专业。",
+      "毕业后去了百度做了三年后端。",
+      "现在在一家创业公司做架构。"
+    ],
+    "description": "已知信息确认",
+    "tag": "negative"
+  },
+  {
+    "id": "MA-temporal-q0",
+    "source": "multi_angle",
+    "category": "temporal",
+    "query": "我什么时候离职的？",
+    "expected_ids_or_texts": [
+      "3月",
+      "2024"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "2024年3月，我从百度离职了。",
+      "离职后我去西藏玩了一个月。",
+      "5月份回来开始找工作。",
+      "6月中拿到了一家 AI 公司的 offer。",
+      "7月1号正式入职新公司。",
+      "新公司在海淀，离家有点远。"
+    ],
+    "description": "时间点",
+    "tag": "temporal"
+  },
+  {
+    "id": "MA-temporal-q1",
+    "source": "multi_angle",
+    "category": "temporal",
+    "query": "离职后干了什么？",
+    "expected_ids_or_texts": [
+      "西藏"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "2024年3月，我从百度离职了。",
+      "离职后我去西藏玩了一个月。",
+      "5月份回来开始找工作。",
+      "6月中拿到了一家 AI 公司的 offer。",
+      "7月1号正式入职新公司。",
+      "新公司在海淀，离家有点远。"
+    ],
+    "description": "时序关系",
+    "tag": "temporal"
+  },
+  {
+    "id": "MA-temporal-q2",
+    "source": "multi_angle",
+    "category": "temporal",
+    "query": "什么时候入职新公司的？",
+    "expected_ids_or_texts": [
+      "7月"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "2024年3月，我从百度离职了。",
+      "离职后我去西藏玩了一个月。",
+      "5月份回来开始找工作。",
+      "6月中拿到了一家 AI 公司的 offer。",
+      "7月1号正式入职新公司。",
+      "新公司在海淀，离家有点远。"
+    ],
+    "description": "最新时间",
+    "tag": "temporal"
+  },
+  {
+    "id": "MA-temporal-q3",
+    "source": "multi_angle",
+    "category": "temporal",
+    "query": "新公司在哪？",
+    "expected_ids_or_texts": [
+      "海淀"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "2024年3月，我从百度离职了。",
+      "离职后我去西藏玩了一个月。",
+      "5月份回来开始找工作。",
+      "6月中拿到了一家 AI 公司的 offer。",
+      "7月1号正式入职新公司。",
+      "新公司在海淀，离家有点远。"
+    ],
+    "description": "关联信息",
+    "tag": "temporal"
+  },
+  {
+    "id": "MA-contradiction-q0",
+    "source": "multi_angle",
+    "category": "contradiction",
+    "query": "我最喜欢什么语言？",
+    "expected_ids_or_texts": [
+      "Rust",
+      "Python"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我觉得 Python 是最适合做 AI 的语言。",
+      "后来用了 Go 写后端，发现性能确实好很多。",
+      "不过 Python 的生态还是最完善的。",
+      "最近在学 Rust，感觉这才是未来。"
+    ],
+    "description": "矛盾偏好→返回多个",
+    "tag": "contradiction"
+  },
+  {
+    "id": "MA-contradiction-q1",
+    "source": "multi_angle",
+    "category": "contradiction",
+    "query": "我觉得什么语言性能好？",
+    "expected_ids_or_texts": [
+      "Go"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "我觉得 Python 是最适合做 AI 的语言。",
+      "后来用了 Go 写后端，发现性能确实好很多。",
+      "不过 Python 的生态还是最完善的。",
+      "最近在学 Rust，感觉这才是未来。"
+    ],
+    "description": "精确匹配",
+    "tag": "contradiction"
+  },
+  {
+    "id": "MA-long_conversation-q0",
+    "source": "multi_angle",
+    "category": "long",
+    "query": "A轮融资目标是多少？",
+    "expected_ids_or_texts": [
+      "5000"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第5次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第10次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了3个菜，食堂今天还行。",
+      "今天开了第15次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了4个菜，食堂今天还行。",
+      "今天开了第20次项目周会，讨论了进度问题。",
+      "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第25次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第30次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了3个菜，食堂今天还行。",
+      "CTO 说他看好边缘计算方向，让我们提前布局。",
+      "今天开了第35次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了4个菜，食堂今天还行。",
+      "今天开了第40次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第45次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第50次项目周会，讨论了进度问题。"
+    ],
+    "description": "长对话中精确召回",
+    "tag": "long_conversation"
+  },
+  {
+    "id": "MA-long_conversation-q1",
+    "source": "multi_angle",
+    "category": "long",
+    "query": "CTO看好什么方向？",
+    "expected_ids_or_texts": [
+      "边缘计算"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第5次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第10次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了3个菜，食堂今天还行。",
+      "今天开了第15次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了4个菜，食堂今天还行。",
+      "今天开了第20次项目周会，讨论了进度问题。",
+      "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第25次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第30次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了3个菜，食堂今天还行。",
+      "CTO 说他看好边缘计算方向，让我们提前布局。",
+      "今天开了第35次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了4个菜，食堂今天还行。",
+      "今天开了第40次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第45次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第50次项目周会，讨论了进度问题。"
+    ],
+    "description": "长对话中关键信息",
+    "tag": "long_conversation"
+  },
+  {
+    "id": "MA-long_conversation-q2",
+    "source": "multi_angle",
+    "category": "long",
+    "query": "Q3要完成几个核心功能？",
+    "expected_ids_or_texts": [
+      "核心功能"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第5次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第10次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了3个菜，食堂今天还行。",
+      "今天开了第15次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了4个菜，食堂今天还行。",
+      "今天开了第20次项目周会，讨论了进度问题。",
+      "重要：公司决定年底前完成 A 轮融资，目标金额 5000 万。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第25次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第30次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了3个菜，食堂今天还行。",
+      "CTO 说他看好边缘计算方向，让我们提前布局。",
+      "今天开了第35次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台3TB的硬盘。",
+      "中午吃了4个菜，食堂今天还行。",
+      "今天开了第40次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台2TB的硬盘。",
+      "中午吃了1个菜，食堂今天还行。",
+      "今天开了第45次项目周会，讨论了进度问题。",
+      "同事小明请假了，他家里有事。",
+      "老板说Q3的目标是完成3个核心功能。",
+      "我在考虑要不要换一台1TB的硬盘。",
+      "中午吃了2个菜，食堂今天还行。",
+      "今天开了第50次项目周会，讨论了进度问题。"
+    ],
+    "description": "数值信息",
+    "tag": "long_conversation"
+  },
+  {
+    "id": "MA-semantic-q0",
+    "source": "multi_angle",
+    "category": "semantic",
+    "query": "妈妈多大了",
+    "expected_ids_or_texts": [
+      "55"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "妈妈今年55岁，退休教师。",
+      "我最喜欢机械键盘。",
+      "李丽是张三是前同事，她是家庭主妇。",
+      "张三买了特斯拉Model 3。",
+      "李四买了比亚迪电动车。",
+      "2025年妈妈退休了。",
+      "2024年爸爸换了工作。",
+      "我最近开始跑步健身。",
+      "体重增加了5公斤，需要控制饮食。",
+      "今天在会议室被老板批评了。",
+      "中午吃了红烧肉，味道还行。",
+      "我想明年去日本旅游，看樱花。",
+      "张三送了我一把HHKB键盘，因为是生日礼物。",
+      "李四说这个键盘不好用。"
+    ],
+    "description": "同义词:多大了→年龄",
+    "tag": "semantic"
+  },
+  {
+    "id": "MA-semantic-q1",
+    "source": "multi_angle",
+    "category": "semantic",
+    "query": "李四买特斯拉了吗",
+    "expected_ids_or_texts": [
+      "比亚迪"
+    ],
+    "forbidden_ids_or_texts": [
+      "特斯拉"
+    ],
+    "is_negative": false,
+    "memories": [
+      "妈妈今年55岁，退休教师。",
+      "我最喜欢机械键盘。",
+      "李丽是张三是前同事，她是家庭主妇。",
+      "张三买了特斯拉Model 3。",
+      "李四买了比亚迪电动车。",
+      "2025年妈妈退休了。",
+      "2024年爸爸换了工作。",
+      "我最近开始跑步健身。",
+      "体重增加了5公斤，需要控制饮食。",
+      "今天在会议室被老板批评了。",
+      "中午吃了红烧肉，味道还行。",
+      "我想明年去日本旅游，看樱花。",
+      "张三送了我一把HHKB键盘，因为是生日礼物。",
+      "李四说这个键盘不好用。"
+    ],
+    "description": "否定查询:李四没买特斯拉",
+    "tag": "semantic"
+  },
+  {
+    "id": "MA-semantic-q2",
+    "source": "multi_angle",
+    "category": "semantic",
+    "query": "我为什么心情不好",
+    "expected_ids_or_texts": [
+      "批评"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "妈妈今年55岁，退休教师。",
+      "我最喜欢机械键盘。",
+      "李丽是张三是前同事，她是家庭主妇。",
+      "张三买了特斯拉Model 3。",
+      "李四买了比亚迪电动车。",
+      "2025年妈妈退休了。",
+      "2024年爸爸换了工作。",
+      "我最近开始跑步健身。",
+      "体重增加了5公斤，需要控制饮食。",
+      "今天在会议室被老板批评了。",
+      "中午吃了红烧肉，味道还行。",
+      "我想明年去日本旅游，看樱花。",
+      "张三送了我一把HHKB键盘，因为是生日礼物。",
+      "李四说这个键盘不好用。"
+    ],
+    "description": "情感推理:心情不好→被批评",
+    "tag": "semantic"
+  },
+  {
+    "id": "MA-semantic-q3",
+    "source": "multi_angle",
+    "category": "semantic",
+    "query": "我之前说的那个计划",
+    "expected_ids_or_texts": [
+      "日本旅游"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "妈妈今年55岁，退休教师。",
+      "我最喜欢机械键盘。",
+      "李丽是张三是前同事，她是家庭主妇。",
+      "张三买了特斯拉Model 3。",
+      "李四买了比亚迪电动车。",
+      "2025年妈妈退休了。",
+      "2024年爸爸换了工作。",
+      "我最近开始跑步健身。",
+      "体重增加了5公斤，需要控制饮食。",
+      "今天在会议室被老板批评了。",
+      "中午吃了红烧肉，味道还行。",
+      "我想明年去日本旅游，看樱花。",
+      "张三送了我一把HHKB键盘，因为是生日礼物。",
+      "李四说这个键盘不好用。"
+    ],
+    "description": "模糊指代:计划→旅游",
+    "tag": "semantic"
+  },
+  {
+    "id": "MA-semantic-q4",
+    "source": "multi_angle",
+    "category": "semantic",
+    "query": "他送我的东西好用吗",
+    "expected_ids_or_texts": [
+      "HHKB",
+      "键盘"
+    ],
+    "forbidden_ids_or_texts": [
+      "不好用"
+    ],
+    "is_negative": false,
+    "memories": [
+      "妈妈今年55岁，退休教师。",
+      "我最喜欢机械键盘。",
+      "李丽是张三是前同事，她是家庭主妇。",
+      "张三买了特斯拉Model 3。",
+      "李四买了比亚迪电动车。",
+      "2025年妈妈退休了。",
+      "2024年爸爸换了工作。",
+      "我最近开始跑步健身。",
+      "体重增加了5公斤，需要控制饮食。",
+      "今天在会议室被老板批评了。",
+      "中午吃了红烧肉，味道还行。",
+      "我想明年去日本旅游，看樱花。",
+      "张三送了我一把HHKB键盘，因为是生日礼物。",
+      "李四说这个键盘不好用。"
+    ],
+    "description": "人称指代:他→张三,东西→键盘",
+    "tag": "semantic"
+  },
+  {
+    "id": "MA-semantic-q5",
+    "source": "multi_angle",
+    "category": "semantic",
+    "query": "我胖了吗",
+    "expected_ids_or_texts": [
+      "体重"
+    ],
+    "forbidden_ids_or_texts": [],
+    "is_negative": false,
+    "memories": [
+      "妈妈今年55岁，退休教师。",
+      "我最喜欢机械键盘。",
+      "李丽是张三是前同事，她是家庭主妇。",
+      "张三买了特斯拉Model 3。",
+      "李四买了比亚迪电动车。",
+      "2025年妈妈退休了。",
+      "2024年爸爸换了工作。",
+      "我最近开始跑步健身。",
+      "体重增加了5公斤，需要控制饮食。",
+      "今天在会议室被老板批评了。",
+      "中午吃了红烧肉，味道还行。",
+      "我想明年去日本旅游，看樱花。",
+      "张三送了我一把HHKB键盘，因为是生日礼物。",
+      "李四说这个键盘不好用。"
+    ],
+    "description": "语义相似:胖→体重增加",
+    "tag": "semantic"
+  }
+]

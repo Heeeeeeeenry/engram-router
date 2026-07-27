@@ -1,0 +1,134 @@
+[
+  {
+    "id": "ml-01",
+    "query_zh": "我在哪家公司工作",
+    "query_en": "Which company do I work at",
+    "expected": "腾讯",
+    "memory_texts": [
+      "我目前在腾讯工作，担任架构师",
+      "以前在百度做过两年",
+      "大学是在清华读的计算机"
+    ]
+  },
+  {
+    "id": "ml-02",
+    "query_zh": "我喜欢什么颜色",
+    "query_en": "What is my favorite color",
+    "expected": "蓝色",
+    "memory_texts": [
+      "我特别喜欢蓝色，衣服大多是蓝色的",
+      "办公桌也是蓝色系的",
+      "不过红色也还行"
+    ]
+  },
+  {
+    "id": "ml-03",
+    "query_zh": "我的猫叫什么名字",
+    "query_en": "What is my cat's name",
+    "expected": "咪咪",
+    "memory_texts": [
+      "我家养了一只橘猫叫咪咪",
+      "咪咪特别能吃，已经快十斤了",
+      "每天回家咪咪都在门口等"
+    ]
+  },
+  {
+    "id": "ml-04",
+    "query_zh": "我上次旅游去了哪里",
+    "query_en": "Where did I go on my last trip",
+    "expected": "大理",
+    "memory_texts": [
+      "上次旅游去了大理，住了洱海边",
+      "大理的天气特别好",
+      "还在古城里吃了很多小吃"
+    ]
+  },
+  {
+    "id": "ml-05",
+    "query_zh": "我每天几点起床",
+    "query_en": "What time do I wake up every day",
+    "expected": "七点",
+    "memory_texts": [
+      "我每天七点起床，先跑步半小时",
+      "周末可以睡到九点",
+      "早上一般喝一杯咖啡"
+    ]
+  },
+  {
+    "id": "ml-06",
+    "query_zh": "我最喜欢吃什么",
+    "query_en": "What is my favorite food",
+    "expected": "火锅",
+    "memory_texts": [
+      "我最喜欢吃火锅，尤其是重庆火锅",
+      "每周至少吃一次火锅",
+      "上次和朋友去了海底捞"
+    ]
+  },
+  {
+    "id": "ml-07",
+    "query_zh": "我开什么车",
+    "query_en": "What car do I drive",
+    "expected": "特斯拉",
+    "memory_texts": [
+      "我买了一辆特斯拉Model Y",
+      "充电比加油便宜多了",
+      "自动驾驶功能很好用"
+    ]
+  },
+  {
+    "id": "ml-08",
+    "query_zh": "我学的是什么专业",
+    "query_en": "What did I major in",
+    "expected": "计算机",
+    "memory_texts": [
+      "我大学学的是计算机专业",
+      "研究生也是计算机方向",
+      "不过我对设计也很感兴趣"
+    ]
+  },
+  {
+    "id": "ml-09",
+    "query_zh": "我在哪个城市生活",
+    "query_en": "Which city do I live in",
+    "expected": "北京",
+    "memory_texts": [
+      "我在北京生活了快十年了",
+      "从毕业就一直待在北京",
+      "冬天太冷了有点想搬去南方"
+    ]
+  },
+  {
+    "id": "ml-10",
+    "query_zh": "我养了什么宠物",
+    "query_en": "What pet do I have",
+    "expected": "猫",
+    "memory_texts": [
+      "我养了一只猫，已经三岁了",
+      "猫粮每个月要花不少钱",
+      "它还特别粘人，总喜欢趴我键盘上"
+    ]
+  },
+  {
+    "id": "ml-11",
+    "query_zh": "我的领导叫什么名字",
+    "query_en": "What is my manager's name",
+    "expected": "张总",
+    "memory_texts": [
+      "我的直属领导是张总，他人挺好的",
+      "张总在公司干了八年了",
+      "上个月张总还请大家吃了顿饭"
+    ]
+  },
+  {
+    "id": "ml-12",
+    "query_zh": "我最近在学什么",
+    "query_en": "What am I learning recently",
+    "expected": "Rust",
+    "memory_texts": [
+      "我最近在学Rust，感觉语法挺难的",
+      "买了一本Rust编程之道",
+      "每天晚上花两小时学习"
+    ]
+  }
+]
