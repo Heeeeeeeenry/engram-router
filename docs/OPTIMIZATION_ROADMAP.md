@@ -118,7 +118,7 @@
 #### 0.2 判分器升级
 - [x] LLM-as-judge:输出 `{answered, faithful, hallucinated}` — faithfulness_judge() + _heuristic_faithfulness() fallback
 - [x] cross-encoder 打 relevance ground truth — cross_encoder_ground_truth() + _fallback_relevance() Jaccard fallback
-- [~] judge 模型与被测模型解耦(不同厂商) — DeepSeek vs GPT-5.5 已交叉验证 95% 一致
+- [x] judge 模型与被测模型解耦(不同厂商) — DeepSeek vs GPT-5.5 cross-judge 95.0% 一致(2026-07-23, 20 题样本)，✅ L0.2 全部完成
 
 #### 0.3 评估数据集重建
 - [x] held-out 集与调参集彻底隔离(发版前只跑一次) — `tests/data/held_out_cases.json`(49→19 scenarios)
