@@ -125,7 +125,7 @@
 - [x] 对抗集:LLM 针对当前 top-1 生成 near-miss 干扰项 — `tests/data/adversarial_cases.json`(10 cases)
 - [ ] 真实 agent trace ≥ 100 段 50-turn+
 - [x] 多语言:英文、中英混合各一份 — `tests/data/multilingual_cases.json`(12 cases)
-- [ ] 长尾长度:500-turn / 5000-turn 两档
+- [~] 长尾长度:500-turn / 5000-turn 两档 — `docs/design/longtail_dataset.md` 方案已设计 + `tests/longtail_converter.py` 已实现 + `tests/data/longtail_500.json` 已生成(500 场景, 122K memories)
 
 #### 0.4 竞品对照矩阵
 - [x] naïve vector-only RAG 对照 — `tests/providers/naive_vector.py` 已交付

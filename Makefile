@@ -1,4 +1,4 @@
-.PHONY: ci-gate test ci-gate-test eval eval-report
+.PHONY: ci-gate test ci-gate-test eval eval-report longtail-500 longtail-5000 eval-longtail-500 eval-longtail-5000
 
 # CI gate: runs eval_v2 with gate thresholds.
 # Requires ENGRAM_SKIP_VECTOR=1 for deterministic, fast evaluation.
@@ -36,3 +36,10 @@ eval-multilingual:
 # Multi-angle CI gate: precision >= 85%, isolation >= 85%.
 ci-gate-multi:
 	ENGRAM_SKIP_VECTOR=1 python tests/multi_angle_eval.py
+
+# Long-tail datasets: convert LongMemEval splits to eval_v2 scenarios.
+longtail-500:
+	python tests/longtail_converter.py --split s --output tests/data/longtail_500.json
+
+longtail-5000:
+	python tests/longtail_converter.py --split m --output tests/data/longtail_5000.json --limit 100
