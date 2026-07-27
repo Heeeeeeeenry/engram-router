@@ -280,6 +280,21 @@ class MemoryStore:
                 FOREIGN KEY(time_entity_id) REFERENCES entities(id) ON DELETE CASCADE,
                 FOREIGN KEY(memory_id) REFERENCES memories(id) ON DELETE CASCADE
             );
+
+            -- Sampled recall traces for offline replay and debugging (L4.3).
+            -- Written probabilistically by recall(); sampling_rate controls
+            -- how often a call is snapshotted to avoid storage bloat.
+            CREATE TABLE IF NOT EXISTS recall_snapshots (
+                id TEXT PRIMARY KEY,
+                query TEXT NOT NULL,
+                namespace TEXT NOT NULL DEFAULT 'default',
+                top_k INTEGER NOT NULL DEFAULT 5,
+                result_ids TEXT NOT NULL DEFAULT '[]',
+                trace_json TEXT NOT NULL DEFAULT '{}',
+                latency_ms REAL NOT NULL DEFAULT 0.0,
+                memory_count INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
             """
         )
         self._migrate_schema()
@@ -712,8 +727,17 @@ class MemoryStore:
 
     def recall(self, query: str, top_k: int = 5,
                namespace: str = "default") -> list[MemoryRecord]:
-        """Delegate to recall.recall."""
-        return _recall.recall(self, query, top_k=top_k, namespace=namespace)
+        """Delegate to recall.recall, with optional snapshot sampling (L4.3)."""
+        import time as _time
+
+        t0 = _time.perf_counter()
+        results = _recall.recall(self, query, top_k=top_k, namespace=namespace)
+        elapsed = (_time.perf_counter() - t0) * 1000
+        # Capture any trace from the pipeline tracer for snapshot retention.
+        trace = getattr(self, '_tracer', None)
+        self._write_snapshot(query, results, trace=trace, latency_ms=elapsed,
+                             namespace=namespace, top_k=top_k)
+        return results
 
     def _build_scored_candidates(
         self,
@@ -975,6 +999,7 @@ class MemoryStore:
         "edges": "edge",
         "raw_logs": "raw",
         "distilled_memories": "dst",
+        "recall_snapshots": "snap",
     }
 
     def _next_id(self, table: str, prefix: str) -> str:
@@ -1174,4 +1199,83 @@ class MemoryStore:
     @staticmethod
     def _match_reason(terms: list[str], haystack: str, score: float) -> str:
         return scoring.match_reason(terms, haystack, score)
+
+    # --- recall snapshots (L4.3) ---
+
+    def _write_snapshot(
+        self,
+        query: str,
+        results: list[MemoryRecord],
+        trace: "RecallTracer | None" = None,
+        latency_ms: float = 0.0,
+        namespace: str = "default",
+        top_k: int = 5,
+    ) -> None:
+        """Probabilistically write a recall snapshot for offline replay.
+
+        Sampling is gated by ``self.weights.sampling_rate``.  Samples capture
+        the query text, result ids, trace JSON (from tracer.to_dict()), wall-clock
+        latency, and the store's total memory count at call time.
+        """
+        import json as _json
+        import random as _random
+
+        if self.weights.sampling_rate <= 0.0:
+            return
+        if _random.random() > self.weights.sampling_rate:
+            return
+
+        snap_id = self._next_id("recall_snapshots", "snap")
+        result_ids = _json.dumps([r.id for r in results], ensure_ascii=False)
+        trace_json = _json.dumps(
+            trace.to_dict() if trace else {}, ensure_ascii=False,
+        )
+        memory_count = self.conn.execute(
+            "SELECT COUNT(*) FROM memories WHERE namespace = ?",
+            (namespace,),
+        ).fetchone()[0]
+
+        self.conn.execute(
+            """INSERT INTO recall_snapshots
+               (id, query, namespace, top_k, result_ids, trace_json, latency_ms, memory_count)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (snap_id, query, namespace, top_k, result_ids, trace_json, latency_ms, memory_count),
+        )
+        self.conn.commit()
+
+    def replay_snapshots(
+        self, limit: int = 20, namespace: str = "default",
+    ) -> list[dict[str, Any]]:
+        """Return recent recall snapshots for offline replay analysis.
+
+        Each snapshot is returned as a dict with keys: id, query, namespace,
+        top_k, result_ids (parsed list), trace (parsed dict), latency_ms,
+        memory_count, created_at.  Results are ordered by recency.
+        """
+        import json as _json
+
+        rows = self.conn.execute(
+            """SELECT id, query, namespace, top_k, result_ids, trace_json,
+                      latency_ms, memory_count, created_at
+               FROM recall_snapshots
+               WHERE namespace = ?
+               ORDER BY created_at DESC
+               LIMIT ?""",
+            (namespace, limit),
+        ).fetchall()
+
+        return [
+            {
+                "id": r["id"],
+                "query": r["query"],
+                "namespace": r["namespace"],
+                "top_k": r["top_k"],
+                "result_ids": _json.loads(r["result_ids"]),
+                "trace": _json.loads(r["trace_json"]),
+                "latency_ms": r["latency_ms"],
+                "memory_count": r["memory_count"],
+                "created_at": r["created_at"],
+            }
+            for r in rows
+        ]
 

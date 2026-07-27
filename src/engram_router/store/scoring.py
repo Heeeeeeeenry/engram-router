@@ -167,6 +167,12 @@ class RecallWeights:
     """Weight of multi-query result lists vs primary query in fusion.
     Lower values keep multi-query as a supplement, not the primary signal."""
 
+    # ── Recall snapshots (L4.3 observability) ──────────────────────────
+    sampling_rate: float = 0.01
+    """Fraction of recall() calls to snapshot (0.0 disables, 1.0 = all).
+    Snapshots record query/result_ids/trace for offline replay and debugging.
+    Default 1% avoids storage bloat in production while still capturing samples."""
+
     def __post_init__(self) -> None:
         """Validate weights on construction so misconfiguration is caught early."""
         if not (0 < self.recall_decay <= 1):
@@ -217,6 +223,8 @@ class RecallWeights:
             raise ValueError(f"multi_query_num_variants must be >= 1, got {self.multi_query_num_variants}")
         if not (0.0 <= self.multi_query_fusion_weight <= 5.0):
             raise ValueError(f"multi_query_fusion_weight must be in [0, 5], got {self.multi_query_fusion_weight}")
+        if not (0.0 <= self.sampling_rate <= 1.0):
+            raise ValueError(f"sampling_rate must be in [0, 1], got {self.sampling_rate}")
 
 
 def _default_weights() -> RecallWeights:
