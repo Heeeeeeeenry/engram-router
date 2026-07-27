@@ -1064,6 +1064,19 @@ def main() -> int:
         "--adversarial", action="store_true",
         help="Run adversarial near-miss evaluation with adversarial_cases.json.",
     )
+    # Generic external scenario JSONs (e.g. long-tail)
+    parser.add_argument(
+        "--scenarios", type=str, default=None,
+        help="Path to external scenario JSON file (EvalScenario format).",
+    )
+    parser.add_argument(
+        "--limit", type=int, default=0,
+        help="Cap scenarios to first N (dev speed, 0 = all).",
+    )
+    parser.add_argument(
+        "--judge", action="store_true",
+        help="Enable LLM judge for generated answer evaluation (reuses lme_judge).",
+    )
     # Output
     parser.add_argument(
         "--output", type=str, default=None,
@@ -1134,6 +1147,10 @@ def main() -> int:
     elif args.adversarial:
         adv_cases = load_adversarial_cases()
         scenarios = _build_scenarios_from_json(adv_cases, "adversarial")
+    elif args.scenarios:
+        scenarios = _load_scenario_json(Path(args.scenarios))
+        if args.limit:
+            scenarios = scenarios[: args.limit]
     else:
         dev_scenarios = load_scenarios()
         scenarios = dev_scenarios
@@ -1193,6 +1210,60 @@ def main() -> int:
 
     # Default gate: P@1 >= 0.8 → exit 0.
     return 0 if report["aggregate"]["p_at_1"] >= 0.8 else 1
+
+
+def _load_scenario_json(path: Path) -> list[EvalScenario]:
+    """Load EvalScenario-format JSON (with nested cases) from a file.
+
+    Supports both flat list of EvalCase dicts and nested scenario format
+    used by longtail_converter.py.
+    """
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not isinstance(data, list):
+        raise ValueError(f"Expected a JSON array, got {type(data).__name__}")
+
+    scenarios: list[EvalScenario] = []
+    for item in data:
+        # Nested format: {id, source, memories, cases: [{id, query, ...}]}
+        if "cases" in item and "memories" in item:
+            for c in item["cases"]:
+                ec = EvalCase(
+                    id=c.get("id", item.get("id", "")),
+                    query=c["query"],
+                    expected_ids_or_texts=c.get("expected_ids_or_texts", []),
+                    forbidden_ids_or_texts=c.get("forbidden_ids_or_texts", []),
+                    is_negative=c.get("is_negative", False),
+                    description=c.get("description", ""),
+                )
+                scenarios.append(
+                    EvalScenario(
+                        id=item.get("id", ec.id),
+                        source=item.get("source", "external"),
+                        memories=item["memories"],
+                        cases=[ec],
+                    )
+                )
+        # Flat format: {id, query, expected_ids_or_texts, memories, ...}
+        elif "query" in item:
+            ec = EvalCase(
+                id=item.get("id", ""),
+                query=item["query"],
+                expected_ids_or_texts=item.get("expected_ids_or_texts", []),
+                forbidden_ids_or_texts=item.get("forbidden_ids_or_texts", []),
+                is_negative=item.get("is_negative", False),
+                description=item.get("description", ""),
+            )
+            scenarios.append(
+                EvalScenario(
+                    id=item.get("id", ""),
+                    source=item.get("source", "external"),
+                    memories=item.get("memories", []),
+                    cases=[ec],
+                )
+            )
+    return scenarios
 
 
 def _build_scenarios_from_json(cases: list[dict[str, Any]], source: str) -> list[EvalScenario]:
