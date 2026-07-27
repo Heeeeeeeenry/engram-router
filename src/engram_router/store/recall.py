@@ -320,6 +320,24 @@ def build_scored_candidates(
             and not matching_person
             and not query_persons.issubset(_ROLE_WORDS)
         )
+
+        # Person-isolation scope: when query names a specific person,
+        # all memories about other people (or with no person entity)
+        # get penalized and have topic-based entity bonuses stripped.
+        # This closes the gap where pronoun-only memories like
+        # "她特别喜欢猫" escaped person checks entirely.
+        person_scoped = bool(query_persons and not query_persons.issubset(_ROLE_WORDS))
+        if person_scoped and not matching_person:
+            score *= store.weights.person_isolation_scope_weight
+            score -= store.weights.person_isolation_subtract
+            reason = (reason + "; person-isolation scope").lstrip("; ")
+            # Strip ALL entity-based shared bonuses (not just topic).
+            # When the query is about 老张, shared entities like "猫"
+            # or "爱好" should not reward 小李's memories.
+            if shared:
+                score -= store.weights.shared_entity_multiplier * len(shared)
+                shared.clear()
+
         if matching_person:
             # Query specifically names this person — significant boost
             score += store.weights.person_match_boost
@@ -780,6 +798,49 @@ def build_recall_response(
             logger.debug("Reranker applied to %d records", len(records))
         except Exception as exc:
             logger.debug("Reranker skipped: %s", exc)
+
+    # ── Phase 2.6: Person-isolation post-filter ──
+    # Runs AFTER CE and LLM reranker so their scores don't undo the isolation.
+    # When query names a specific person, heavily penalize memories about
+    # other people. Uses DB entity_map (covers pronoun-only memories like
+    # "她特别喜欢猫" that have no text-level person entity).
+    from ..config import config as _cfg
+    _ROLE_WORDS_POST = set(_cfg.entities.role_words)
+    from ..entities import extract_entities as _extract_entities
+    _q_persons_post = {e["name"] for e in _extract_entities(query) if e.get("kind") == "person" and e.get("kind") != "cjk_ngram"}
+    if records and _q_persons_post and not _q_persons_post.issubset(_ROLE_WORDS_POST):
+        _all_post_ids = [r.id for r in records]
+        _post_entity_map = candidates.entities_for_memories(store.conn, _all_post_ids)
+        for i, r in enumerate(records):
+            _post_ents = _post_entity_map.get(r.id, [])
+            _mem_persons_post = {e["name"] for e in _post_ents if e.get("kind") == "person"}
+            if not _mem_persons_post:
+                _txt_ents_fb = _extract_entities(r.raw_text)
+                _mem_persons_post = {e["name"] for e in _txt_ents_fb if e.get("kind") == "person" and e.get("kind") != "cjk_ngram"}
+            if _q_persons_post & _mem_persons_post:
+                continue  # matching person — no penalty
+            if _mem_persons_post:
+                # Has a DIFFERENT person entity → clear isolation violation
+                records[i] = MemoryRecord(
+                    id=r.id, raw_text=r.raw_text, summary=r.summary,
+                    confidence=r.confidence, metadata=r.metadata,
+                    evidence_refs=r.evidence_refs,
+                    score=r.score * store.weights.person_isolation_scope_weight
+                          - store.weights.person_isolation_subtract,
+                    match_reason=r.match_reason + " · person-isolation (different person)",
+                )
+            else:
+                # No person entity at all → likely pronoun (他/她) coreference,
+                # NOT a clear isolation violation. Apply milder penalty.
+                records[i] = MemoryRecord(
+                    id=r.id, raw_text=r.raw_text, summary=r.summary,
+                    confidence=r.confidence, metadata=r.metadata,
+                    evidence_refs=r.evidence_refs,
+                    score=r.score * store.weights.person_isolation_noentity_weight
+                          - store.weights.person_isolation_noentity_subtract,
+                    match_reason=r.match_reason + " · person-isolation (no entity)",
+                )
+        records.sort(key=lambda x: x.score, reverse=True)
 
     # ── Phase 3: Record access for forgetting engine ──
     candidates.record_access(store.conn, [r.id for r in records])

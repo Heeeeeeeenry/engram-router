@@ -1,17 +1,17 @@
 {
-  "timestamp": "2026-07-22T10:18:32",
+  "timestamp": "2026-07-27T16:45:03",
   "rejection_threshold": 1.0,
   "aggregate": {
     "positive_cases": 46,
     "negative_cases": 3,
     "p_at_1": 0.8043,
-    "p_at_3": 0.9565,
-    "p_at_5": 0.9565,
-    "mrr": 0.8696,
-    "ndcg_at_5": 0.8016,
-    "recall_at_5": 0.9565,
-    "contamination_at_3": 0.034,
-    "rejection_accuracy": 0.6667
+    "p_at_3": 0.913,
+    "p_at_5": 0.9348,
+    "mrr": 0.86,
+    "ndcg_at_5": 0.7841,
+    "recall_at_5": 0.9348,
+    "contamination_at_3": 0.0136,
+    "rejection_accuracy": 1.0
   },
   "per_scenario": [
     {
@@ -38,7 +38,7 @@
         {
           "rank": 1,
           "id": "mem_1",
-          "score": 5.76,
+          "score": 5.26,
           "text": "妈妈今年55岁，已经退休了。"
         },
         {
@@ -88,13 +88,13 @@
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.1365,
+          "score": 0.0,
           "text": "鼠标我用的是罗技的无线鼠标。"
         },
         {
           "rank": 3,
           "id": "mem_3",
-          "score": 0.0,
+          "score": 0.5,
           "text": "显示器是戴尔的27寸4K屏。"
         }
       ],
@@ -127,19 +127,19 @@
         {
           "rank": 1,
           "id": "mem_1",
-          "score": 1.0,
+          "score": 6.67,
           "text": "李丽是我的大学同学，张三是我的前同事。"
         },
         {
           "rank": 2,
           "id": "mem_3",
-          "score": 0.1968,
+          "score": 0.5,
           "text": "王芳在北京协和医院工作。"
         },
         {
           "rank": 3,
           "id": "mem_2",
-          "score": 0.0158,
+          "score": 0.5,
           "text": "李丽是家庭主妇，没有上班。"
         }
       ],
@@ -158,38 +158,38 @@
         "李四最近在考虑买电动车。"
       ],
       "forbidden": [],
-      "rank_of_target": 1,
-      "p_at_1": 1.0,
+      "rank_of_target": 2,
+      "p_at_1": 0.0,
       "p_at_3": 1.0,
       "p_at_5": 1.0,
-      "reciprocal_rank": 1.0,
-      "ndcg_at_5": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_5": 0.6309,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
       "top_5": [
         {
           "rank": 1,
-          "id": "mem_2",
-          "score": 1.0,
-          "text": "李四最近在考虑买电动车。"
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "特斯拉最近降价了。"
         },
         {
           "rank": 2,
-          "id": "mem_1",
-          "score": 0.693,
-          "text": "张三上个月买了一辆特斯拉。"
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "李四最近在考虑买电动车。"
         },
         {
           "rank": 3,
-          "id": "mem_3",
-          "score": 0.0,
-          "text": "特斯拉最近降价了。"
+          "id": "mem_1",
+          "score": 0.5,
+          "text": "张三上个月买了一辆特斯拉。"
         }
       ],
       "old_passed": true,
       "legacy_pass_recomputed": true,
-      "new_passed": true
+      "new_passed": false
     },
     {
       "scenario_id": "SA-S5",
@@ -202,12 +202,12 @@
         "2025年妈妈退休了，回家种花。"
       ],
       "forbidden": [],
-      "rank_of_target": 3,
+      "rank_of_target": 2,
       "p_at_1": 0.0,
       "p_at_3": 1.0,
       "p_at_5": 1.0,
-      "reciprocal_rank": 0.3333,
-      "ndcg_at_5": 0.5,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_5": 0.6309,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -220,15 +220,15 @@
         },
         {
           "rank": 2,
-          "id": "mem_3",
-          "score": 0.1939,
-          "text": "我2023年大学毕业。"
+          "id": "mem_1",
+          "score": 0.4,
+          "text": "2025年妈妈退休了，回家种花。"
         },
         {
           "rank": 3,
-          "id": "mem_1",
-          "score": 0.0,
-          "text": "2025年妈妈退休了，回家种花。"
+          "id": "mem_3",
+          "score": 0.1154,
+          "text": "我2023年大学毕业。"
         }
       ],
       "old_passed": true,
@@ -265,7 +265,7 @@
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.1988,
+          "score": 0.0661,
           "text": "李四也送了我一本书，挺好看的。"
         },
         {
@@ -347,19 +347,19 @@
         {
           "rank": 1,
           "id": "mem_3",
-          "score": 1.0,
+          "score": 0.5,
           "text": "昨天晚上睡得很好。"
         },
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.1968,
+          "score": 0.5,
           "text": "中午吃了红烧肉，味道还行。"
         },
         {
           "rank": 3,
           "id": "mem_1",
-          "score": 0.1604,
+          "score": 0.5,
           "text": "今天在会议室被老板批评了。"
         }
       ],
@@ -391,13 +391,13 @@
         {
           "rank": 1,
           "id": "mem_1",
-          "score": 0.9236,
+          "score": 0.6,
           "text": "我想明年去日本旅游，看看樱花。"
         },
         {
           "rank": 2,
           "id": "mem_3",
-          "score": 0.592,
+          "score": 0.192,
           "text": "Python 3.12 的新特性挺多的。"
         },
         {
@@ -435,13 +435,13 @@
         {
           "rank": 1,
           "id": "mem_1",
-          "score": 1.0,
+          "score": 0.8133,
           "text": "张三送了我一把HHKB键盘。"
         },
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.3325,
+          "score": 0.5357,
           "text": "李四说这个键盘不好用。"
         },
         {
@@ -479,31 +479,31 @@
         {
           "rank": 1,
           "id": "mem_1",
-          "score": 1.0,
+          "score": 4.06,
           "text": "我表姐叫王芳，在北京协和医院当儿科医生。"
         },
         {
           "rank": 2,
           "id": "mem_6",
-          "score": 0.3161,
+          "score": 0.5,
           "text": "她女儿今年上小学三年级。"
         },
         {
           "rank": 3,
           "id": "mem_5",
-          "score": 0.2324,
+          "score": 0.5,
           "text": "王芳说最近医院很忙，流感季。"
         },
         {
           "rank": 4,
           "id": "mem_4",
-          "score": 0.1807,
+          "score": 0.5,
           "text": "她家养了一只金毛，叫豆豆。"
         },
         {
           "rank": 5,
           "id": "mem_3",
-          "score": 0.0753,
+          "score": 0.5,
           "text": "我上周末去她家，她做了糖醋排骨。"
         }
       ],
@@ -541,26 +541,26 @@
         {
           "rank": 2,
           "id": "mem_5",
-          "score": 0.3126,
+          "score": 0.4181,
           "text": "王芳说最近医院很忙，流感季。"
         },
         {
           "rank": 3,
           "id": "mem_2",
-          "score": 0.2327,
+          "score": 0.039,
           "text": "她老公是做金融的，在国贸上班。"
         },
         {
           "rank": 4,
           "id": "mem_3",
-          "score": 0.0008,
+          "score": 0.0251,
           "text": "我上周末去她家，她做了糖醋排骨。"
         },
         {
           "rank": 5,
-          "id": "mem_6",
-          "score": 0.0,
-          "text": "她女儿今年上小学三年级。"
+          "id": "mem_4",
+          "score": 0.025,
+          "text": "她家养了一只金毛，叫豆豆。"
         }
       ],
       "old_passed": true,
@@ -597,26 +597,26 @@
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.5409,
+          "score": 0.4224,
           "text": "她老公是做金融的，在国贸上班。"
         },
         {
           "rank": 3,
           "id": "mem_5",
-          "score": 0.2819,
+          "score": 0.0249,
           "text": "王芳说最近医院很忙，流感季。"
         },
         {
           "rank": 4,
           "id": "mem_6",
-          "score": 0.1728,
+          "score": 0.0146,
           "text": "她女儿今年上小学三年级。"
         },
         {
           "rank": 5,
-          "id": "mem_4",
-          "score": 0.0447,
-          "text": "她家养了一只金毛，叫豆豆。"
+          "id": "mem_3",
+          "score": 0.0001,
+          "text": "我上周末去她家，她做了糖醋排骨。"
         }
       ],
       "old_passed": true,
@@ -647,31 +647,31 @@
         {
           "rank": 1,
           "id": "mem_2",
-          "score": 1.0,
+          "score": 4.51,
           "text": "她老公是做金融的，在国贸上班。"
         },
         {
           "rank": 2,
-          "id": "mem_4",
-          "score": 0.3149,
-          "text": "她家养了一只金毛，叫豆豆。"
-        },
-        {
-          "rank": 3,
           "id": "mem_6",
-          "score": 0.2324,
+          "score": 0.5,
           "text": "她女儿今年上小学三年级。"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "id": "mem_5",
-          "score": 0.1525,
+          "score": 0.5,
           "text": "王芳说最近医院很忙，流感季。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "她家养了一只金毛，叫豆豆。"
         },
         {
           "rank": 5,
           "id": "mem_3",
-          "score": 0.0751,
+          "score": 0.5,
           "text": "我上周末去她家，她做了糖醋排骨。"
         }
       ],
@@ -703,31 +703,31 @@
         {
           "rank": 1,
           "id": "mem_4",
-          "score": 1.0,
+          "score": 1.81,
           "text": "她家养了一只金毛，叫豆豆。"
         },
         {
           "rank": 2,
           "id": "mem_6",
-          "score": 0.3149,
+          "score": 0.5,
           "text": "她女儿今年上小学三年级。"
         },
         {
           "rank": 3,
           "id": "mem_5",
-          "score": 0.2324,
+          "score": 0.5,
           "text": "王芳说最近医院很忙，流感季。"
         },
         {
           "rank": 4,
           "id": "mem_3",
-          "score": 0.1526,
+          "score": 0.5,
           "text": "我上周末去她家，她做了糖醋排骨。"
         },
         {
           "rank": 5,
           "id": "mem_2",
-          "score": 0.0751,
+          "score": 0.5,
           "text": "她老公是做金融的，在国贸上班。"
         }
       ],
@@ -759,31 +759,31 @@
         {
           "rank": 1,
           "id": "mem_6",
-          "score": 1.0,
+          "score": 4.46,
           "text": "她女儿今年上小学三年级。"
         },
         {
           "rank": 2,
-          "id": "mem_4",
-          "score": 0.2942,
-          "text": "她家养了一只金毛，叫豆豆。"
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "王芳说最近医院很忙，流感季。"
         },
         {
           "rank": 3,
-          "id": "mem_5",
-          "score": 0.253,
-          "text": "王芳说最近医院很忙，流感季。"
+          "id": "mem_4",
+          "score": 0.5,
+          "text": "她家养了一只金毛，叫豆豆。"
         },
         {
           "rank": 4,
           "id": "mem_3",
-          "score": 0.1525,
+          "score": 0.5,
           "text": "我上周末去她家，她做了糖醋排骨。"
         },
         {
           "rank": 5,
           "id": "mem_2",
-          "score": 0.0752,
+          "score": 0.5,
           "text": "她老公是做金融的，在国贸上班。"
         }
       ],
@@ -807,7 +807,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.8503,
+      "ndcg_at_5": 0.8772,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -815,32 +815,32 @@
         {
           "rank": 1,
           "id": "mem_2",
-          "score": 1.0,
+          "score": 4.86,
           "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
         },
         {
           "rank": 2,
-          "id": "mem_1",
-          "score": 0.9251,
-          "text": "我认识一个投资人叫陈总，他在红杉资本。"
-        },
-        {
-          "rank": 3,
           "id": "mem_5",
-          "score": 0.2802,
+          "score": 0.5,
           "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "id": "mem_4",
-          "score": 0.0006,
+          "score": 0.5,
           "text": "他们去年拿了 B 轮，估值 20 亿。"
         },
         {
-          "rank": 5,
+          "rank": 4,
           "id": "mem_3",
-          "score": 0.0,
+          "score": 0.5,
           "text": "途灵科技的创始人是清华计算机系毕业的。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_1",
+          "score": 0.5,
+          "text": "我认识一个投资人叫陈总，他在红杉资本。"
         }
       ],
       "old_passed": true,
@@ -878,25 +878,25 @@
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.7225,
+          "score": 0.5807,
           "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
         },
         {
           "rank": 3,
           "id": "mem_1",
-          "score": 0.195,
+          "score": 0.0319,
           "text": "我认识一个投资人叫陈总，他在红杉资本。"
         },
         {
           "rank": 4,
           "id": "mem_5",
-          "score": 0.0953,
+          "score": 0.0,
           "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
         },
         {
           "rank": 5,
           "id": "mem_4",
-          "score": 0.0003,
+          "score": 0.5,
           "text": "他们去年拿了 B 轮，估值 20 亿。"
         }
       ],
@@ -929,32 +929,32 @@
         {
           "rank": 1,
           "id": "mem_2",
-          "score": 1.0,
+          "score": 4.86,
           "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
         },
         {
           "rank": 2,
-          "id": "mem_1",
-          "score": 0.6522,
-          "text": "我认识一个投资人叫陈总，他在红杉资本。"
+          "id": "mem_5",
+          "score": 0.5,
+          "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
         },
         {
           "rank": 3,
           "id": "mem_4",
-          "score": 0.3064,
+          "score": 0.5,
           "text": "他们去年拿了 B 轮，估值 20 亿。"
         },
         {
           "rank": 4,
-          "id": "mem_5",
-          "score": 0.2546,
-          "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "途灵科技的创始人是清华计算机系毕业的。"
         },
         {
           "rank": 5,
-          "id": "mem_3",
-          "score": 0.0,
-          "text": "途灵科技的创始人是清华计算机系毕业的。"
+          "id": "mem_1",
+          "score": 0.5,
+          "text": "我认识一个投资人叫陈总，他在红杉资本。"
         }
       ],
       "old_passed": true,
@@ -991,25 +991,25 @@
         {
           "rank": 2,
           "id": "mem_1",
-          "score": 0.2702,
+          "score": 0.1282,
           "text": "我认识一个投资人叫陈总，他在红杉资本。"
         },
         {
           "rank": 3,
           "id": "mem_2",
-          "score": 0.2192,
+          "score": 0.112,
           "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
         },
         {
           "rank": 4,
           "id": "mem_5",
-          "score": 0.0959,
+          "score": 0.0003,
           "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
         },
         {
           "rank": 5,
           "id": "mem_3",
-          "score": 0.0,
+          "score": 0.5,
           "text": "途灵科技的创始人是清华计算机系毕业的。"
         }
       ],
@@ -1039,7 +1039,7 @@
       "reciprocal_rank": 1.0,
       "ndcg_at_5": 0.6131,
       "recall_at_5": 1.0,
-      "contamination_at_3": 0.3333,
+      "contamination_at_3": 0.0,
       "rejection_correct": null,
       "top_5": [
         {
@@ -1051,31 +1051,31 @@
         {
           "rank": 2,
           "id": "mem_1",
-          "score": 0.3767,
+          "score": 0.0,
           "text": "老张是我们部门的技术主管，干了十年了。"
         },
         {
           "rank": 3,
-          "id": "mem_7",
-          "score": 0.292,
-          "text": "小李开的是比亚迪海豚，电动车。"
-        },
-        {
-          "rank": 4,
           "id": "mem_8",
-          "score": 0.282,
+          "score": 0.5,
           "text": "她每天骑共享单车到地铁站。"
         },
         {
+          "rank": 4,
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "小李开的是比亚迪海豚，电动车。"
+        },
+        {
           "rank": 5,
-          "id": "mem_2",
-          "score": 0.1195,
-          "text": "他之前在华为做过，后来跳过来的。"
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她特别喜欢猫，养了两只英短。"
         }
       ],
-      "old_passed": false,
-      "legacy_pass_recomputed": false,
-      "new_passed": false
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
     },
     {
       "scenario_id": "MA-isolation",
@@ -1111,13 +1111,13 @@
         {
           "rank": 2,
           "id": "mem_5",
-          "score": 0.2245,
+          "score": 0.0,
           "text": "小李是去年刚来的应届生，做前端的。"
         },
         {
           "rank": 3,
           "id": "mem_8",
-          "score": 0.0,
+          "score": 0.5,
           "text": "她每天骑共享单车到地铁站。"
         },
         {
@@ -1151,49 +1151,49 @@
         "猫",
         "英短"
       ],
-      "rank_of_target": 2,
+      "rank_of_target": 7,
       "p_at_1": 0.0,
-      "p_at_3": 1.0,
-      "p_at_5": 1.0,
-      "reciprocal_rank": 0.5,
-      "ndcg_at_5": 0.6309,
-      "recall_at_5": 1.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.1429,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
       "top_5": [
         {
           "rank": 1,
           "id": "mem_1",
-          "score": 0.7755,
+          "score": 0.6,
           "text": "老张是我们部门的技术主管，干了十年了。"
         },
         {
           "rank": 2,
-          "id": "mem_4",
-          "score": 0.652,
-          "text": "他喜欢钓鱼，周末经常去密云水库。"
-        },
-        {
-          "rank": 3,
           "id": "mem_3",
-          "score": 0.3712,
+          "score": 0.0,
           "text": "老张开一辆黑色宝马 X5。"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "id": "mem_8",
-          "score": 0.2789,
+          "score": 0.5,
           "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "小李开的是比亚迪海豚，电动车。"
         },
         {
           "rank": 5,
           "id": "mem_6",
-          "score": 0.228,
+          "score": 0.5,
           "text": "她特别喜欢猫，养了两只英短。"
         }
       ],
-      "old_passed": true,
-      "legacy_pass_recomputed": true,
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
       "new_passed": false
     },
     {
@@ -1211,12 +1211,12 @@
         "钓鱼",
         "金毛"
       ],
-      "rank_of_target": 2,
+      "rank_of_target": 4,
       "p_at_1": 0.0,
-      "p_at_3": 1.0,
+      "p_at_3": 0.0,
       "p_at_5": 1.0,
-      "reciprocal_rank": 0.5,
-      "ndcg_at_5": 0.3869,
+      "reciprocal_rank": 0.25,
+      "ndcg_at_5": 0.2641,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -1224,36 +1224,36 @@
         {
           "rank": 1,
           "id": "mem_7",
-          "score": 0.9971,
+          "score": 0.6,
           "text": "小李开的是比亚迪海豚，电动车。"
         },
         {
           "rank": 2,
-          "id": "mem_6",
-          "score": 0.9075,
-          "text": "她特别喜欢猫，养了两只英短。"
-        },
-        {
-          "rank": 3,
           "id": "mem_5",
-          "score": 0.3027,
+          "score": 0.0,
           "text": "小李是去年刚来的应届生，做前端的。"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "id": "mem_8",
-          "score": 0.2183,
+          "score": 0.5,
           "text": "她每天骑共享单车到地铁站。"
+        },
+        {
+          "rank": 4,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她特别喜欢猫，养了两只英短。"
         },
         {
           "rank": 5,
           "id": "mem_4",
-          "score": 0.1593,
+          "score": 0.5,
           "text": "他喜欢钓鱼，周末经常去密云水库。"
         }
       ],
-      "old_passed": true,
-      "legacy_pass_recomputed": true,
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
       "new_passed": false
     },
     {
@@ -1288,25 +1288,25 @@
         {
           "rank": 2,
           "id": "mem_5",
-          "score": 0.3032,
+          "score": 0.1187,
           "text": "小李是去年刚来的应届生，做前端的。"
         },
         {
           "rank": 3,
           "id": "mem_8",
-          "score": 0.2481,
+          "score": 0.0,
           "text": "她每天骑共享单车到地铁站。"
         },
         {
           "rank": 4,
           "id": "mem_7",
-          "score": 0.2145,
+          "score": 0.0,
           "text": "小李开的是比亚迪海豚，电动车。"
         },
         {
           "rank": 5,
           "id": "mem_6",
-          "score": 0.1355,
+          "score": 0.5,
           "text": "她特别喜欢猫，养了两只英短。"
         }
       ],
@@ -1332,42 +1332,42 @@
       "reciprocal_rank": 0.0,
       "ndcg_at_5": 0.0,
       "recall_at_5": 0.0,
-      "contamination_at_3": 0.3333,
+      "contamination_at_3": 0.0,
       "rejection_correct": null,
       "top_5": [
         {
           "rank": 1,
-          "id": "mem_6",
-          "score": 1.0,
-          "text": "她特别喜欢猫，养了两只英短。"
-        },
-        {
-          "rank": 2,
           "id": "mem_1",
-          "score": 0.5465,
+          "score": 0.6,
           "text": "老张是我们部门的技术主管，干了十年了。"
         },
         {
-          "rank": 3,
+          "rank": 2,
           "id": "mem_3",
-          "score": 0.2929,
+          "score": 0.0,
           "text": "老张开一辆黑色宝马 X5。"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "id": "mem_8",
-          "score": 0.2181,
+          "score": 0.5,
           "text": "她每天骑共享单车到地铁站。"
         },
         {
-          "rank": 5,
+          "rank": 4,
           "id": "mem_7",
-          "score": 0.1609,
+          "score": 0.5,
           "text": "小李开的是比亚迪海豚，电动车。"
+        },
+        {
+          "rank": 5,
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "她特别喜欢猫，养了两只英短。"
         }
       ],
       "old_passed": true,
-      "legacy_pass_recomputed": false,
+      "legacy_pass_recomputed": true,
       "new_passed": false
     },
     {
@@ -1401,25 +1401,25 @@
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.2992,
+          "score": 0.0003,
           "text": "点了水煮鱼和宫保鸡丁，味道挺正宗的。"
         },
         {
           "rank": 3,
           "id": "mem_5",
-          "score": 0.1974,
+          "score": 0.0,
           "text": "我同事推荐的，说他们家的毛血旺更绝。"
         },
         {
           "rank": 4,
           "id": "mem_4",
-          "score": 0.0997,
+          "score": 0.5,
           "text": "服务员态度特别好，还送了果盘。"
         },
         {
           "rank": 5,
           "id": "mem_3",
-          "score": 0.0,
+          "score": 0.5,
           "text": "人均大概一百二左右，不算贵。"
         }
       ],
@@ -1697,30 +1697,30 @@
       "ndcg_at_5": 0.0,
       "recall_at_5": 0.0,
       "contamination_at_3": 0.0,
-      "rejection_correct": 0.0,
+      "rejection_correct": 1.0,
       "top_5": [
         {
           "rank": 1,
           "id": "mem_3",
-          "score": 1.0,
+          "score": 0.6,
           "text": "现在在一家创业公司做架构。"
         },
         {
           "rank": 2,
-          "id": "mem_2",
-          "score": 0.0291,
-          "text": "毕业后去了百度做了三年后端。"
-        },
-        {
-          "rank": 3,
           "id": "mem_1",
           "score": 0.0,
           "text": "我大学学的是计算机专业。"
+        },
+        {
+          "rank": 3,
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "毕业后去了百度做了三年后端。"
         }
       ],
       "old_passed": true,
       "legacy_pass_recomputed": true,
-      "new_passed": false
+      "new_passed": true
     },
     {
       "scenario_id": "MA-negative",
@@ -1752,7 +1752,7 @@
         {
           "rank": 2,
           "id": "mem_3",
-          "score": 0.2236,
+          "score": 0.0946,
           "text": "现在在一家创业公司做架构。"
         },
         {
@@ -1797,25 +1797,25 @@
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.3172,
+          "score": 0.4024,
           "text": "离职后我去西藏玩了一个月。"
         },
         {
           "rank": 3,
           "id": "mem_5",
-          "score": 0.2444,
+          "score": 0.187,
           "text": "7月1号正式入职新公司。"
         },
         {
           "rank": 4,
           "id": "mem_6",
-          "score": 0.1525,
+          "score": 0.175,
           "text": "新公司在海淀，离家有点远。"
         },
         {
           "rank": 5,
           "id": "mem_4",
-          "score": 0.076,
+          "score": 0.0009,
           "text": "6月中拿到了一家 AI 公司的 offer。"
         }
       ],
@@ -1853,25 +1853,25 @@
         {
           "rank": 2,
           "id": "mem_1",
-          "score": 0.3309,
+          "score": 0.2828,
           "text": "2024年3月，我从百度离职了。"
         },
         {
           "rank": 3,
           "id": "mem_5",
-          "score": 0.2127,
+          "score": 0.117,
           "text": "7月1号正式入职新公司。"
         },
         {
           "rank": 4,
           "id": "mem_6",
-          "score": 0.1531,
+          "score": 0.1167,
           "text": "新公司在海淀，离家有点远。"
         },
         {
           "rank": 5,
           "id": "mem_4",
-          "score": 0.0965,
+          "score": 0.0021,
           "text": "6月中拿到了一家 AI 公司的 offer。"
         }
       ],
@@ -1909,25 +1909,25 @@
         {
           "rank": 2,
           "id": "mem_6",
-          "score": 0.2691,
+          "score": 0.2078,
           "text": "新公司在海淀，离家有点远。"
         },
         {
           "rank": 3,
           "id": "mem_4",
-          "score": 0.2202,
+          "score": 0.1305,
           "text": "6月中拿到了一家 AI 公司的 offer。"
         },
         {
           "rank": 4,
-          "id": "mem_3",
-          "score": 0.1282,
-          "text": "5月份回来开始找工作。"
+          "id": "mem_1",
+          "score": 0.0021,
+          "text": "2024年3月，我从百度离职了。"
         },
         {
           "rank": 5,
           "id": "mem_2",
-          "score": 0.0166,
+          "score": 0.0,
           "text": "离职后我去西藏玩了一个月。"
         }
       ],
@@ -2008,7 +2008,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.332,
+      "ndcg_at_5": 0.3431,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -2022,24 +2022,24 @@
         {
           "rank": 2,
           "id": "mem_3",
-          "score": 0.3626,
+          "score": 0.0988,
           "text": "不过 Python 的生态还是最完善的。"
         },
         {
           "rank": 3,
-          "id": "mem_2",
-          "score": 0.1325,
-          "text": "后来用了 Go 写后端，发现性能确实好很多。"
+          "id": "mem_4",
+          "score": 0.0,
+          "text": "最近在学 Rust，感觉这才是未来。"
         },
         {
           "rank": 4,
-          "id": "mem_4",
-          "score": 0.0416,
-          "text": "最近在学 Rust，感觉这才是未来。"
+          "id": "mem_2",
+          "score": 0.5,
+          "text": "后来用了 Go 写后端，发现性能确实好很多。"
         }
       ],
-      "old_passed": false,
-      "legacy_pass_recomputed": false,
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
       "new_passed": true
     },
     {
@@ -2066,26 +2066,26 @@
         {
           "rank": 1,
           "id": "mem_2",
-          "score": 1.0,
+          "score": 0.856,
           "text": "后来用了 Go 写后端，发现性能确实好很多。"
         },
         {
           "rank": 2,
           "id": "mem_1",
-          "score": 0.5892,
+          "score": 0.6615,
           "text": "我觉得 Python 是最适合做 AI 的语言。"
         },
         {
           "rank": 3,
-          "id": "mem_3",
-          "score": 0.0681,
-          "text": "不过 Python 的生态还是最完善的。"
+          "id": "mem_4",
+          "score": 0.0,
+          "text": "最近在学 Rust，感觉这才是未来。"
         },
         {
           "rank": 4,
-          "id": "mem_4",
-          "score": 0.0639,
-          "text": "最近在学 Rust，感觉这才是未来。"
+          "id": "mem_3",
+          "score": 0.5,
+          "text": "不过 Python 的生态还是最完善的。"
         }
       ],
       "old_passed": true,
@@ -2122,25 +2122,25 @@
         {
           "rank": 2,
           "id": "mem_7",
-          "score": 0.3366,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 3,
           "id": "mem_49",
-          "score": 0.263,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 4,
           "id": "mem_44",
-          "score": 0.2037,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 5,
           "id": "mem_39",
-          "score": 0.1438,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         }
       ],
@@ -2172,31 +2172,31 @@
         {
           "rank": 1,
           "id": "mem_36",
-          "score": 1.0,
+          "score": 8.41,
           "text": "CTO 说他看好边缘计算方向，让我们提前布局。"
         },
         {
           "rank": 2,
           "id": "mem_9",
-          "score": 0.3498,
+          "score": 0.5,
           "text": "中午吃了2个菜，食堂今天还行。"
         },
         {
           "rank": 3,
           "id": "mem_8",
-          "score": 0.3012,
+          "score": 0.5,
           "text": "我在考虑要不要换一台3TB的硬盘。"
         },
         {
           "rank": 4,
           "id": "mem_7",
-          "score": 0.2545,
+          "score": 0.5,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 5,
           "id": "mem_6",
-          "score": 0.2085,
+          "score": 0.5,
           "text": "同事小明请假了，他家里有事。"
         }
       ],
@@ -2228,31 +2228,31 @@
         {
           "rank": 1,
           "id": "mem_7",
-          "score": 0.4,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 2,
           "id": "mem_49",
-          "score": 0.3498,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 3,
           "id": "mem_44",
-          "score": 0.3012,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 4,
           "id": "mem_39",
-          "score": 0.2542,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         },
         {
           "rank": 5,
           "id": "mem_33",
-          "score": 0.2085,
+          "score": 0.0,
           "text": "老板说Q3的目标是完成3个核心功能。"
         }
       ],
@@ -2329,50 +2329,50 @@
       "forbidden": [
         "特斯拉"
       ],
-      "rank_of_target": 2,
-      "p_at_1": 0.0,
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
       "p_at_3": 1.0,
       "p_at_5": 1.0,
-      "reciprocal_rank": 0.5,
-      "ndcg_at_5": 0.6309,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
-      "contamination_at_3": 0.3333,
+      "contamination_at_3": 0.0,
       "rejection_correct": null,
       "top_5": [
         {
           "rank": 1,
-          "id": "mem_4",
-          "score": 0.9478,
-          "text": "张三买了特斯拉Model 3。"
-        },
-        {
-          "rank": 2,
           "id": "mem_5",
-          "score": 0.9067,
+          "score": 8.17,
           "text": "李四买了比亚迪电动车。"
         },
         {
+          "rank": 2,
+          "id": "mem_9",
+          "score": 0.5,
+          "text": "体重增加了5公斤，需要控制饮食。"
+        },
+        {
           "rank": 3,
-          "id": "mem_14",
-          "score": 0.3276,
-          "text": "李四说这个键盘不好用。"
+          "id": "mem_8",
+          "score": 0.5,
+          "text": "我最近开始跑步健身。"
         },
         {
           "rank": 4,
-          "id": "mem_2",
-          "score": 0.2776,
-          "text": "我最喜欢机械键盘。"
+          "id": "mem_7",
+          "score": 0.5,
+          "text": "2024年爸爸换了工作。"
         },
         {
           "rank": 5,
-          "id": "mem_9",
-          "score": 0.2312,
-          "text": "体重增加了5公斤，需要控制饮食。"
+          "id": "mem_6",
+          "score": 0.5,
+          "text": "2025年妈妈退休了。"
         }
       ],
-      "old_passed": false,
-      "legacy_pass_recomputed": false,
-      "new_passed": false
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
     },
     {
       "scenario_id": "MA-semantic",
@@ -2398,32 +2398,32 @@
         {
           "rank": 1,
           "id": "mem_3",
-          "score": 1.0,
+          "score": 0.6588,
           "text": "李丽是张三是前同事，她是家庭主妇。"
         },
         {
           "rank": 2,
-          "id": "mem_8",
-          "score": 0.3203,
-          "text": "我最近开始跑步健身。"
-        },
-        {
-          "rank": 3,
           "id": "mem_13",
-          "score": 0.306,
+          "score": 0.4003,
           "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "id": "mem_14",
-          "score": 0.293,
+          "score": 0.1938,
           "text": "李四说这个键盘不好用。"
         },
         {
+          "rank": 4,
+          "id": "mem_8",
+          "score": 0.0761,
+          "text": "我最近开始跑步健身。"
+        },
+        {
           "rank": 5,
-          "id": "mem_2",
-          "score": 0.2555,
-          "text": "我最喜欢机械键盘。"
+          "id": "mem_12",
+          "score": 0.0011,
+          "text": "我想明年去日本旅游，看樱花。"
         }
       ],
       "old_passed": false,
@@ -2454,32 +2454,32 @@
         {
           "rank": 1,
           "id": "mem_12",
-          "score": 0.7816,
+          "score": 0.6,
           "text": "我想明年去日本旅游，看樱花。"
         },
         {
           "rank": 2,
           "id": "mem_3",
-          "score": 0.4605,
+          "score": 0.4105,
           "text": "李丽是张三是前同事，她是家庭主妇。"
         },
         {
           "rank": 3,
-          "id": "mem_9",
-          "score": 0.4299,
-          "text": "体重增加了5公斤，需要控制饮食。"
+          "id": "mem_14",
+          "score": 0.4,
+          "text": "李四说这个键盘不好用。"
         },
         {
           "rank": 4,
-          "id": "mem_6",
-          "score": 0.342,
-          "text": "2025年妈妈退休了。"
+          "id": "mem_8",
+          "score": 0.068,
+          "text": "我最近开始跑步健身。"
         },
         {
           "rank": 5,
-          "id": "mem_14",
-          "score": 0.2906,
-          "text": "李四说这个键盘不好用。"
+          "id": "mem_13",
+          "score": 0.0001,
+          "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
         }
       ],
       "old_passed": true,
@@ -2505,40 +2505,40 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.649,
+      "ndcg_at_5": 0.4308,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.3333,
       "rejection_correct": null,
       "top_5": [
         {
           "rank": 1,
-          "id": "mem_13",
-          "score": 1.0,
-          "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
-        },
-        {
-          "rank": 2,
           "id": "mem_14",
-          "score": 0.7453,
+          "score": 0.8209,
           "text": "李四说这个键盘不好用。"
         },
         {
-          "rank": 3,
-          "id": "mem_2",
-          "score": 0.3817,
-          "text": "我最喜欢机械键盘。"
+          "rank": 2,
+          "id": "mem_13",
+          "score": 0.8133,
+          "text": "张三送了我一把HHKB键盘，因为是生日礼物。"
         },
         {
-          "rank": 4,
+          "rank": 3,
           "id": "mem_3",
-          "score": 0.2756,
+          "score": 0.1237,
           "text": "李丽是张三是前同事，她是家庭主妇。"
         },
         {
+          "rank": 4,
+          "id": "mem_2",
+          "score": 0.0584,
+          "text": "我最喜欢机械键盘。"
+        },
+        {
           "rank": 5,
-          "id": "mem_9",
-          "score": 0.1796,
-          "text": "体重增加了5公斤，需要控制饮食。"
+          "id": "mem_8",
+          "score": 0.0001,
+          "text": "我最近开始跑步健身。"
         }
       ],
       "old_passed": false,
@@ -2603,12 +2603,10 @@
     }
   ],
   "regressions_vs_old_report": [
-    "SA-S5 was reported passed but P@1=0 (target at rank 3)",
+    "SA-S4 was reported passed but P@1=0 (target at rank 2)",
+    "SA-S5 was reported passed but P@1=0 (target at rank 2)",
     "SA-S8 was reported passed but P@1=0 (target at rank 3)",
     "MA-multi_hop-q2 was reported passed but P@1=0 (target at rank 3)",
-    "MA-isolation-q2 was reported passed but P@1=0 (target at rank 2)",
-    "MA-isolation-q3 was reported passed but P@1=0 (target at rank 2)",
-    "MA-isolation-q5 was reported passed but P@1=0 (target at rank not-in-top-10)",
-    "MA-negative-q2 was reported passed but negative case leaked top-1 score 1.0"
+    "MA-isolation-q5 was reported passed but P@1=0 (target at rank not-in-top-10)"
   ]
 }

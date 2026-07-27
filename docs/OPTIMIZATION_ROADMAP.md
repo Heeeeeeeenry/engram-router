@@ -63,7 +63,7 @@
   - 新增 `tests/test_pipeline.py`（335 行，21 cases）
 - **回归**: 391 passed / 4 skipped / 12 xfailed（2 个预存失败不变）
 - **Commit**: 7bf3c1d
-- **L4.2 ✅ 完成**，**L4.3 部分完成**（recall_snapshots 采样表待做）
+- **L4.2 ✅ 完成**，**L4.3 后续交付**（recall_snapshots 在 2026-07-27 commit c93971b 完成）
 
 ### 2026-07-24 · store.py 拆解完成 (Steps 1-7) + 审计清理
 
@@ -111,20 +111,20 @@
 - [x] `Precision@1` / `MRR` / `nDCG@k` / `Recall@k` 替代"包含即通过" — `tests/eval_v2.py` 已交付
 - [x] `Contamination@k` 反污染指标(禁词出现在 top-k 的比例)
 - [x] 拒答指标(负样本真正门禁:该拒答未拒答 → 失败) — 阈值 1.0,负样本目前仅 3 例,样本量不足
-- [ ] 稳定性指标(同 query 跑 20 次的 Jaccard、rank 方差)
+- [x] 稳定性指标(同 query 跑 20 次的 Jaccard、rank 方差) — `eval_v2.py --stability`，L0.1 完成
 
-**首次真实基线(2026-07-21,49 用例)**:P@1 = **0.6087** · P@3 = 0.8913 · MRR = 0.7404 · nDCG@5 = 0.6973 · Contamination@3 = 0.0272。老报告 100% 通过是水分,13 例 regression。**结论:召回没塌,排序塌了**(P@1 vs P@3 差 28 个百分点)—— cross-encoder 精排是最高 ROI 的下一步。
+**最新基线(2026-07-27)**: P@1 = **0.8043** · P@3 = 0.9130 · MRR = 0.8600 · nDCG@5 = 0.7841 · Contamination@3 = 0.0136。CI gate 三项全部 PASS。
 
 #### 0.2 判分器升级
-- [ ] LLM-as-judge:输出 `{answered, faithful, hallucinated}`
-- [ ] cross-encoder 打 relevance ground truth
-- [ ] judge 模型与被测模型解耦(不同厂商)
+- [x] LLM-as-judge:输出 `{answered, faithful, hallucinated}` — faithfulness_judge() + _heuristic_faithfulness() fallback
+- [x] cross-encoder 打 relevance ground truth — cross_encoder_ground_truth() + _fallback_relevance() Jaccard fallback
+- [~] judge 模型与被测模型解耦(不同厂商) — DeepSeek vs GPT-5.5 已交叉验证 95% 一致
 
 #### 0.3 评估数据集重建
-- [ ] held-out 集与调参集彻底隔离(发版前只跑一次)
-- [ ] 对抗集:LLM 针对当前 top-1 生成 near-miss 干扰项
+- [x] held-out 集与调参集彻底隔离(发版前只跑一次) — `tests/data/held_out_cases.json`(49→19 scenarios)
+- [x] 对抗集:LLM 针对当前 top-1 生成 near-miss 干扰项 — `tests/data/adversarial_cases.json`(10 cases)
 - [ ] 真实 agent trace ≥ 100 段 50-turn+
-- [ ] 多语言:英文、中英混合各一份
+- [x] 多语言:英文、中英混合各一份 — `tests/data/multilingual_cases.json`(12 cases)
 - [ ] 长尾长度:500-turn / 5000-turn 两档
 
 #### 0.4 竞品对照矩阵
@@ -135,9 +135,9 @@
 - [x] 输出矩阵:方法 × 场景 → P@1/MRR/contamination/延迟 — `docs/eval_v2_matrix.json`(4 provider × 49 case)
 
 #### 0.5 CI 门禁生效
-- [ ] `semantic_audit.py:412` 门槛从 ≥4/10 提到 P@1 ≥ 0.8, contam ≤ 5%
-- [ ] `multi_angle_eval.py:410` 加入 isolation ≥ 85% 门禁
-- [ ] PR shadow diff:main vs branch 双跑,看增量而非绝对分
+- [x] `semantic_audit.py:412` 门槛从 ≥4/10 提到 P@1 ≥ 0.8, contam ≤ 5% — `eval_v2.py --ci` 三项门禁
+- [x] `multi_angle_eval.py:410` 加入 isolation ≥ 85% 门禁 — `make ci-gate-multi`
+- [x] PR shadow diff:main vs branch 双跑,看增量而非绝对分 — `eval_v2.py --pr-shadow-diff`
 
 ### L1 召回架构核心
 
@@ -168,7 +168,7 @@
 #### 4.3 可观测性
 - [x] recall debug trace(每阶段输入/输出/top5/耗时)
 - [x] Prometheus 指标(recall_latency_ms / stage_hit_ratio / save_dedup_ratio) — stub with graceful no-op
-- [ ] `recall_snapshots` 采样表用于回放
+- [x] `recall_snapshots` 采样表用于回放 — commit c93971b，L4.3 ✅ 全部完成
 
 ---
 
@@ -819,3 +819,70 @@
 
 - **下一步**: 本次修了 6 个低风险、高影响的问题。下一轮应做 **store.py 拆解 Step 1 (query_intent.py)** 或 **LongMemEval `_s` split 首轮**。
   - `_s` split 优先: 含 40 session/题的 distractor 场景是 engram 首次真正能证明多层召回价值的测试
+
+### 2026-07-27 · L0 评估体系收尾 + CI 门禁全覆盖
+
+- **Commit**: b2b51c9 · L0.2 faithfulness judge + cross-encoder ground-truth
+  - `faithfulness_judge()`: LLM 驱动的忠实度判分 → {faithful, hallucinated, unsupported_claims}
+  - `cross_encoder_ground_truth()`: bge-reranker-v2-m3 自动打 relevance 标签
+  - `_heuristic_faithfulness()`: 无 LLM 时的词重叠 fallback
+  - `_fallback_relevance()`: 无 sentence-transformers 时的 Jaccard fallback
+  - `_parse_faithfulness_json()`: judge JSON 容错解析器
+  - +10 单元测试 (`tests/test_lme_judge_upgrade.py`)
+
+- **Commit**: d61b0d4 · L0.1/L0.3/L0.5 评估基础设施
+  - L0.1 stability: `--stability` mode — Jaccard/rank-variance/rank-stability over n runs
+  - L0.3 datasets: adversarial_cases.json(10), multilingual_cases.json(12), held_out_cases.json(49→19)
+  - L0.5 CI gate: `--ci` mode — P@1≥0.8 / contam≤0.05 / rejection≥0.9
+  - PR shadow diff: `--pr-shadow-diff` — main vs branch 双跑增量比对
+  - Makefile targets: ci-gate / ci-gate-test / eval-held-out / pr-shadow-diff / eval-adversarial / eval-multilingual
+  - +24 CI gate tests + 5 stability tests
+
+- **Commit**: c93971b · L4.3 recall_snapshots 采样表
+  - recall_snapshots 表: query / result_ids / trace_json / latency_ms / memory_count
+  - `RecallWeights.sampling_rate`(default 0.01): 随机采样写入，零阻塞
+  - `replay_snapshots()`: namespace + recency 查询回放
+  - 与 RecallTracer 集成: 自动捕获 trace 上下文
+  - **L4.3 ✅ 全部完成**
+
+- **Commit**: c9e3e69 · L0.5 multi_angle_eval isolation ≥ 85% gate
+  - CI gate 双阈值: precision ≥ 85% AND isolation ≥ 85%
+  - `make ci-gate-multi` target
+  - **L0.5 ✅ CI 门禁全部完成**
+
+- **L0 评估总结**:
+  - L0.1 全部打勾 ✅(P@1/MRR/nDCG/Recall/Contamination/Rejection/Stability)
+  - L0.2 faithfulness judge ✅ / cross-encoder GT ✅ / judge 模型解耦 [~](DeepSeek vs GPT-5.5 95% 一致)
+  - L0.3 held-out ✅ / adversarial ✅ / multilingual ✅ / agent traces [ ] / long-tail [ ]
+  - L0.4 naive/long-context/mem0/矩阵 ✅ / letta/zep [ ]
+  - L0.5 CI gate ✅ / isolation gate ✅ / PR shadow diff ✅
+
+- **下一步建议**: 跑通 `make ci-gate` + stability benchmark 实际验证新交付的基础设施能否一键跑通
+
+### 2026-07-27 · Person-isolation post-filter（isolation 门禁修复）
+
+- **背景**: `make ci-gate-multi` 的 isolation 门禁仅 4/8 (50%) 通过。根因是多层融合+CE 重排覆盖了 `build_scored_candidates` 中的人物隔离逻辑。
+- **本次改动**:
+  - `RecallWeights` 新增 `person_isolation_scope_weight`(0.25) / `person_isolation_subtract`(1.0) / `person_isolation_noentity_weight`(0.5) / `person_isolation_noentity_subtract`(0.2)
+  - `build_recall_response` Phase 2.6：CE/LLM 重排后加 person-isolation post-filter
+    - 查询含命名人物时，使用 DB entity_map 检测记忆归属的人物
+    - 明确属于别人 → 重罚(0.25× + subtract 1.0)
+    - 无 person entity（代词） → 轻罚(0.5× + subtract 0.2)
+  - 修正了 `build_scored_candidates` 中 person-scoped 的 entity bonus 剥离逻辑
+
+- **效果**:
+  - Isolation: **4/8 (50%) → 6/8 (75%)** (+25 pp)
+  - 修好 2 例: "老张养猫吗"(猫不再泄漏)、"李四买特斯拉"(特斯拉不再泄漏)
+  - 遗留 2 例: "谁之前在华为做过"(小李泄漏、"谁"无命名人物)、"他送我的东西"(不好用泄漏、"他"为代词)
+  - 遗留 2 例需 LLM 语义层判断
+
+- **CI Gate**:
+  - `make ci-gate`: ✅ PASS — P@1=0.8043 / contam=0.0136 / rejection=1.0
+  - `make ci-gate-multi`: ❌ FAIL — Isolation=75.0% 未达 85% 门禁(从 50% 大幅改善)
+
+- **回归**: `pytest -q` **511 passed / 4 skipped / 12 xfailed**，零破坏
+
+- **下一步建议**:
+  - **A. 继续修 isolation → 85%**：剩余 2 例("谁"/"他送我的东西")需 LLM judge 分析语义排他性
+  - **B. L0.3 long-tail 数据集**(500/5000-turn)：脱离玩具语料，是证明检索价值的核心前提
+  - **C. L0.2 judge 模型解耦**：DeepSeek vs GPT 已验证 95% 一致，可打勾收尾

@@ -41,6 +41,24 @@ class RecallWeights:
     fts_boost: float = 0.1
     shared_entity_multiplier: float = 1.2
     conflicting_person_penalty: float = 2.2
+    person_isolation_scope_weight: float = 0.25
+    """Multiplier for person-isolation narrowing: when query names a person,
+    memories without that person have their score multiplied by this factor.
+    0.25 means a 75% penalty for no-person-match memories. This closes the
+    gap where memories with no person entity (e.g., '她特别喜欢猫') escaped
+    person checks entirely."""
+    person_isolation_subtract: float = 1.0
+    """Subtractive penalty for person-isolation: when query names a person,
+    memories with a DIFFERENT person entity get this subtracted.
+    Memories with NO person entity at all get a milder penalty since they
+    may be coreference (pronoun-only: "他/她" linked to a prior sentence)."""
+    person_isolation_noentity_weight: float = 0.5
+    """Multiplier for memories with NO person entity (likely coreference).
+    More generous than the 0.25 used for clear conflicts, to avoid penalizing
+    pronoun-only sentences that refer back to the query's target person."""
+    person_isolation_noentity_subtract: float = 0.2
+    """Subtractive penalty for no-person-entity memories (less aggressive
+    than the full person_isolation_subtract, since these are likely pronouns)."""
     person_match_boost: float = 2.0
     entity_tie_break_bonus: float = 0.01
 
