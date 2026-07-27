@@ -228,8 +228,290 @@ def judge_correctness(
 
 
 # ─────────────────────────────────────────────────────────────────────────
-# Internals
+# Faithfulness judge (L0.2 LLM-as-judge upgrade)
 # ─────────────────────────────────────────────────────────────────────────
+
+_FAITHFULNESS_SYSTEM = """\
+You are a fact-checking judge for a personal memory retrieval system.
+Your job is to determine whether a generated answer is faithful to the
+retrieved memory snippets.
+
+Rules:
+1. Output ONLY a JSON object with fields: {"faithful": true or false,
+   "hallucinated": true or false, "hallucination_rate": <float 0-1>,
+   "unsupported_claims": [<string, ...>], "reason": "<one short sentence>"}.
+   No prose outside the JSON.
+2. For each factual claim in the answer, check if it can be confirmed by
+   at least one of the provided memory snippets.
+3. faithful=true means EVERY factual claim in the answer is supported by
+   the memory snippets. faithful=false means at least one claim is unsupported.
+4. hallucinated=true means the answer contains claims that directly contradict
+   the memory snippets or invent facts not present anywhere.
+5. hallucination_rate should be the fraction of total claims that are
+   unsupported (0.0 = perfect, 1.0 = entirely fabricated).
+6. For "I don't know" or refusal answers, treat them as faithful=true if
+   indeed the memories lack the answer, and faithful=false if the memories
+   DO contain the answer.
+7. Be precise: paraphrase is okay, but changing numbers, dates, names,
+   or adding new entities is not.
+"""
+
+_FAITHFULNESS_USER_TEMPLATE = """\
+Question: {question}
+
+Retrieved memory snippets:
+{memories}
+
+Generated answer: {answer}
+
+Respond with JSON only."""
+
+
+def faithfulness_judge(
+    answer: str,
+    memories: list[str],
+    query: str,
+    client: Any = None,
+) -> dict:
+    """Judge whether the answer is faithful to the retrieved memories.
+
+    Detects:
+    - Hallucination: answer contains facts not in memories
+    - Faithful: all claims are supported by at least one memory
+    - Partial: some claims supported, some not
+
+    Args:
+        answer: The generated answer text.
+        memories: List of retrieved memory snippet texts.
+        query: The original question.
+        client: An LLMClient instance. If None, tries to build one from env.
+
+    Returns:
+        {
+            "faithful": bool,
+            "hallucinated": bool,
+            "hallucination_rate": float,  # 0.0 = fully faithful
+            "unsupported_claims": list[str],
+            "reason": str,
+        }
+    """
+    if client is None:
+        try:
+            client = _make_client()
+        except RuntimeError:
+            # Fallback: deterministic heuristic without LLM.
+            return _heuristic_faithfulness(answer, memories, query)
+
+    memories_block = "\n".join(
+        f"[{i + 1}] {m}" for i, m in enumerate(memories)
+    ) if memories else "(no memories retrieved)"
+
+    messages = [
+        {"role": "system", "content": _FAITHFULNESS_SYSTEM},
+        {"role": "user", "content": _FAITHFULNESS_USER_TEMPLATE.format(
+            question=query, memories=memories_block, answer=answer)},
+    ]
+    raw = client.chat(messages, temperature=0.0, max_tokens=2000)
+    raw_str = (raw or "").strip()
+    parsed = _parse_faithfulness_json(raw_str)
+
+    if parsed is None:
+        return {
+            "faithful": False,
+            "hallucinated": True,
+            "hallucination_rate": 1.0,
+            "unsupported_claims": ["[unparseable judge output]"],
+            "reason": f"unparseable: {raw_str[:100]}",
+        }
+
+    return {
+        "faithful": bool(parsed.get("faithful", False)),
+        "hallucinated": bool(parsed.get("hallucinated", False)),
+        "hallucination_rate": float(parsed.get("hallucination_rate", 0.0)),
+        "unsupported_claims": list(parsed.get("unsupported_claims", [])),
+        "reason": str(parsed.get("reason", ""))[:200],
+    }
+
+
+def _heuristic_faithfulness(
+    answer: str,
+    memories: list[str],
+    query: str,
+) -> dict:
+    """Simple string-overlap heuristic when no LLM client is available.
+
+    Checks whether at least some key content from the answer appears verbatim
+    or near-verbatim in the memory snippets.  This is intentionally lenient
+    — it errs toward faithful=true — to avoid false-positive hallucination
+    flags when running offline.
+    """
+    combined = " ".join(memories).lower()
+    answer_lower = answer.lower()
+
+    # "I don't know" is always faithful.
+    if "i don't know" in answer_lower or "don't know based" in answer_lower:
+        return {
+            "faithful": True,
+            "hallucinated": False,
+            "hallucination_rate": 0.0,
+            "unsupported_claims": [],
+            "reason": "Answer is a refusal / I-don't-know.",
+        }
+
+    # Split answer into short segments (rough claims).
+    import re
+    segments = re.split(r"[,.!?;:，。！？；：\n]", answer)
+    segments = [s.strip() for s in segments if len(s.strip()) > 10]
+    if not segments:
+        return {
+            "faithful": True,
+            "hallucinated": False,
+            "hallucination_rate": 0.0,
+            "unsupported_claims": [],
+            "reason": "Answer too short to evaluate heuristically.",
+        }
+
+    unsupported: list[str] = []
+    for seg in segments:
+        seg_lower = seg.lower()
+        # Check if any keyword from the segment appears in memories.
+        words = re.findall(r'\b\w{4,}\b', seg_lower)
+        if not words:
+            continue
+        supported = any(w in combined for w in words)
+        if not supported:
+            unsupported.append(seg)
+
+    rate = len(unsupported) / len(segments) if segments else 0.0
+    fully_faithful = len(unsupported) == 0
+
+    return {
+        "faithful": fully_faithful,
+        "hallucinated": not fully_faithful and rate >= 0.5,
+        "hallucination_rate": round(rate, 4),
+        "unsupported_claims": unsupported[:5],
+        "reason": (
+            f"Heuristic: {len(unsupported)}/{len(segments)} segments unsupported "
+            f"(no LLM available)"
+        ),
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Cross-encoder ground-truth (L0.2 automated relevance labeling)
+# ─────────────────────────────────────────────────────────────────────────
+
+def cross_encoder_ground_truth(
+    question: str,
+    memories: list[str],
+    model_name: str = "BAAI/bge-reranker-v2-m3",
+) -> list[float]:
+    """Score each memory's relevance to the question using a cross-encoder.
+
+    This is an automated relevance labeler — faster than human annotation
+    and more objective than LLM-as-judge. Each memory gets a score in [0, 1].
+
+    The cross-encoder evaluates each (query, memory) pair independently,
+    producing a relevance score. Results are returned in the same order as
+    the input ``memories`` list.
+
+    Graceful degradation: if ``sentence-transformers`` is not installed,
+    falls back to a simple word-overlap heuristic and logs a warning.
+
+    Args:
+        question: The query/question text.
+        memories: List of memory texts to score.
+        model_name: HuggingFace cross-encoder model name.
+
+    Returns:
+        List of float scores, one per memory, in the same order as input.
+    """
+    if not memories:
+        return []
+
+    # Try to use sentence-transformers CrossEncoder.
+    try:
+        from sentence_transformers import CrossEncoder
+    except ImportError:
+        logging.warning(
+            "sentence-transformers not installed; "
+            "cross_encoder_ground_truth falling back to word-overlap heuristic."
+        )
+        return _fallback_relevance(question, memories)
+
+    try:
+        model = CrossEncoder(model_name)
+        pairs = [(question, mem) for mem in memories]
+        scores = model.predict(pairs)
+        # Convert to float list; normalize if model returns logits.
+        if hasattr(scores, "tolist"):
+            scores = scores.tolist()
+        return [float(s) for s in scores]
+    except Exception as exc:
+        logging.warning(
+            "Cross-encoder failed (%s); falling back to word-overlap.", exc
+        )
+        return _fallback_relevance(question, memories)
+
+
+def _fallback_relevance(question: str, memories: list[str]) -> list[float]:
+    """Word-overlap relevance heuristic (no external deps)."""
+    import re
+
+    q_words = set(re.findall(r'\b\w{3,}\b', question.lower()))
+    if not q_words:
+        return [0.0] * len(memories)
+
+    scores: list[float] = []
+    for mem in memories:
+        m_words = set(re.findall(r'\b\w{3,}\b', mem.lower()))
+        if not m_words:
+            scores.append(0.0)
+            continue
+        overlap = len(q_words & m_words)
+        # Jaccard-like but scaled by question coverage.
+        score = overlap / len(q_words)
+        scores.append(round(score, 4))
+    return scores
+
+def _parse_faithfulness_json(raw: str) -> dict[str, Any] | None:
+    """Parse the faithfulness judge's JSON verdict.
+
+    Like _parse_judge_json but looks for ``faithful`` key instead of ``correct``.
+    """
+    if not raw:
+        return None
+    cleaned = re.sub(r"```(?:json)?\s*", "", raw)
+    cleaned = re.sub(r"\s*```", "", cleaned).strip()
+
+    # Direct parse first.
+    try:
+        obj = json.loads(cleaned)
+        if isinstance(obj, dict) and "faithful" in obj:
+            return obj
+    except json.JSONDecodeError:
+        pass
+
+    # Balanced-brace scan.
+    depth = 0
+    start = -1
+    for i, ch in enumerate(cleaned):
+        if ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0 and start >= 0:
+                try:
+                    obj = json.loads(cleaned[start:i + 1])
+                    if isinstance(obj, dict) and "faithful" in obj:
+                        return obj
+                except json.JSONDecodeError:
+                    pass
+                start = -1
+    return None
+
 
 def _parse_judge_json(raw: str) -> dict[str, Any] | None:
     """Parse the judge's JSON verdict.
