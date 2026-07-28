@@ -23,6 +23,7 @@ from ..cross_encoder import CrossEncoderReranker
 from ..colbert_reranker import ColBERTReranker
 from ..coref import CorefTracker
 from ..embedding import EmbeddingEngine
+from ..entity_canon import canonicalize_entity_name, _migrate_alias_table
 from ..entities import classify_salience, extract_entities
 from ..fusion import reciprocal_rank_fusion
 from ..hyde import HyDEExpander
@@ -562,19 +563,19 @@ class MemoryStore:
 
 
     def _get_or_create_entity(self, name: str, kind: str, salience_class: str = "event") -> str:
-        # salience is per-memory (stored on memory_entities), NOT a global
-        # property of the entity -- the same 妈妈 is a base_attr in one memory
-        # and a sensory anchor in another. So entities.salience_class is only a
-        # coarse hint and we do not let later memories mutate it.
+        # Canonicalize: map aliases (老张 → 张伟) to the canonical entity.
+        # Conservatively only does direct lookup; fuzzy suggestions are logged.
+        canonical = canonicalize_entity_name(self, name, kind)
+
         row = self.conn.execute(
-            "SELECT id FROM entities WHERE name = ? AND kind = ?", (name, kind)
+            "SELECT id FROM entities WHERE name = ? AND kind = ?", (canonical, kind)
         ).fetchone()
         if row is not None:
             return str(row["id"])
         entity_id = self._next_id("entities", "ent")
         self.conn.execute(
             "INSERT INTO entities (id, name, kind, salience_class) VALUES (?, ?, ?, ?)",
-            (entity_id, name, kind, salience_class),
+            (entity_id, canonical, kind, salience_class),
         )
         return entity_id
 
