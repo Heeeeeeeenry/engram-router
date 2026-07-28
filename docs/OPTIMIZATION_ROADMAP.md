@@ -177,9 +177,9 @@
 
 ### L1 召回架构其余
 - [x] bge-m3(1024d 多语言)替换 bge-small-zh — 默认模型已切换，bge-small 保留为 fallback，commit bbe6144
-- [ ] ColBERT / late-interaction 长 query 兜底
-- [ ] HNSW + PQ 量化 或 sqlite-vec
-- [ ] spaCy zh_core_web_trf / HanLP NER 替代规则
+- [x] ColBERT / late-interaction 长 query 兜底 — `colbert_reranker.py` Phase 2.45, Jina ColBERT v2 默认
+- [x] HNSW + PQ 量化 或 sqlite-vec — `vector_index.py` 升级为 IndexHNSWFlat(default) + IndexIVFPQ(opt-in)
+- [x] spaCy zh_core_web_trf / HanLP NER 替代规则 — `hanlp_ner.py` + entities.py 集成, MSRA_NER_ELECTRA_SMALL_ZH
 - [ ] Coreference resolution(fastcoref)代词消解
 - [ ] Entity canonicalization + alias 表
 - [ ] 关系类型扩展:IS_A / OWNS / LOCATED_IN / WORKS_FOR / TEMPORAL_BEFORE / CONTRADICTS
