@@ -176,7 +176,7 @@
 ## 中期方案
 
 ### L1 召回架构其余
-- [ ] bge-m3(1024d 多语言)替换 bge-small-zh
+- [x] bge-m3(1024d 多语言)替换 bge-small-zh — 默认模型已切换，bge-small 保留为 fallback，commit bbe6144
 - [ ] ColBERT / late-interaction 长 query 兜底
 - [ ] HNSW + PQ 量化 或 sqlite-vec
 - [ ] spaCy zh_core_web_trf / HanLP NER 替代规则
