@@ -271,6 +271,10 @@ class MemoryStore:
                 evidence_ref TEXT NOT NULL DEFAULT ''
             );
 
+            CREATE INDEX IF NOT EXISTS idx_edges_src ON edges(src_id);
+            CREATE INDEX IF NOT EXISTS idx_edges_dst ON edges(dst_id);
+            CREATE INDEX IF NOT EXISTS idx_edges_relation ON edges(relation);
+
             CREATE TABLE IF NOT EXISTS corrections (
                 id TEXT PRIMARY KEY,
                 target_id TEXT NOT NULL,

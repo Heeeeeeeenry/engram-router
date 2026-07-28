@@ -140,6 +140,37 @@ def index_edges(
                  f"{memory_id}:llm"),
             )
 
+    # ── Extended relationship types (L1) ──
+    # IS_A: person → topic (e.g., 张三 IS_A 架构师)
+    for ent in uniq:
+        if ent["kind"] == "person":
+            for other in uniq:
+                if other["kind"] == "topic" and other["name"] in config.recall.occupation_topics:
+                    _add_edge(ent["id"], other["id"], "IS_A", 0.9)
+
+    # OWNS: person → object (heuristic: person near object in same memory)
+    for ent in uniq:
+        if ent["kind"] == "person":
+            for other in uniq:
+                if other["kind"] == "object" and other.get("name") != ent.get("name"):
+                    _add_edge(ent["id"], other["id"], "OWNS", 0.7)
+
+    # LOCATED_IN: company/location → location/time
+    for ent in uniq:
+        if ent["kind"] in ("company", "location"):
+            for other in uniq:
+                if other["kind"] == "location" and other.get("name") != ent.get("name"):
+                    _add_edge(ent["id"], other["id"], "LOCATED_IN", 0.8)
+                if other["kind"] == "time" and other.get("name") != ent.get("name"):
+                    _add_edge(ent["id"], other["id"], "TEMPORAL_AT", 0.7)
+
+    # CONTRADICTS: attribute conflict in same memory
+    attrs = [e for e in uniq if e["kind"] == "attribute"]
+    if len(attrs) >= 2:
+        for i in range(len(attrs)):
+            for j in range(i + 1, len(attrs)):
+                _add_edge(attrs[i]["id"], attrs[j]["id"], "CONTRADICTS", 0.3)
+
 
 # ---------------------------------------------------------------------------
 # Query relevance scoring for entities reached during edge expansion

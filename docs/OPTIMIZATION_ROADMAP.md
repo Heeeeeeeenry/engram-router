@@ -182,7 +182,7 @@
 - [x] spaCy zh_core_web_trf / HanLP NER 替代规则 — `hanlp_ner.py` + entities.py 集成, MSRA_NER_ELECTRA_SMALL_ZH
 - [x] Coreference resolution(fastcoref)代词消解 — `coref.py` + MemoryStore._index_entities 集成, last-named-person tracking
 - [x] Entity canonicalization + alias 表 — `entity_canon.py` + alias 表 + bigram overlap 启发式
-- [~] 关系类型扩展:IS_A / OWNS / LOCATED_IN / WORKS_FOR / TEMPORAL_BEFORE / CONTRADICTS — 下一步
+- [x] 关系类型扩展:IS_A / OWNS / LOCATED_IN / WORKS_FOR / TEMPORAL_BEFORE / CONTRADICTS — `graph.py` index_edges() 新增 5 种关系 heuristic
 - [ ] Personalized PageRank 替代 BFS activation
 - [ ] edges 加 `valid_from / valid_to` 时间戳
 - [ ] 时间归一化(2024/去年/上周 → 绝对时间戳独立字段)
