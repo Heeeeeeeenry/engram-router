@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-07-27T18:22:15",
+  "timestamp": "2026-07-28T10:14:06",
   "rejection_threshold": 1.0,
   "aggregate": {
-    "positive_cases": 3,
+    "positive_cases": 10,
     "negative_cases": 0,
-    "p_at_1": 0.6667,
-    "p_at_3": 0.6667,
-    "p_at_5": 0.6667,
-    "mrr": 0.6667,
-    "ndcg_at_5": 0.6667,
-    "recall_at_5": 0.6667,
+    "p_at_1": 0.5,
+    "p_at_3": 0.6,
+    "p_at_5": 0.7,
+    "mrr": 0.5583,
+    "ndcg_at_5": 0.6001,
+    "recall_at_5": 0.7,
     "contamination_at_3": 0.0,
     "rejection_accuracy": 0.0
   },
@@ -38,31 +38,31 @@
         {
           "rank": 1,
           "id": "mem_264",
-          "score": 1.0,
+          "score": 27.02,
           "text": "I graduated with a degree in Business Administration, which has definitely helped me in my new role. Do you have any adv"
         },
         {
           "rank": 2,
           "id": "mem_89",
-          "score": 0.0549,
+          "score": 19.02,
           "text": "Hi Michael,\n\nHope you're well?\n\nRegarding my previous email to support HexaChem with good price offers,\n\nWhat are your c"
         },
         {
           "rank": 3,
           "id": "mem_72",
-          "score": 0.0526,
+          "score": 19.02,
           "text": "What are some unique flavor combinations with cacao in food products?"
         },
         {
           "rank": 4,
           "id": "mem_179",
-          "score": 0.0308,
+          "score": 18.52,
           "text": "What factors led to the formation of the ANZAC organization, and how did this contribute to shaping national identity?"
         },
         {
           "rank": 5,
           "id": "mem_260",
-          "score": 0.0,
+          "score": 17.81,
           "text": "It seems overwhelming to know where to start with so many problems causing species extinction. How do we know what actio"
         }
       ],
@@ -94,31 +94,31 @@
         {
           "rank": 1,
           "id": "mem_45",
-          "score": 1.0,
+          "score": 33.44,
           "text": "I've been listening to audiobooks during my daily commute, which takes 45 minutes each way."
         },
         {
           "rank": 2,
           "id": "mem_1",
-          "score": 0.3798,
+          "score": 32.94,
           "text": "I'm looking for some advice on how to take care of my leather boots. I've been wearing my new boots almost daily since J"
         },
         {
           "rank": 3,
           "id": "mem_177",
-          "score": 0.2621,
+          "score": 30.02,
           "text": "I'll definitely check out those resources. Speaking of comfort, I'm really happy with my office chair now that it's been"
         },
         {
           "rank": 4,
           "id": "mem_189",
-          "score": 0.069,
+          "score": 25.23,
           "text": "It's good to hear that the Maldives is taking action to address the issue. How effective do you think these initiatives "
         },
         {
           "rank": 5,
           "id": "mem_180",
-          "score": 0.069,
+          "score": 25.23,
           "text": "I'm looking for some advice on organic fertilizers. I've been using some packets I got from the local nursery, but I'm n"
         }
       ],
@@ -150,32 +150,424 @@
         {
           "rank": 1,
           "id": "mem_222",
-          "score": 1.0,
+          "score": 56.94,
           "text": "I actually redeemed a $5 coupon on coffee creamer last Sunday, which was a nice surprise since I didn't know I had it in"
         },
         {
           "rank": 2,
           "id": "mem_234",
-          "score": 0.0512,
+          "score": 26.31,
           "text": "I'd like to know more about the different ways to get involved with the ACS, such as volunteering opportunities and fund"
         },
         {
           "rank": 3,
           "id": "mem_232",
-          "score": 0.0512,
+          "score": 26.31,
           "text": "I'm looking for some information on local charities that focus on cancer research. I recently participated in a charity "
         },
         {
           "rank": 4,
           "id": "mem_99",
-          "score": 0.0195,
+          "score": 23.52,
           "text": "That's really helpful, thanks! I think I'll start with the coffee table and sort out all the remotes and random items th"
         },
         {
           "rank": 5,
           "id": "mem_220",
-          "score": 0.0057,
+          "score": 22.31,
           "text": "I'm trying to organize my coupons and receipts, do you have any tips on the best way to do that?"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "58bf7951",
+      "source": "longmemeval_s",
+      "case_id": "58bf7951",
+      "query": "What play did I attend at the local community theater?",
+      "description": "single-session-user | 57s | 616t | 305m",
+      "is_negative": false,
+      "expected": [
+        "The Glass Menagerie"
+      ],
+      "forbidden": [],
+      "rank_of_target": 4,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 0.25,
+      "ndcg_at_5": 0.4307,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_160",
+          "score": 47.65,
+          "text": "I'll definitely try those suggestions. By the way, I recently went to a play at the local community theater and was impr"
+        },
+        {
+          "rank": 2,
+          "id": "mem_16",
+          "score": 42.73,
+          "text": "Figure 4 provides an overview of our fndings on SAV deployment,\nfor packets both outbound from and inbound to the measur"
+        },
+        {
+          "rank": 3,
+          "id": "mem_108",
+          "score": 36.23,
+          "text": "What role did the relationship between the author's personal beliefs and values play in shaping the messages conveyed in"
+        },
+        {
+          "rank": 4,
+          "id": "mem_161",
+          "score": 29.31,
+          "text": "I was thinking of getting Emily to audition for a role, I'll definitely encourage her to give it a shot. The play I atte"
+        },
+        {
+          "rank": 5,
+          "id": "mem_302",
+          "score": 28.81,
+          "text": "I was thinking of trying out saggar firing in my next pottery class, but I'm not sure what kind of clay body to use. Can"
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "1e043500",
+      "source": "longmemeval_s",
+      "case_id": "1e043500",
+      "query": "What is the name of the playlist I created on Spotify?",
+      "description": "single-session-user | 50s | 510t | 253m",
+      "is_negative": false,
+      "expected": [
+        "Summer Vibes"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_65",
+          "score": 53.15,
+          "text": "What's a good music streaming service that can help me discover new music and artists, especially in the ambient and lo-"
+        },
+        {
+          "rank": 2,
+          "id": "mem_91",
+          "score": 34.73,
+          "text": "I think I'll also add a case study or a success story on my website, highlighting how I helped a client create a consist"
+        },
+        {
+          "rank": 3,
+          "id": "mem_45",
+          "score": 34.73,
+          "text": "I'm not sure about specific traditions, but I think the gender ratio might have influenced the way we interact with each"
+        },
+        {
+          "rank": 4,
+          "id": "mem_215",
+          "score": 33.52,
+          "text": "Can you expand on the key components of the strategy, explaining what needs to be done to successfully accomplish this"
+        },
+        {
+          "rank": 5,
+          "id": "mem_210",
+          "score": 33.52,
+          "text": "What measures are being taken by international organizations to address the issue of human trafficking?"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "c5e8278d",
+      "source": "longmemeval_s",
+      "case_id": "c5e8278d",
+      "query": "What was my last name before I changed it?",
+      "description": "single-session-user | 44s | 469t | 233m",
+      "is_negative": false,
+      "expected": [
+        "Johnson"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_190",
+          "score": 46.36,
+          "text": "I need to update my address with my health insurance provider. Can you walk me through the process or give me a phone nu"
+        },
+        {
+          "rank": 2,
+          "id": "mem_22",
+          "score": 36.73,
+          "text": "Here are the lyrics to the sea shanty song \"The Wellerman\"\n\n[Verse 1]\nThere once was a ship that put to sea\nThe name of "
+        },
+        {
+          "rank": 3,
+          "id": "mem_138",
+          "score": 30.94,
+          "text": "I'm in the city center, and I prefer outdoor courts with lighting since we usually play in the evening. I don't mind pla"
+        },
+        {
+          "rank": 4,
+          "id": "mem_35",
+          "score": 30.94,
+          "text": "I'm planning a picnic for this weekend and I need some help with a playlist. Can you suggest some relaxing music that's "
+        },
+        {
+          "rank": 5,
+          "id": "mem_208",
+          "score": 29.73,
+          "text": "I'm glad I was able to get rid of the whiteflies on my orchid. It's been a month now and it's recovering nicely. On a se"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "6ade9755",
+      "source": "longmemeval_s",
+      "case_id": "6ade9755",
+      "query": "Where do I take yoga classes?",
+      "description": "single-session-user | 51s | 513t | 252m",
+      "is_negative": false,
+      "expected": [
+        "Serenity Yoga"
+      ],
+      "forbidden": [],
+      "rank_of_target": 3,
+      "p_at_1": 0.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 0.3333,
+      "ndcg_at_5": 0.5706,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_192",
+          "score": 22.1,
+          "text": "Next week, after youth group, Damien is learning to share his actual feelings for other people, and not try to pretend h"
+        },
+        {
+          "rank": 2,
+          "id": "mem_248",
+          "score": 18.02,
+          "text": "I'll try searching online for healthy brunch spots near my place. By the way, do you know any good yoga apps that can he"
+        },
+        {
+          "rank": 3,
+          "id": "mem_247",
+          "score": 16.81,
+          "text": "I'm trying to plan a self-care day and was thinking of doing a morning yoga practice at home, then meeting a friend for "
+        },
+        {
+          "rank": 4,
+          "id": "mem_249",
+          "score": 15.6,
+          "text": "I've actually been using Down Dog for my home practice and I really like it. It's been super helpful for me, especially "
+        },
+        {
+          "rank": 5,
+          "id": "mem_54",
+          "score": 15.6,
+          "text": "I've heard that Facebook has faced criticism for not doing enough to protect user data. What steps have they taken to ad"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "6f9b354f",
+      "source": "longmemeval_s",
+      "case_id": "6f9b354f",
+      "query": "What color did I repaint my bedroom walls?",
+      "description": "single-session-user | 50s | 500t | 247m",
+      "is_negative": false,
+      "expected": [
+        "a lighter shade of gray"
+      ],
+      "forbidden": [],
+      "rank_of_target": 1,
+      "p_at_1": 1.0,
+      "p_at_3": 1.0,
+      "p_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_5": 1.0,
+      "recall_at_5": 1.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_201",
+          "score": 33.73,
+          "text": "I've heard great things about Snake Plants, but I'm also curious about the ZZ Plant. Can you tell me more about its wate"
+        },
+        {
+          "rank": 2,
+          "id": "mem_137",
+          "score": 18.52,
+          "text": "What is the length of the Great Wall of China, and how long did it take to build?"
+        },
+        {
+          "rank": 3,
+          "id": "mem_56",
+          "score": 18.52,
+          "text": "\"What did you learn in this course?\""
+        },
+        {
+          "rank": 4,
+          "id": "mem_210",
+          "score": 18.02,
+          "text": "I think varying the phrase is a great way to create a sense of progression and add depth to the lyrics. I was also think"
+        },
+        {
+          "rank": 5,
+          "id": "mem_193",
+          "score": 18.02,
+          "text": "What's the best way to update my voter registration with my new name?"
+        }
+      ],
+      "old_passed": true,
+      "legacy_pass_recomputed": true,
+      "new_passed": true
+    },
+    {
+      "scenario_id": "58ef2f1c",
+      "source": "longmemeval_s",
+      "case_id": "58ef2f1c",
+      "query": "When did I volunteer at the local animal shelter's fundraising dinner?",
+      "description": "single-session-user | 50s | 518t | 256m",
+      "is_negative": false,
+      "expected": [
+        "February 14th"
+      ],
+      "forbidden": [],
+      "rank_of_target": 0,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_252",
+          "score": 59.15,
+          "text": "I'm most passionate about animal welfare and children's health, so anything related to those causes would be great. I'm "
+        },
+        {
+          "rank": 2,
+          "id": "mem_255",
+          "score": 44.23,
+          "text": "I'm really looking forward to the silent auction and raffles at \"Strut Your Mutt\". I've had a great experience with simi"
+        },
+        {
+          "rank": 3,
+          "id": "mem_216",
+          "score": 35.52,
+          "text": "I'm interested in helping out at a local food bank. Can you tell me more about what kind of tasks I'd be doing if I volu"
+        },
+        {
+          "rank": 4,
+          "id": "mem_225",
+          "score": 33.31,
+          "text": "I didn't think to ask my relatives about my grandfather's life as a freedom fighter. I'll definitely reach out to my mot"
+        },
+        {
+          "rank": 5,
+          "id": "mem_232",
+          "score": 29.02,
+          "text": "I think those activity ideas are great! I'm especially interested in having a game night and watching a movie together. "
+        }
+      ],
+      "old_passed": false,
+      "legacy_pass_recomputed": false,
+      "new_passed": false
+    },
+    {
+      "scenario_id": "f8c5f88b",
+      "source": "longmemeval_s",
+      "case_id": "f8c5f88b",
+      "query": "Where did I buy my new tennis racket from?",
+      "description": "single-session-user | 46s | 487t | 241m",
+      "is_negative": false,
+      "expected": [
+        "the sports store downtown"
+      ],
+      "forbidden": [],
+      "rank_of_target": 0,
+      "p_at_1": 0.0,
+      "p_at_3": 0.0,
+      "p_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_5": 0.0,
+      "recall_at_5": 0.0,
+      "contamination_at_3": 0.0,
+      "rejection_correct": null,
+      "top_5": [
+        {
+          "rank": 1,
+          "id": "mem_134",
+          "score": 41.15,
+          "text": "I'll definitely do those exercises before playing tennis. By the way, I'm really happy with my new tennis racket, which "
+        },
+        {
+          "rank": 2,
+          "id": "mem_137",
+          "score": 33.94,
+          "text": "I'll consider getting a tennis ball machine, but for now, I think I'll focus on improving my game with my new racket and"
+        },
+        {
+          "rank": 3,
+          "id": "mem_135",
+          "score": 26.23,
+          "text": "I'm planning to buy new tennis balls this weekend. Do you know any good brands or types of tennis balls that are suitabl"
+        },
+        {
+          "rank": 4,
+          "id": "mem_4",
+          "score": 24.73,
+          "text": "Can you recommend some good graphic tees to pair with my new high-waisted jeans from Old Navy? I've been loving their tr"
+        },
+        {
+          "rank": 5,
+          "id": "mem_2",
+          "score": 24.73,
+          "text": "I'm looking for some fashion advice. I need a new outfit for a night out with friends this weekend. Can you suggest some"
         }
       ],
       "old_passed": false,
@@ -183,5 +575,7 @@
       "new_passed": false
     }
   ],
-  "regressions_vs_old_report": []
+  "regressions_vs_old_report": [
+    "6ade9755 was reported passed but P@1=0 (target at rank 3)"
+  ]
 }

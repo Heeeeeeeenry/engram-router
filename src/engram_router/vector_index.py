@@ -42,7 +42,7 @@ class VectorIndex:
 
     def __init__(
         self,
-        dim: int = 512,
+        dim: int = 1024,
         path: str | Path | None = None,
         nlist: int | None = None,
     ):

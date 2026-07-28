@@ -34,11 +34,17 @@ class EmbeddingEngine:
 
     # Well-known lightweight Chinese-English models
     _MODELS = {
+        "bge-m3": {
+            "name": "BAAI/bge-m3",
+            "dim": 1024,
+            "size_mb": 2200,
+            "desc": "多语言旗舰 (2.2GB, 1024d), 替换 bge-small-zh 为默认",
+        },
         "bge-small": {
             "name": "BAAI/bge-small-zh-v1.5",
             "dim": 512,
             "size_mb": 24,
-            "desc": "最佳中文轻量 (24MB, 512d)",
+            "desc": "中文轻量兼容替代 (24MB, 512d)",
         },
         "text2vec": {
             "name": "shibing624/text2vec-base-chinese",
@@ -56,7 +62,7 @@ class EmbeddingEngine:
 
     def __init__(
         self,
-        model: str = "bge-small",
+        model: str = "bge-m3",
         backend: str = "auto",           # "auto" | "local" | "remote"
         api_base: str | None = None,
         api_key: str | None = None,
