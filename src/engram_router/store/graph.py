@@ -92,9 +92,20 @@ def index_edges(
 
     # CO_OCCURS_WITH: every unordered pair, written once as a directed edge
     # from the earlier-indexed entity to the later one (low confidence).
+    # Include valid_from timestamp so BFS can filter aged-out edges.
+    _now = None  # lazy-import datetime only if needed
     for i in range(len(uniq)):
         for j in range(i + 1, len(uniq)):
             _add_edge(uniq[i]["id"], uniq[j]["id"], "CO_OCCURS_WITH", 0.4)
+    # Set valid_from on all edges created in this batch
+    try:
+        from datetime import datetime, timezone
+        _now = datetime.now(timezone.utc).isoformat()
+    except Exception:
+        pass  # non-critical
+    if _now:
+        conn.execute("UPDATE edges SET valid_from = ? WHERE evidence_ref = ? AND valid_from IS NULL",
+                     (_now, memory_id))
 
     # CAUSED_BY: user-stated causation (effect -> cause). The reason entity
     # is the cause; connect it only to the nearest non-reason entities

@@ -184,8 +184,8 @@
 - [x] Entity canonicalization + alias 表 — `entity_canon.py` + alias 表 + bigram overlap 启发式
 - [x] 关系类型扩展:IS_A / OWNS / LOCATED_IN / WORKS_FOR / TEMPORAL_BEFORE / CONTRADICTS — `graph.py` index_edges() 新增 5 种关系 heuristic
 - [ ] Personalized PageRank 替代 BFS activation — 暂缓，当前 BFS + multi-hop relevance-gating 已满足召回精度
-- [ ] edges 加 `valid_from / valid_to` 时间戳
-- [ ] 时间归一化(2024/去年/上周 → 绝对时间戳独立字段)
+- [x] edges 加 `valid_from / valid_to` 时间戳 — schema migration 已加列 + BFS 过滤已集成
+- [x] 时间归一化(2024/去年/上周 → 绝对时间戳独立字段) — `config.py` time_patterns 扩展 10+ 词 + `causal.py` _TIME_SORT_ORDER 已补全
 
 ### L2 数据/存储
 - [ ] L1 event 表(主语 + 动词 + 宾语 + 时间 + confidence)

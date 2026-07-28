@@ -380,6 +380,13 @@ class MemoryStore:
             )"""
         )
 
+        # Phase 5: edges time range columns (valid_from / valid_to).
+        edge_cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(edges)").fetchall()}
+        if "valid_from" not in edge_cols:
+            self.conn.execute("ALTER TABLE edges ADD COLUMN valid_from TEXT")
+        if "valid_to" not in edge_cols:
+            self.conn.execute("ALTER TABLE edges ADD COLUMN valid_to TEXT")
+
     def _init_indices(self) -> None:
         """Delegates to candidates.init_indices."""
         candidates.init_indices(self.conn)
