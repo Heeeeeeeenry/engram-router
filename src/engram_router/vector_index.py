@@ -4,11 +4,17 @@ Provides ANN (Approximate Nearest Neighbor) search over memory embeddings.
 Stored alongside the SQLite database as <db_path>.faiss and <db_path>.idmap.
 
 Architecture:
-  - FAISS IndexIVFFlat for sub-linear search (clusters → local search)
+  - FAISS IndexHNSWFlat as default (graph-based, no training needed, fast)
+  - FAISS IndexIVFPQ as optional quantized mode (compact, training required)
   - Cosine similarity via inner product on L2-normalized vectors
   - ID mapping between FAISS internal IDs and memory_ids
   - Incremental updates (add new memories without rebuild)
   - Persistent serialization (save/load on close/open)
+
+Upgrade (2026-07-28): IndexIVFFlat → IndexHNSWFlat default.
+  - HNSW eliminates the "not enough vectors to train" OOM for long-tail scenarios
+  - No training phase required — add vectors immediately
+  - PQ quantization available as opt-in via ``use_pq=True`` for >100K vectors
 
 Dependencies:
   - faiss-cpu (via pip install engram-router[llm])
@@ -45,6 +51,10 @@ class VectorIndex:
         dim: int = 1024,
         path: str | Path | None = None,
         nlist: int | None = None,
+        hnsw_m: int = 32,
+        use_pq: bool = False,
+        pq_m: int = 64,
+        pq_nbits: int = 8,
     ):
         self._dim = dim
         self._path = Path(path) if path else None
@@ -63,7 +73,11 @@ class VectorIndex:
             logger.debug("VectorIndex load skipped: %s", exc)
 
         if not loaded:
-            self._nlist = nlist or 8
+            self._hnsw_m = hnsw_m
+            self._use_pq = use_pq
+            self._pq_m = pq_m
+            self._pq_nbits = pq_nbits
+            self._nlist = nlist or 8  # retained for IVFPQ compatibility
             self._index = None
             try:
                 self._init_index()
@@ -91,8 +105,8 @@ class VectorIndex:
     ) -> None:
         """Add a single embedding to the index.
 
-        If the index is new (< nlist*40 vectors), vectors are buffered.
-        Training happens automatically when enough data is accumulated.
+        HNSW adds vectors immediately (no training buffer needed).
+        For IVFPQ mode, vectors are buffered until enough for training.
         """
         with self._lock:
             vec = np.asarray(embedding, dtype=np.float32).reshape(1, -1)
@@ -104,10 +118,14 @@ class VectorIndex:
             faiss_id = self._next_id
             self._next_id += 1
 
+            # HNSW: add immediately, always "trained"
             if self._trained:
                 self._index.add(vec)
+                # HNSW benefits from rebuilding periodically for optimal graph
+                if self._hnsw_mode and self._next_id % 500 == 0:
+                    pass  # FAISS HNSW supports incremental adds natively
             else:
-                # Buffer for later training
+                # Buffer for IVFPQ training only; HNSW never falls through here
                 if not hasattr(self, "_buffer_embs") or self._buffer_embs is None:
                     self._buffer_embs: list["np.ndarray"] = []  # type: ignore[type-arg]
                     self._buffer_ids: list[int] = []
@@ -261,10 +279,21 @@ class VectorIndex:
     def _init_index(self) -> None:
         if faiss is None:
             raise ImportError("faiss-cpu is required for VectorIndex. Install with: pip install engram-router[llm]")
-        quantizer = faiss.IndexFlatIP(self._dim)
-        self._index = faiss.IndexIVFFlat(
-            quantizer, self._dim, self._nlist, faiss.METRIC_INNER_PRODUCT
-        )
+        if self._use_pq:
+            # IVFPQ: compact, quantized, training required
+            quantizer = faiss.IndexFlatIP(self._dim)
+            self._index = faiss.IndexIVFPQ(
+                quantizer, self._dim, self._nlist,
+                self._pq_m, self._pq_nbits, faiss.METRIC_INNER_PRODUCT,
+            )
+            self._hnsw_mode = False
+        else:
+            # HNSW: graph-based, no training, add vectors immediately
+            self._index = faiss.IndexHNSWFlat(self._dim, self._hnsw_m, faiss.METRIC_INNER_PRODUCT)
+            self._index.hnsw.efConstruction = 200
+            self._index.hnsw.efSearch = 64
+            self._trained = True  # HNSW doesn't need a training phase
+            self._hnsw_mode = True
 
     def _train_from_buffer(self) -> None:
         all_vecs = np.concatenate(self._buffer_embs, axis=0)
