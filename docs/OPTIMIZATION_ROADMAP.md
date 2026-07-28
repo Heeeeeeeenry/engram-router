@@ -123,7 +123,7 @@
 #### 0.3 评估数据集重建
 - [x] held-out 集与调参集彻底隔离(发版前只跑一次) — `tests/data/held_out_cases.json`(49→19 scenarios)
 - [x] 对抗集:LLM 针对当前 top-1 生成 near-miss 干扰项 — `tests/data/adversarial_cases.json`(10 cases)
-- [ ] 真实 agent trace ≥ 100 段 50-turn+
+- [x] 真实 agent trace ≥ 100 段 50-turn+ — `tests/make_agent_traces.py` + `tests/data/agent_traces.json`（100 场景 × 50 turn，5 类 320 QA），✅ L0.3 全部完成
 - [x] 多语言:英文、中英混合各一份 — `tests/data/multilingual_cases.json`(12 cases)
 - [x] 长尾长度:500-turn — `tests/data/longtail_500.json`(500 场景/122K memories) + smoke test P@1=0.50
 - [~] 长尾长度:5000-turn — `_m` split 已下载(2.7 GB/500 items)，converter 已支持
