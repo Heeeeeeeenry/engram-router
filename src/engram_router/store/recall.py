@@ -779,6 +779,36 @@ def build_recall_response(
         except Exception as exc:
             logger.debug("Cross-encoder skipped: %s", exc)
 
+    # ── Phase 2.45: ColBERT late-interaction rerank ──
+    colbert = getattr(store, 'colbert_reranker', None)
+    if colbert and getattr(colbert, "available", False) and records and len(records) > 1:
+        try:
+            cands = [{"text": r.raw_text, "score": r.score, "id": r.id} for r in records]
+            reranked = colbert.rerank(query, cands)
+            new_order: list[MemoryRecord] = []
+            for c in reranked:
+                src = next((r for r in records if r.id == c["id"]), None)
+                if src is None:
+                    continue
+                reason = src.match_reason
+                if "colbert_score" in c and "colbert" not in reason:
+                    reason = (reason + " · colbert" if reason else "colbert").strip(" ·")
+                new_order.append(MemoryRecord(
+                    id=src.id, raw_text=src.raw_text, summary=src.summary,
+                    confidence=src.confidence, metadata=src.metadata,
+                    evidence_refs=src.evidence_refs,
+                    score=float(c.get("score", src.score)),
+                    match_reason=reason,
+                ))
+            seen_colbert = {r.id for r in new_order}
+            for r in records:
+                if r.id not in seen_colbert:
+                    new_order.append(r)
+            records = new_order
+            logger.debug("ColBERT reranked %d records", len(cands))
+        except Exception as exc:
+            logger.debug("ColBERT skipped: %s", exc)
+
     # ── Phase 2.5: LLM reranker (semantic re-rank, optional) ──
     reranker = getattr(store, 'reranker', None)
     if reranker and reranker.available and records and len(records) > 1:

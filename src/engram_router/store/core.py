@@ -20,6 +20,7 @@ from . import graph
 from . import records
 from . import scoring
 from ..cross_encoder import CrossEncoderReranker
+from ..colbert_reranker import ColBERTReranker
 from ..embedding import EmbeddingEngine
 from ..entities import classify_salience, extract_entities
 from ..fusion import reciprocal_rank_fusion
@@ -53,6 +54,7 @@ class MemoryStore:
         llm_query_extract: bool = False,
         reranker: Any | None = None,
         cross_encoder: Any | None = None,
+        colbert_reranker: Any | None = None,
         hyde: Any | None = None,
         embedding_engine: Any | None = None,
         vector_index: Any | None = None,
@@ -113,6 +115,21 @@ class MemoryStore:
                 self.cross_encoder = None
         else:
             self.cross_encoder = None
+
+        # ── ColBERT late-interaction reranker ──
+        _skip_colbert = os.environ.get("ENGRAM_SKIP_COLBERT") == "1"
+        if colbert_reranker is not None:
+            self.colbert_reranker = colbert_reranker
+        elif not _skip_colbert and self.weights.ce_enabled:
+            try:
+                self.colbert_reranker = ColBERTReranker(
+                    max_candidates=self.weights.ce_max_candidates,
+                )
+            except Exception as exc:
+                logger.debug("ColBERTReranker init failed: %s", exc)
+                self.colbert_reranker = None
+        else:
+            self.colbert_reranker = None
 
         # ── HyDE (Phase 2 rerank_and_hyde.md) ──
         if hyde is not None:
