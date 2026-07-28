@@ -183,7 +183,7 @@
 - [x] Coreference resolution(fastcoref)代词消解 — `coref.py` + MemoryStore._index_entities 集成, last-named-person tracking
 - [x] Entity canonicalization + alias 表 — `entity_canon.py` + alias 表 + bigram overlap 启发式
 - [x] 关系类型扩展:IS_A / OWNS / LOCATED_IN / WORKS_FOR / TEMPORAL_BEFORE / CONTRADICTS — `graph.py` index_edges() 新增 5 种关系 heuristic
-- [ ] Personalized PageRank 替代 BFS activation
+- [ ] Personalized PageRank 替代 BFS activation — 暂缓，当前 BFS + multi-hop relevance-gating 已满足召回精度
 - [ ] edges 加 `valid_from / valid_to` 时间戳
 - [ ] 时间归一化(2024/去年/上周 → 绝对时间戳独立字段)
 
