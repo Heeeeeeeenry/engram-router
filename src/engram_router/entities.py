@@ -225,4 +225,8 @@ def extract_entities(text: str) -> list[dict[str, Any]]:
     entities.extend(_extract_topics(text))
     # 兜底：CJK n-gram 实体提取，覆盖不在 known_objects 中的未知词
     entities.extend(_extract_cjk_bigrams(text))
+    # HanLP NER augmentation: fill gaps rule-based extraction misses
+    # (person names, locations, organisations, etc.)
+    from .hanlp_ner import enrich_entities as _enrich
+    entities = _enrich(text, entities)
     return _dedup(entities)
