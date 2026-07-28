@@ -887,3 +887,27 @@
   - **A. 继续修 isolation → 85%**：剩余 2 例("谁"/"他送我的东西")需 LLM judge 分析语义排他性
   - **B. L0.3 long-tail 数据集**(500/5000-turn)：脱离玩具语料，是证明检索价值的核心前提
   - **C. L0.2 judge 模型解耦**：DeepSeek vs GPT 已验证 95% 一致，可打勾收尾
+
+### 2026-07-27 · L0.3 long-tail 500-turn converter + 快速基线
+
+- **本次改动**:
+  - `tests/longtail_converter.py`(93 行)：LongMemEval LMECase → eval_v2 EvalScenario JSON
+  - `tests/data/longtail_500.json`：500 场景 / 122K memories（基于 `_s` split，~40-55 session/case）
+  - `eval_v2.py`：新增 `--scenarios` / `--limit` / `--judge` flags + `_load_scenario_json()`
+  - `Makefile`：`longtail-500` / `longtail-5000` targets
+
+- **500-turn 快速基线**(10 题，ENGRAM_SKIP_VECTOR + SKIP_CE，纯 FTS):
+
+  | 指标 | 值 |
+  |---|---|
+  | P@1 | 0.50 |
+  | P@5 | 0.70 |
+  | MRR | 0.56 |
+  | nDCG@5 | 0.60 |
+  | Recall@5 | 0.70 |
+
+  与之前 `_s` split 30 题的 substring 基线 (P@1=0.53) 一致。CE + vector 后再跑完整 judge 版预计 P@1 会有显著提升。
+
+- **L0 评估体系除 agent traces 外全部闭环**，Roadmap 状态更新完毕
+
+- **下一步建议**: agent traces（100 段 50-turn+）是 L0 最后缺口。或者转向 L1 中期（bge-m3 / ColBERT / NER），从"评审"阶段进入"实际召回能力提升"阶段。
