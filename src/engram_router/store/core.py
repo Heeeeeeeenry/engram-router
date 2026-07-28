@@ -21,6 +21,7 @@ from . import records
 from . import scoring
 from ..cross_encoder import CrossEncoderReranker
 from ..colbert_reranker import ColBERTReranker
+from ..coref import CorefTracker
 from ..embedding import EmbeddingEngine
 from ..entities import classify_salience, extract_entities
 from ..fusion import reciprocal_rank_fusion
@@ -196,6 +197,7 @@ class MemoryStore:
         # ── Phase 3: Persona / Causal / Forgetting (lazy-init) ──
         self._persona: Any = None
         self._causal: Any = None
+        self._coref = CorefTracker()
         self._timeline: Any = None
         self._forgetting: Any = None
 
@@ -458,11 +460,16 @@ class MemoryStore:
     # --- entity indexing -----------------------------------------------------
 
     def _index_entities(self, memory_id: str, text: str) -> None:
+        # 0. Pronoun coreference: backfill person entities for pronoun-starting
+        #    texts ("她特别喜欢猫" → inject 小李 as person entity).
+        raw_entities = extract_entities(text)
+        raw_entities = self._coref.resolve(text, raw_entities)
+
         # 1. Rule-based entities (always runs — the safety net).
         indexed: list[dict[str, Any]] = []
         seen_names: set[tuple[str, str]] = set()
 
-        for ent in extract_entities(text):
+        for ent in raw_entities:
             salience = classify_salience(ent, text)
             entity_id = self._get_or_create_entity(ent["name"], ent["kind"], salience)
             link_id = self._next_id("memory_entities", "me")
