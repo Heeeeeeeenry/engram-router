@@ -834,10 +834,34 @@ def build_recall_response(
     # When query names a specific person, heavily penalize memories about
     # other people. Uses DB entity_map (covers pronoun-only memories like
     # "她特别喜欢猫" that have no text-level person entity).
+    #
+    # Query-side person augmentation: when the query has NO explicit person
+    # entity ("谁在华为做过"/"他送我的东西"), scan the top-ranked memory's
+    # DB entity_map to find candidate persons referenced by the query context.
     from ..config import config as _cfg
     _ROLE_WORDS_POST = set(_cfg.entities.role_words)
     from ..entities import extract_entities as _extract_entities
     _q_persons_post = {e["name"] for e in _extract_entities(query) if e.get("kind") == "person" and e.get("kind") != "cjk_ngram"}
+
+    # Augment: when query lacks a person entity but the query is asking about
+    # a person ("谁"/"他"/"她" questions), look at top-ranked memories' DB
+    # entity_map to find candidate persons that might be the query's target.
+    # This closes the gap for pronoun-only or "谁"-type isolation failures.
+    if records and not _q_persons_post:
+        _query_has_person_pronoun = any(
+            w in query for w in ("谁", "他", "她", "哪位", "哪个人")
+        )
+        if _query_has_person_pronoun:
+            _top_ids = [r.id for r in records[:3]]
+            _top_entity_map = candidates.entities_for_memories(store.conn, _top_ids)
+            for _mid in _top_ids:
+                _top_ents = _top_entity_map.get(_mid, [])
+                for e in _top_ents:
+                    if e.get("kind") == "person" and e.get("name") not in _ROLE_WORDS_POST:
+                        _q_persons_post.add(e["name"])
+            # Deduplicate and limit to 3 persons max
+            _q_persons_post = set(list(_q_persons_post)[:3])
+
     if records and _q_persons_post and not _q_persons_post.issubset(_ROLE_WORDS_POST):
         _all_post_ids = [r.id for r in records]
         _post_entity_map = candidates.entities_for_memories(store.conn, _all_post_ids)
