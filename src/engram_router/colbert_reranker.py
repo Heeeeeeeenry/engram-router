@@ -90,6 +90,11 @@ class ColBERTReranker:
         return self._enabled and self._model is not None
 
     @property
+    def available_hint(self) -> bool:
+        """True before lazy-load so outer guards can trigger _ensure_loaded()."""
+        return self._enabled
+
+    @property
     def dim(self) -> int:
         return int(self._model_info.get("dim", 1024)) if self._model_info else 1024
 

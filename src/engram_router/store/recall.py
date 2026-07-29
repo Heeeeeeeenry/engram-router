@@ -613,11 +613,17 @@ def build_recall_response(
     # keyword+vector+hyde RRF path.
     if _three_channel_records is not None:
         records = _three_channel_records
-        _query_vec = None  # skip standard vector fusion below
+        _skip_rrf = True
+    else:
+        _skip_rrf = False
 
     # Pre-compute the query vector once — used by RRF fusion (Phase 2)
-    # and post-CE fallback (Phase 3.5) below.
-    _query_vec: Any = None
+    # and post-CE fallback (Phase 3.5) below.  Skipped when three-channel
+    # fusion already produced results (avoids double HyDE/vector re-run).
+    if _skip_rrf:
+        _query_vec: Any = None
+    else:
+        _query_vec: Any = None
     _vector_enabled = getattr(store, '_vector_enabled', True)
     embedding_engine = getattr(store, 'embedding_engine', None)
     vector_index = getattr(store, 'vector_index', None)

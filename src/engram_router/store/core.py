@@ -383,9 +383,33 @@ class MemoryStore:
         # Phase 5: edges time range columns (valid_from / valid_to).
         edge_cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(edges)").fetchall()}
         if "valid_from" not in edge_cols:
-            self.conn.execute("ALTER TABLE edges ADD COLUMN valid_from TEXT")
+            try:
+                self.conn.execute("ALTER TABLE edges ADD COLUMN valid_from TEXT")
+            except sqlite3.OperationalError:
+                pass
         if "valid_to" not in edge_cols:
-            self.conn.execute("ALTER TABLE edges ADD COLUMN valid_to TEXT")
+            try:
+                self.conn.execute("ALTER TABLE edges ADD COLUMN valid_to TEXT")
+            except sqlite3.OperationalError:
+                pass
+
+        # Phase 6: recall_snapshots table (L4.3).
+        # Defined in _init_schema() for new DBs; migration path added here
+        # so existing DBs don't crash on first snapshot INSERT.
+        snap_cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(recall_snapshots)").fetchall()}
+        if not snap_cols:
+            self.conn.execute(
+                """CREATE TABLE recall_snapshots (
+                    id TEXT PRIMARY KEY,
+                    query TEXT NOT NULL,
+                    result_ids TEXT NOT NULL DEFAULT '[]',
+                    trace_json TEXT NOT NULL DEFAULT '{}',
+                    latency_ms REAL NOT NULL DEFAULT 0,
+                    memory_count INTEGER NOT NULL DEFAULT 0,
+                    namespace TEXT NOT NULL DEFAULT 'default',
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )"""
+            )
 
     def _init_indices(self) -> None:
         """Delegates to candidates.init_indices."""

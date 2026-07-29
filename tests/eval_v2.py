@@ -182,11 +182,13 @@ def ndcg_at_k(records: list[MemoryRecord], case: EvalCase, k: int = 5) -> float:
 
     dcg = _dcg(gains)
     # Ideal ordering: all grade-2 memories first, then grade-1, up to k slots.
-    n_grade2 = len(case.expected_ids_or_texts)
+    # n_grade2 = max count of grade-2 results actually attainable in this
+    # result set, not the count of expected substrings (which can be >1 for
+    # multi-hop queries where 清华+计算机 must appear in the SAME memory).
+    actual_grade2 = gains.count(2)
     ideal = sorted(gains, reverse=True)
-    # Ensure the ideal has at least the expected count of grade-2 targets.
-    if ideal.count(2) < n_grade2:
-        ideal = [2] * n_grade2 + [g for g in ideal if g < 2]
+    if actual_grade2 > 0:
+        ideal = [2] * actual_grade2 + [g for g in ideal if g < 2]
         ideal = ideal[:k]
     idcg = _dcg(ideal)
     if idcg == 0.0:
