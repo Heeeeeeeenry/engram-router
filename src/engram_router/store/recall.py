@@ -328,15 +328,13 @@ def build_scored_candidates(
         # "她特别喜欢猫" escaped person checks entirely.
         person_scoped = bool(query_persons and not query_persons.issubset(_ROLE_WORDS))
         if person_scoped and not matching_person:
-            score *= store.weights.person_isolation_scope_weight
-            score -= store.weights.person_isolation_subtract
-            reason = (reason + "; person-isolation scope").lstrip("; ")
-            # Strip ALL entity-based shared bonuses (not just topic).
-            # When the query is about 老张, shared entities like "猫"
-            # or "爱好" should not reward 小李's memories.
+            # Isolation penalty is applied ONCE in Phase 2.6 post-filter
+            # (after CE/ColBERT).  The scoring loop only strips entity
+            # bonuses for wrong-person memories to avoid double-penalty.
             if shared:
                 score -= store.weights.shared_entity_multiplier * len(shared)
                 shared.clear()
+            reason = (reason + "; person-scoped (deferred to Phase 2.6)").lstrip("; ")
 
         if matching_person:
             # Query specifically names this person — significant boost

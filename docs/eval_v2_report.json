@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-28T18:40:30",
+  "timestamp": "2026-07-29T13:33:52",
   "rejection_threshold": 1.0,
   "aggregate": {
     "positive_cases": 46,
@@ -8,7 +8,7 @@
     "p_at_3": 0.9348,
     "p_at_5": 0.9348,
     "mrr": 0.8795,
-    "ndcg_at_5": 0.7935,
+    "ndcg_at_5": 0.8783,
     "recall_at_5": 0.9348,
     "contamination_at_3": 0.0136,
     "rejection_accuracy": 1.0
@@ -271,7 +271,7 @@
         {
           "rank": 3,
           "id": "mem_3",
-          "score": 0.0,
+          "score": -0.2,
           "text": "我每年生日都会给自己买个礼物。"
         }
       ],
@@ -447,7 +447,7 @@
         {
           "rank": 3,
           "id": "mem_3",
-          "score": 0.0,
+          "score": -0.2,
           "text": "我自己买了一个鼠标。"
         }
       ],
@@ -553,13 +553,13 @@
         {
           "rank": 4,
           "id": "mem_3",
-          "score": 0.0251,
+          "score": -0.9937,
           "text": "我上周末去她家，她做了糖醋排骨。"
         },
         {
           "rank": 5,
           "id": "mem_4",
-          "score": 0.025,
+          "score": -0.9938,
           "text": "她家养了一只金毛，叫豆豆。"
         }
       ],
@@ -609,13 +609,13 @@
         {
           "rank": 4,
           "id": "mem_6",
-          "score": 0.0146,
+          "score": -0.9963,
           "text": "她女儿今年上小学三年级。"
         },
         {
           "rank": 5,
           "id": "mem_3",
-          "score": 0.0001,
+          "score": -1.0,
           "text": "我上周末去她家，她做了糖醋排骨。"
         }
       ],
@@ -864,7 +864,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.6131,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -878,25 +878,25 @@
         {
           "rank": 2,
           "id": "mem_2",
-          "score": 0.5708,
+          "score": 0.5849,
           "text": "陈总投过一家做自动驾驶的公司，叫途灵科技。"
         },
         {
           "rank": 3,
           "id": "mem_1",
-          "score": 0.017,
+          "score": 0.0382,
           "text": "我认识一个投资人叫陈总，他在红杉资本。"
         },
         {
           "rank": 4,
           "id": "mem_5",
-          "score": 0.0,
+          "score": 0.022,
           "text": "陈总说他最看好 L4 级别的自动驾驶方案。"
         },
         {
           "rank": 5,
           "id": "mem_4",
-          "score": 0.5,
+          "score": 0.0003,
           "text": "他们去年拿了 B 轮，估值 20 亿。"
         }
       ],
@@ -921,7 +921,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 0.5,
-      "ndcg_at_5": 0.3869,
+      "ndcg_at_5": 0.6309,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -1037,7 +1037,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.6131,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -1097,7 +1097,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.6131,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -1216,7 +1216,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.6131,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -1387,7 +1387,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 0.5,
-      "ndcg_at_5": 0.1823,
+      "ndcg_at_5": 0.6509,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -1444,7 +1444,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.6131,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -1783,7 +1783,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.6131,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -2008,7 +2008,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.3431,
+      "ndcg_at_5": 1.0,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.0,
       "rejection_correct": null,
@@ -2505,7 +2505,7 @@
       "p_at_3": 1.0,
       "p_at_5": 1.0,
       "reciprocal_rank": 1.0,
-      "ndcg_at_5": 0.4308,
+      "ndcg_at_5": 0.6399,
       "recall_at_5": 1.0,
       "contamination_at_3": 0.3333,
       "rejection_correct": null,
@@ -2531,13 +2531,13 @@
         {
           "rank": 4,
           "id": "mem_2",
-          "score": 0.0584,
+          "score": -0.1708,
           "text": "我最喜欢机械键盘。"
         },
         {
           "rank": 5,
           "id": "mem_8",
-          "score": 0.0001,
+          "score": -0.2,
           "text": "我最近开始跑步健身。"
         }
       ],
