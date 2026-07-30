@@ -288,16 +288,21 @@ def build_scored_candidates(
             reason = (reason + "; fts trigram candidate").lstrip("; ")
 
         # Entity/topic hop: reward memories sharing extracted entities.
-        # cjk_ngram entities are excluded — they're for FTS5 LIKE fallback only.
+        # Prefer the pre-computed ``query_entities`` set when the caller
+        # supplied it (avoids O(n) re-filtering per row). Falls back to
+        # deriving from query_entity_objs for callers that didn't pass it.
         mem_entity_objs = entity_map.get(row["id"], [])
         mem_entities = {
             e["name"] for e in mem_entity_objs
             if e.get("kind") != "cjk_ngram"
         }
-        query_ents_filtered = {
-            e["name"] for e in query_entity_objs
-            if e.get("kind") != "cjk_ngram"
-        }
+        if query_entities:
+            query_ents_filtered = query_entities
+        else:
+            query_ents_filtered = {
+                e["name"] for e in query_entity_objs
+                if e.get("kind") != "cjk_ngram"
+            }
         shared = query_ents_filtered & mem_entities
         if shared:
             score += store.weights.shared_entity_multiplier * len(shared)
@@ -730,11 +735,15 @@ def build_recall_response(
     # Candidates found ONLY by HyDE (not in keyword or vector) are lower
     # confidence.  De-weight so CE doesn't accidentally promote a
     # hyde-only match into top-1 and poison rejection accuracy.
-    if _hyde_ids and _vector_ids and records:
-        keyword_ids_before = {r.id for r in records
-                              if "HyDE" in (r.match_reason or "")
-                              and "vector" not in (r.match_reason or "").lower()}
-        hyde_only = _hyde_ids - _vector_ids - keyword_ids_before
+    #
+    # Prefer id-set arithmetic over match_reason string matching: keyword
+    # sources (base scoring pass) are the records with positive fusion
+    # score BEFORE HyDE-only insertion; those we subtract from _hyde_ids.
+    if _hyde_ids and records:
+        _keyword_scored_ids = {r.id for r in records
+                               if r.id not in _hyde_ids
+                               and r.id not in _vector_ids}
+        hyde_only = _hyde_ids - _vector_ids - _keyword_scored_ids
         if hyde_only:
             records = [
                 MemoryRecord(

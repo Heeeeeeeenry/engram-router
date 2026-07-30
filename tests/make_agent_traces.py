@@ -36,23 +36,49 @@ OUTPUT = HERE / "data" / "agent_traces.json"
 
 
 def _make_multi_person(i: int) -> dict[str, Any]:
-    """Two characters with distinct cars, pets, jobs."""
+    """Two characters with distinct cars, pets, jobs.
+
+    Fields per character: (name, gender, car, pet, occupation)
+    gender ∈ {"男", "女"} governs pronoun choice (他/她) to avoid contamination.
+    """
     seed = i * 7 + 3
     random.seed(seed)
-    names = [("张伟", "宝马", "金毛", "架构师"), ("李娜", "比亚迪", "英短", "设计师"),
-             ("王磊", "特斯拉", "柯基", "产品经理"), ("陈静", "蔚来", "布偶", "数据科学家")]
+    # 20 unique names covering diverse surnames (H12 fix: prev only 4 names)
+    names = [
+        ("张伟", "男", "宝马", "金毛", "架构师"),
+        ("李娜", "女", "比亚迪", "英短", "设计师"),
+        ("王磊", "男", "特斯拉", "柯基", "产品经理"),
+        ("陈静", "女", "蔚来", "布偶", "数据科学家"),
+        ("刘洋", "男", "奥迪", "拉布拉多", "算法工程师"),
+        ("周敏", "女", "小鹏", "泰迪", "运营总监"),
+        ("赵磊", "男", "吉利", "边牧", "前端负责人"),
+        ("孙丽", "女", "理想", "美短", "客户成功"),
+        ("吴强", "男", "凯迪拉克", "哈士奇", "DBA"),
+        ("郑雪", "女", "沃尔沃", "银渐层", "产品设计师"),
+        ("钱峰", "男", "奔驰", "德牧", "架构评审"),
+        ("徐婷", "女", "本田", "萨摩耶", "QA 组长"),
+        ("何军", "男", "丰田", "比熊", "SRE"),
+        ("罗颖", "女", "MG", "蓝猫", "数据分析师"),
+        ("胡涛", "男", "领克", "金毛巡回", "网络工程师"),
+        ("彭珊", "女", "极氪", "缅因猫", "视觉设计师"),
+        ("邓凯", "男", "长安", "松狮", "内核研发"),
+        ("袁玥", "女", "红旗", "折耳猫", "服务端 leader"),
+        ("方博", "男", "捷豹", "阿拉斯加", "机器学习平台"),
+        ("范丽", "女", "路虎", "英短蓝白", "前端架构"),
+    ]
     a, b = random.sample(names, 2)
-    pet_a = a[2]
-    pet_b = b[2] if b[2] != a[2] else a[2]
+    # H13 fix: pronoun follows gender to avoid data contamination
+    pron_a = "他" if a[1] == "男" else "她"
+    pron_b = "他" if b[1] == "男" else "她"
     turns = [
-        f"Week 1: {a[0]}是我们部门新来的{a[3]}。",
-        f"Week 1: {a[0]}开一辆{a[1]}，养了一只{a[2]}。",
-        f"Week 1: {b[0]}是我们隔壁团队的{b[3]}。",
-        f"Week 1: {b[0]}开一辆{b[1]}，养了两只猫。",
-        f"Week 2: 今天和{a[0]}开会讨论项目方案，他思路很清晰。",
-        f"Week 2: {b[0]}请假了，说是家里的{a[2]}生病了要带去看兽医。",
-        f"Week 3: {a[0]}说他家的{a[2]}最近很活跃，每天要遛两次。",
-        f"Week 3: 中午和{b[0]}一起吃饭，她推荐了公司附近一家川菜馆。",
+        f"Week 1: {a[0]}是我们部门新来的{a[4]}。",
+        f"Week 1: {a[0]}开一辆{a[2]}，养了一只{a[3]}。",
+        f"Week 1: {b[0]}是我们隔壁团队的{b[4]}。",
+        f"Week 1: {b[0]}开一辆{b[2]}，养了一只{b[3]}。",
+        f"Week 2: 今天和{a[0]}开会讨论项目方案，{pron_a}思路很清晰。",
+        f"Week 2: {b[0]}请假了，说是家里的{b[3]}生病了要带去看兽医。",
+        f"Week 3: {a[0]}说{pron_a}家的{a[3]}最近很活跃，每天要遛两次。",
+        f"Week 3: 中午和{b[0]}一起吃饭，{pron_b}推荐了公司附近一家川菜馆。",
         f"Week 4: 项目deadline要到了，{a[0]}加班到很晚。",
         f"Week 4: {b[0]}分享了一个设计工具，说是能让效率翻倍。",
     ]
@@ -60,26 +86,23 @@ def _make_multi_person(i: int) -> dict[str, Any]:
         turns.append(f"Week {len(turns)//5 + 1}: 日常对话记录 #{len(turns)}。")
     turns = turns[:50]
 
-    # Determine the "other" pet type for isolation checks
-    other_pet = "猫" if pet_a != "猫" else "狗"
-
     return {
         "id": f"agent-multi-person-{i:03d}",
         "source": "agent_traces_multi_person",
         "memories": turns,
         "cases": [
             {"id": f"{i:03d}-a-car", "query": f"{a[0]}开什么车？",
-             "expected_ids_or_texts": [a[1]], "forbidden_ids_or_texts": [b[1]],
+             "expected_ids_or_texts": [a[2]], "forbidden_ids_or_texts": [b[2]],
              "description": f"{a[0]}的车 vs {b[0]}的车"},
             {"id": f"{i:03d}-a-pet", "query": f"{a[0]}养了什么宠物？",
-             "expected_ids_or_texts": [a[2]], "forbidden_ids_or_texts": [],
+             "expected_ids_or_texts": [a[3]], "forbidden_ids_or_texts": [],
              "description": f"{a[0]}的宠物"},
             {"id": f"{i:03d}-b-car", "query": f"{b[0]}开什么车？",
-             "expected_ids_or_texts": [b[1]], "forbidden_ids_or_texts": [a[1]],
+             "expected_ids_or_texts": [b[2]], "forbidden_ids_or_texts": [a[2]],
              "description": f"{b[0]}的车 vs {a[0]}的车"},
-            {"id": f"{i:03d}-isolation", "query": f"{a[0]}养{a[2]}吗？",
-             "expected_ids_or_texts": [a[2]], "forbidden_ids_or_texts": [],
-             "description": f"{a[0]}的{a[2]}"},
+            {"id": f"{i:03d}-isolation", "query": f"{a[0]}养{a[3]}吗？",
+             "expected_ids_or_texts": [a[3]], "forbidden_ids_or_texts": [],
+             "description": f"{a[0]}的{a[3]}"},
         ],
     }
 

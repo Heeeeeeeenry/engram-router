@@ -982,7 +982,17 @@ class MemoryStore:
         return subjects
 
     _asks_brand = staticmethod(query_intent.asks_brand)
-    _asks_identity = staticmethod(query_intent.asks_identity)
+
+    def _asks_identity(self, query: str) -> bool:
+        """Identity check that uses the LLM classifier when available.
+
+        Delegates to recall._asks_identity(self, query) which honours
+        intent_classifier + regex fallback. Fixes M4 shadow bug: the
+        original staticmethod pointer to query_intent.asks_identity
+        silently bypassed the classifier.
+        """
+        return _recall._asks_identity(self, query)
+
     _asks_eval = staticmethod(query_intent.asks_eval)
     _asks_reason = staticmethod(query_intent.asks_reason)
     _asks_person = staticmethod(query_intent.asks_person)
