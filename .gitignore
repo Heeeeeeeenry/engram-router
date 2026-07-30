@@ -50,3 +50,8 @@ uv.lock
 .codesee/
 .agents/
 AGENTS.md
+
+# Live CI eval outputs — regenerated per run, not source of truth
+docs/eval_v2_report.json
+docs/multi_angle_eval_report.json
+docs/archive/eval-runs/

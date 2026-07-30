@@ -953,3 +953,54 @@
 - **L0 评估体系除 agent traces 外全部闭环**，Roadmap 状态更新完毕
 
 - **下一步建议**: agent traces（100 段 50-turn+）是 L0 最后缺口。或者转向 L1 中期（bge-m3 / ColBERT / NER），从"评审"阶段进入"实际召回能力提升"阶段。
+
+---
+
+## 2026-07-30 · Multi-role audit v2 · Near-term fix plan
+
+**Method**: 5 role-based auditors (SRE / Security / ML-IR / API-Design / Product-Docs), each applying its own standards framework (Google SRE SLO, OWASP+STRIDE, TREC/BEIR, SemVer/PEP 484, Diátaxis).
+
+**Findings**: SRE 17 · Security 16 · ML 10 · API 12 · Product 12 = **67 items**.
+
+### Top 8 items to fix next (impact/effort ratio)
+
+| # | Item | Role | Severity | Effort |
+|---|---|---|---|---|
+| N1 | Wire Prometheus metrics + `/metrics` HTTP exposition | sre | blocker | ~40 LOC |
+| N2 | Fail-loud dim compatibility gate on model swap | sre | blocker | ~25 LOC |
+| N3 | Namespace-scope all cross-tenant paths (delete/persona/timeline/consolidate/aliases) | security | high | ~250 LOC + migration |
+| N4 | Clamp/validate MCP inputs (`top_k`, sizes, LIKE wildcards) | security | medium | ~30 LOC |
+| N5 | Prompt-injection defence in LLM extractor and HyDE | security | high | ~60 LOC |
+| N6 | Atomic FAISS+idmap writes and defer `_save()` to batch commit | sre | high | ~80 LOC |
+| N7 | End-to-end query deadline in `recall()` | sre | high | ~70 LOC |
+| N8 | Rewrite README + CHANGELOG + `docs/MCP.md` + `examples/quickstart.py` | product | critical | ~600 lines docs |
+
+### Three highest-risk gaps (real cost of NOT fixing)
+
+1. **Cross-tenant isolation is broken across 5 paths.** `memory.delete` accepts a monotonic id with no namespace check; `PersonaStore.aggregate`, `Timeline`, `CausalChain`, `consolidate`, and `entity_aliases` all read or mutate across namespaces. A single authenticated caller can delete another tenant's memory, read another tenant's persona, or poison another tenant's entity graph via a global alias.
+2. **Silent data loss on model swap and mid-batch failure.** `embedding_engine.dim` vs `vector_index.dim` mismatch is caught by a broad `except ValueError` at `store/core.py:472` — every new memory's vector is dropped with no operator signal, and the metrics module is a stub so no alert is possible.
+3. **Retrieval has no wall-clock budget and no observability.** `recall()` can stack HyDE + CE + ColBERT + LLM-rerank tails to minutes worst-case; `recall_latency_ms` is defined but never observed; `_write_snapshot` commits inside the read path so a full disk breaks reads not just writes.
+
+### Findings by theme (summary)
+
+- **SRE (17)**: metrics stub / silent dim mismatch / non-atomic FAISS writes / SQLite concurrency ceiling / unbounded latency / snapshot-in-read-path / no backup / cold-start no retry
+- **Security (16)**: cross-tenant isolation × 5 / prompt injection in HyDE+extractor / MCP unclamped inputs / cloud LLM exfiltration / cache not namespace-scoped / `_seed_sequence` assert-only SQL guard
+- **ML (10)**: isolation weights untuned / CE norm scale discontinuity / HyDE no faithfulness audit / surname regex bias / coref never evaluated / bge-m3 swap no A/B / held-out is training set
+- **API (12)**: `RecallWeights` 65 fields SemVer 1.0.0 no schema_version / `MemoryStore.__init__` 14 kwargs / save vs save_batch shape divergence / no custom exceptions / 16 env vars 7 documented
+- **Product (12)**: README lies about default model + stack / no CHANGELOG / roadmap 955 lines mixes public+diary / no `docs/MCP.md` / `examples/` empty / RecallWeights 66 knobs undocumented
+
+### Docs cleanup (this commit)
+
+- Archived to `docs/archive/2026-07/`: `store_refactor.md`, `rerank_and_hyde.md`, `competitor_benchmark.md`, `L_fix_plan.md`, `optimization_round1_plan.md`, `phase2_reassessment.md`, `phase3_target.md`, `longtail_dataset.md`
+- Archived to `docs/archive/eval-runs/`: 12 one-off eval report JSONs (~1 MB)
+- Promoted to `docs/reference/`: `capability_matrix.md`
+- Removed empty `docs/design/`
+- Added `.gitignore` entries for future `docs/eval_v2_report.json` + `docs/multi_angle_eval_report.json` (CI-regenerated, not source of truth)
+
+### Deferred (still valid but lower ROI)
+
+- ML rigor items require held-out re-splitting + A/B benchmark harness — separate multi-day project
+- API SemVer stabilization requires 1.0.0 → 2.0.0 planning
+- Full README/CHANGELOG rewrite is N8 in the plan
+
+**Next execution**: N1 → N2 → N4 (fast wins: metrics wiring, dim gate, MCP clamping). N3 requires schema migration and 3-4 days, plan separately. N8 is 1-2 days docs, best done after N1/N2/N4 land so README numbers are trustworthy.
