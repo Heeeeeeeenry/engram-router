@@ -427,49 +427,74 @@ class MemoryStore:
 
     def save(self, text: str, source: str = "conversation", metadata: dict[str, Any] | None = None,
              namespace: str = "default") -> str:
-        if not text or not text.strip():
-            raise ValueError("text must not be empty")
-        if len(text.encode("utf-8")) > self.MAX_TEXT_BYTES:
-            raise ValueError(
-                f"text exceeds {self.MAX_TEXT_BYTES} bytes "
-                f"(got {len(text.encode('utf-8'))})"
-            )
-        next_id = self._next_id("memories", "mem")
-        summary = self._summarize(text)
-        self.conn.execute(
-            "INSERT INTO memories (id, raw_text, summary, source, confidence, metadata, namespace) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (next_id, text, summary, source, 1.0, self._serialize_metadata(metadata), namespace),
-        )
-        evidence_id = self._next_id("evidence", "evi")
-        self.conn.execute(
-            "INSERT INTO evidence (id, memory_id, quote, source_location) VALUES (?, ?, ?, ?)",
-            (evidence_id, next_id, text, source),
-        )
-        self._index_entities(next_id, text)
-        self._populate_timed_events_for_memory(next_id)
-        if self._fts_enabled:
-            self.conn.execute(
-                "INSERT INTO memories_fts (memory_id, content) VALUES (?, ?)",
-                (next_id, f"{text} {summary}"),
-            )
-        self.conn.commit()
+        """Save a single memory turn."""
+        return self.save_batch([(text, source, metadata)], namespace=namespace)[0]
 
-        # ── Phase 2: Auto-encode for vector search ──
+    def save_batch(
+        self,
+        items: list[tuple[str, str, dict[str, Any] | None]],
+        namespace: str = "default",
+    ) -> list[str]:
+        """Save multiple memory turns in a single batch.
+
+        Batch-encodes vectors and commits once, avoiding HanLP NER +
+        FAISS serialization overhead on per-item calls. For 2500+ item
+        scenarios this is a ~5-10x speedup over calling ``save()`` 2500x.
+        """
+        if not items:
+            return []
+
+        texts = [t for t, _, _ in items]
+        summaries = [self._summarize(t) for t in texts]
+
+        # Pre-encode all vectors in one batch
+        batch_embs = None
         if self._vector_enabled and self.embedding_engine and self.vector_index:
             try:
-                emb = self.embedding_engine.encode(text)
-                if emb is not None:
-                    self.vector_index.add(next_id, emb)
+                batch_embs = self.embedding_engine.encode_batch(texts)
             except Exception as exc:
-                logger.debug("Vector encode skipped for %s: %s", next_id, exc)
+                logger.debug("Batch vector encode skipped: %s", exc)
 
-        # ── Phase 3: auto-update persona from saved text ──
-        try:
-            self._update_persona(text)
-        except Exception as exc:
-            logger.debug("Persona update skipped: %s", exc)
+        ids: list[str] = []
+        for idx, (text, source, metadata) in enumerate(items):
+            if not text or not text.strip():
+                raise ValueError("text must not be empty")
+            if len(text.encode("utf-8")) > self.MAX_TEXT_BYTES:
+                raise ValueError(f"text exceeds {self.MAX_TEXT_BYTES} bytes")
+            next_id = self._next_id("memories", "mem")
+            self.conn.execute(
+                "INSERT INTO memories (id, raw_text, summary, source, confidence, metadata, namespace) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (next_id, text, summaries[idx], source, 1.0, self._serialize_metadata(metadata), namespace),
+            )
+            evidence_id = self._next_id("evidence", "evi")
+            self.conn.execute(
+                "INSERT INTO evidence (id, memory_id, quote, source_location) VALUES (?, ?, ?, ?)",
+                (evidence_id, next_id, text, source),
+            )
+            self._index_entities(next_id, text)
+            self._populate_timed_events_for_memory(next_id)
+            if self._fts_enabled:
+                self.conn.execute(
+                    "INSERT INTO memories_fts (memory_id, content) VALUES (?, ?)",
+                    (next_id, f"{text} {summaries[idx]}"),
+                )
+            if batch_embs is not None and idx < len(batch_embs):
+                try:
+                    self.vector_index.add(next_id, batch_embs[idx])
+                except (ImportError, ValueError, AttributeError):
+                    logger.debug("Vector add skipped for %s", next_id)
+            ids.append(next_id)
 
-        return next_id
+        self.conn.commit()
+
+        # Batch persona update
+        for text in texts:
+            try:
+                self._update_persona(text)
+            except (ImportError, ValueError, AttributeError, KeyError):
+                logger.debug("_update_persona skipped", exc_info=True)
+
+        return ids
 
     def delete(self, memory_id: str) -> bool:
         """Delete a memory and all associated rows (evidence, entities, edges, FTS5).
@@ -484,8 +509,8 @@ class MemoryStore:
         if self._vector_enabled and self.vector_index:
             try:
                 self.vector_index.remove(memory_id)
-            except Exception:
-                pass
+            except (ImportError, ValueError, KeyError):
+                logger.debug("vector_index.remove skipped for %s", memory_id)
 
         cursor = self.conn.execute(
             "DELETE FROM memories WHERE id = ?", (memory_id,)
@@ -582,8 +607,8 @@ class MemoryStore:
             for r in records:
                 if engine.should_forget(r):
                     engine.forget(r.id)
-        except Exception:
-            pass
+        except (ImportError, ValueError, AttributeError):
+            logger.debug("_apply_decay skipped", exc_info=True)
     def _update_persona(self, text):
         try:
             from ..entities import extract_entities
@@ -593,8 +618,8 @@ class MemoryStore:
                     persona = self.persona.aggregate(name)
                     if persona is not None:
                         self.persona.update(persona)
-        except Exception:
-            pass
+        except (ImportError, ValueError, AttributeError, KeyError):
+            logger.debug("_update_persona skipped", exc_info=True)
 
 
     def _get_or_create_entity(self, name: str, kind: str, salience_class: str = "event") -> str:

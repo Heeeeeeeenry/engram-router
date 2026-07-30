@@ -178,6 +178,14 @@ class ColBERTReranker:
             return
 
         device = self._device_override or _auto_device()
+
+        # ColBERT token-level embeddings + MaxSim are expensive on CPU
+        # (200-500ms/rerank). Skip on CPU unless forced via ENGRAM_COLBERT_DEVICE=cpu.
+        if device == "cpu" and not os.environ.get("ENGRAM_COLBERT_DEVICE"):
+            self._init_error = "ColBERT skipped on CPU (use ENGRAM_COLBERT_DEVICE=cpu to force)"
+            logger.debug(self._init_error)
+            return
+
         try:
             model_name = self._model_info["name"]
             self._model = SentenceTransformer(
