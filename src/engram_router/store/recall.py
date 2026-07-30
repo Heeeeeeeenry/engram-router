@@ -459,6 +459,61 @@ def batch_raw_refs(conn: Any, memory_ids: list[str]) -> dict[str, list[str]]:
 # ---------------------------------------------------------------------------
 # _build_recall_response
 # ---------------------------------------------------------------------------
+# _apply_reranker — shared helper for CE + ColBERT rerank blocks (M5)
+# ---------------------------------------------------------------------------
+
+def _apply_reranker(
+    records: list[MemoryRecord],
+    query: str,
+    reranker: Any,
+    reason_label: str,
+    score_key: str,
+) -> list[MemoryRecord]:
+    """Apply a rerank pass and preserve records not in the reranked head.
+
+    Both ``CrossEncoderReranker`` and ``ColBERTReranker`` share this shape:
+      1. Build ``cands = [{text, score, id}, ...]``.
+      2. Call ``reranker.rerank(query, cands)`` — returns list of dicts
+         augmented with ``{score_key}: raw`` + ``score: blended``.
+      3. Rebuild ``MemoryRecord`` list with the new scores + label attached
+         to match_reason.
+      4. Append records that the reranker's head cutoff excluded.
+
+    Any exception silently falls back to the input ``records`` (graceful
+    degradation — pipeline never crashes on a reranker failure).
+    """
+    try:
+        cands = [{"text": r.raw_text, "score": r.score, "id": r.id} for r in records]
+        reranked = reranker.rerank(query, cands)
+        new_order: list[MemoryRecord] = []
+        for c in reranked:
+            src = next((r for r in records if r.id == c["id"]), None)
+            if src is None:
+                continue
+            reason = src.match_reason
+            if score_key in c and reason_label not in reason:
+                reason = (reason + " · " + reason_label if reason else reason_label).strip(" ·")
+            new_order.append(MemoryRecord(
+                id=src.id, raw_text=src.raw_text, summary=src.summary,
+                confidence=src.confidence, metadata=src.metadata,
+                evidence_refs=src.evidence_refs,
+                score=float(c.get("score", src.score)),
+                match_reason=reason,
+            ))
+        seen = {r.id for r in new_order}
+        for r in records:
+            if r.id not in seen:
+                new_order.append(r)
+        logger.debug("%s reranked %d records", reason_label, len(cands))
+        return new_order
+    except Exception as exc:
+        logger.debug("%s rerank skipped: %s", reason_label, exc)
+        return records
+
+
+# ---------------------------------------------------------------------------
+# _build_recall_response
+# ---------------------------------------------------------------------------
 
 def build_recall_response(
     store: Any,
@@ -804,62 +859,16 @@ def build_recall_response(
     cross_encoder = getattr(store, 'cross_encoder', None)
     if cross_encoder and getattr(cross_encoder, "available", False) \
             and query and len(records) > 1:
-        try:
-            cands = [{"text": r.raw_text, "score": r.score, "id": r.id} for r in records]
-            reranked = cross_encoder.rerank(query, cands)
-            new_order: list[MemoryRecord] = []
-            for c in reranked:
-                src = next((r for r in records if r.id == c["id"]), None)
-                if src is None:
-                    continue
-                reason = src.match_reason
-                if "ce_score" in c and "cross-encoder" not in reason:
-                    reason = (reason + " · cross-encoder" if reason else "cross-encoder").strip(" ·")
-                new_order.append(MemoryRecord(
-                    id=src.id, raw_text=src.raw_text, summary=src.summary,
-                    confidence=src.confidence, metadata=src.metadata,
-                    evidence_refs=src.evidence_refs,
-                    score=float(c.get("score", src.score)),
-                    match_reason=reason,
-                ))
-            seen = {r.id for r in new_order}
-            for r in records:
-                if r.id not in seen:
-                    new_order.append(r)
-            records = new_order
-            logger.debug("Cross-encoder reranked %d records", len(cands))
-        except Exception as exc:
-            logger.debug("Cross-encoder skipped: %s", exc)
+        records = _apply_reranker(
+            records, query, cross_encoder, "cross-encoder", "ce_score",
+        )
 
     # ── Phase 2.45: ColBERT late-interaction rerank ──
     colbert = getattr(store, 'colbert_reranker', None)
     if colbert and getattr(colbert, "available", False) and records and len(records) > 1:
-        try:
-            cands = [{"text": r.raw_text, "score": r.score, "id": r.id} for r in records]
-            reranked = colbert.rerank(query, cands)
-            new_order: list[MemoryRecord] = []
-            for c in reranked:
-                src = next((r for r in records if r.id == c["id"]), None)
-                if src is None:
-                    continue
-                reason = src.match_reason
-                if "colbert_score" in c and "colbert" not in reason:
-                    reason = (reason + " · colbert" if reason else "colbert").strip(" ·")
-                new_order.append(MemoryRecord(
-                    id=src.id, raw_text=src.raw_text, summary=src.summary,
-                    confidence=src.confidence, metadata=src.metadata,
-                    evidence_refs=src.evidence_refs,
-                    score=float(c.get("score", src.score)),
-                    match_reason=reason,
-                ))
-            seen_colbert = {r.id for r in new_order}
-            for r in records:
-                if r.id not in seen_colbert:
-                    new_order.append(r)
-            records = new_order
-            logger.debug("ColBERT reranked %d records", len(cands))
-        except Exception as exc:
-            logger.debug("ColBERT skipped: %s", exc)
+        records = _apply_reranker(
+            records, query, colbert, "colbert", "colbert_score",
+        )
 
     # ── Phase 2.5: LLM reranker (semantic re-rank, optional) ──
     reranker = getattr(store, 'reranker', None)

@@ -96,6 +96,7 @@ def load_longmemeval(
     split: str = "oracle",
     limit: int | None = None,
     question_types: set[str] | None = None,
+    include_assistant: bool = False,
 ) -> list[LMECase]:
     """Load and flatten a LongMemEval split into ``LMECase`` objects.
 
@@ -105,6 +106,11 @@ def load_longmemeval(
             sessions/item — very large, hours to ingest per system).
         limit: cap the number of items (dev speed-up).
         question_types: only keep these question_type values.
+        include_assistant: when True, include assistant turns as memories
+            in addition to user turns.  Necessary for ``single-session-
+            assistant`` question types where the target content only appears
+            in an assistant reply (previously never stored and thus
+            unrecallable — reported as M18 in the multi-agent audit).
     """
     path = _ensure_split_file(split)
     with path.open() as f:
@@ -116,11 +122,16 @@ def load_longmemeval(
         if question_types is not None and qt not in question_types:
             continue
 
+        # single-session-assistant test cases require assistant turns to
+        # be stored — auto-enable inclusion regardless of the caller's flag.
+        _include_assistant = include_assistant or (qt == "single-session-assistant")
+
         memories: list[str] = []
         sessions = item.get("haystack_sessions", [])
         for session in sessions:
             for turn in session:
-                if turn.get("role") == "user":
+                role = turn.get("role")
+                if role == "user" or (_include_assistant and role == "assistant"):
                     content = (turn.get("content") or "").strip()
                     if content:
                         memories.append(content)
