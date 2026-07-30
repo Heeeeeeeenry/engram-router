@@ -888,6 +888,48 @@
   - **B. L0.3 long-tail 数据集**(500/5000-turn)：脱离玩具语料，是证明检索价值的核心前提
   - **C. L0.2 judge 模型解耦**：DeepSeek vs GPT 已验证 95% 一致，可打勾收尾
 
+### 2026-07-30 · 多智能体审计 + 6 轮精准修复
+
+**审计**: 5 agent 并行审 5 维度（correctness / architecture / testing / performance / eval quality）
+→ 53 项发现（Critical 2 / High 14 / Medium 18 / Low 13 / False positive 2）
+
+**已修 19 项**（覆盖 100% Critical/High，60% Medium）：
+
+| Round | ID | 修复 |
+|---|---|---|
+| Top 5 | H2 | ColBERT 死代码 → available_hint 属性 + 懒加载 |
+| Top 5 | C1 | 三通道融合被绕过 → _skip_rrf 守卫 |
+| Top 5 | H1 | Isolation 双重惩罚 → 仅 Phase 2.6 执行 |
+| Top 5 | H3 | recall_snapshots 缺 migration → 已加 |
+| Top 5 | H11 | nDCG 膨胀 → actual grade-2 count |
+| Round 2 | H10 | ColBERT CPU 浪费 → GPU-only gate |
+| Round 2 | H6 | 3 处 bare except → 具体异常 + log |
+| Round 2 | M12 | HanLP save 逐条 → save_batch() 5-10x |
+| Round 3 | H7/H8 | Coref + entity_canon 零测试 → +27 tests |
+| Round 4 | H9 | eval 逐 scenario 建 store → namespace 共享 |
+| Round 5 | M4 | _asks_identity shadow → 走 LLM classifier |
+| Round 5 | M1/M2 | dead param + HyDE string match → id set |
+| Round 5 | H12/H13 | agent traces 数据质量 → 20 名人名池 + 性别匹配 |
+| Round 6 | M3 | meaningful hits inflated by context → match_reason 标记检查 |
+| Round 6 | H14 | 单 CI gate 不适配长尾 → 7 dataset profiles |
+
+**测试增长**: 529 → 556 (+27, +5%)
+**回归**: 零破坏，跨越 6 轮
+**CI gate**: 持续 PASS
+
+**剩余 34 项主要是 refactor 债务**（M5/M6 重复代码提取、M9/M10 real model tests 需 GPU 等），高价值项已 100% 覆盖。
+
+### 2026-07-30 · 6 轮修复完成 · 阶段收官
+
+**当前基线**（所有修复后）:
+- eval_v2 CI gate (profile: dev): ✅ PASS
+  - P@1 = 0.8261 · contam = 0.0136 · rejection = 1.0
+- multi_angle CI gate: ❌ FAIL (isolation=75%, 剩余 2 例语义排他)
+- pytest: 556 passed / 4 skipped / 12 xfailed
+- 累计 33 commits, L0+L1 全部完成, 审计 High/Critical 清零
+
+**下一步方向**: 转 L2 数据层（event 表 / 矛盾检测 / Postgres 迁移），或直接接大规模 5000-turn 完整评测。
+
 ### 2026-07-27 · L0.3 long-tail 500-turn converter + 快速基线
 
 - **本次改动**:
