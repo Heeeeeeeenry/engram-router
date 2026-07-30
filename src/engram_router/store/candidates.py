@@ -192,8 +192,17 @@ def fts_candidates(
             f"SELECT id FROM memories WHERE id IN ({placeholders}) AND namespace = ?",
             tuple(raw_ids) + (namespace,),
         ).fetchall()
-        return {r["id"] for r in ns_rows}
-    return raw_ids if raw_ids else None
+        result = {r["id"] for r in ns_rows}
+    else:
+        result = raw_ids
+    # N1: stage hit metric
+    try:
+        from . import metrics as _m
+        outcome = "hit" if result else "miss"
+        _m.stage_hit_ratio.labels(stage="fts_candidate", outcome=outcome).inc()
+    except Exception:
+        pass
+    return result if result else None
 
 
 # ── Row-level access ---------------------------------------------------------

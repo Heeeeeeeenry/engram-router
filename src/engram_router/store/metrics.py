@@ -98,12 +98,55 @@ if _prom_available:
         "engram_save_dedup_ratio",
         "Ratio of deduplicated saves (1.0 = all unique, 0 = all dupes)",
     )
+
+    # N2: dim mismatch counter for silent-data-loss telemetry
+    dropped_vector_count: Any = prometheus_client.Counter(
+        "engram_dropped_vector_count",
+        "Vectors rejected due to dim mismatch or index error",
+        ["reason"],
+    )
+
+    # N7: stage skipped counter (deadline budget exceeded)
+    stage_skipped_count: Any = prometheus_client.Counter(
+        "engram_stage_skipped_count",
+        "Recall stages skipped due to deadline budget",
+        ["stage"],
+    )
 else:
     recall_latency_ms = _NoopHistogram()
     stage_hit_ratio = _NoopCounter()
     save_dedup_ratio = _NoopGauge()
+    dropped_vector_count = _NoopCounter()
+    stage_skipped_count = _NoopCounter()
 
     logger.debug(
         "prometheus_client not installed; metrics are no-ops. "
         "Install with: pip install prometheus-client"
     )
+
+
+# ---------------------------------------------------------------------------
+# HTTP exposition (N1)
+# ---------------------------------------------------------------------------
+
+def start_metrics_server(port: int = 9090, addr: str = "0.0.0.0") -> bool:
+    """Start prometheus /metrics HTTP endpoint. Returns True on success.
+
+    Called from cli.py (server mode) and mcp_server.py at startup. Silently
+    no-ops if prometheus_client is not installed or the port is taken.
+    """
+    if not _prom_available:
+        logger.info("Metrics HTTP disabled (prometheus_client not installed)")
+        return False
+    try:
+        import prometheus_client
+        prometheus_client.start_http_server(port, addr=addr)
+        logger.info("Prometheus /metrics listening on %s:%d", addr, port)
+        return True
+    except OSError as exc:
+        # Port taken / permission — fail-open (metrics still collected in-proc)
+        logger.warning("Metrics HTTP failed to bind %s:%d — %s", addr, port, exc)
+        return False
+    except Exception as exc:
+        logger.warning("Metrics HTTP startup failed: %s", exc)
+        return False

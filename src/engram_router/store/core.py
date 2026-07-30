@@ -469,11 +469,40 @@ class MemoryStore:
             if batch_embs is not None and idx < len(batch_embs):
                 try:
                     self.vector_index.add(next_id, batch_embs[idx])
-                except (ImportError, ValueError, AttributeError):
+                except ValueError as _dim_err:
+                    # N2: fail-loud on dim mismatch — silent-data-loss was
+                    # audit finding SRE-blocker. Detect via error message
+                    # containing "dim" and increment counter instead of
+                    # swallowing silently.
+                    from . import metrics as _m
+                    _err_str = str(_dim_err).lower()
+                    if "dim" in _err_str:
+                        try:
+                            _m.dropped_vector_count.labels(reason="dim_mismatch").inc()
+                        except Exception:
+                            pass
+                        logger.warning(
+                            "Vector dim mismatch for %s (embedding vs index): %s. "
+                            "Consider rebuilding the FAISS index after a model swap.",
+                            next_id, _dim_err,
+                        )
+                    else:
+                        try:
+                            _m.dropped_vector_count.labels(reason="value_error").inc()
+                        except Exception:
+                            pass
+                        logger.debug("Vector add ValueError for %s: %s", next_id, _dim_err)
+                except (ImportError, AttributeError):
                     logger.debug("Vector add skipped for %s", next_id)
             ids.append(next_id)
 
         self.conn.commit()
+        # N1: save_dedup_ratio (dedup TBD — placeholder set to 1.0 = all unique)
+        try:
+            from . import metrics as _m
+            _m.save_dedup_ratio.set(1.0)
+        except Exception:
+            pass
 
         # Batch persona update
         for text in texts:

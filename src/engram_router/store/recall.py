@@ -505,6 +505,13 @@ def _apply_reranker(
             if r.id not in seen:
                 new_order.append(r)
         logger.debug("%s reranked %d records", reason_label, len(cands))
+        # N1: stage hit metric
+        try:
+            from . import metrics as _m
+            stage = "cross_encoder" if reason_label == "cross-encoder" else "colbert"
+            _m.stage_hit_ratio.labels(stage=stage, outcome="applied").inc()
+        except Exception:
+            pass
         return new_order
     except Exception as exc:
         logger.debug("%s rerank skipped: %s", reason_label, exc)
@@ -1097,6 +1104,27 @@ def recall(
     4. Score every candidate through the composable pipeline.
     5. Sort, truncate, and convert to MemoryRecord with batched refs.
     """
+    # N1: recall_latency_ms observation
+    import time as _time
+    from . import metrics as _metrics
+    _t0 = _time.perf_counter()
+    try:
+        return _recall_impl(store, query, top_k, namespace)
+    finally:
+        _elapsed_ms = (_time.perf_counter() - _t0) * 1000.0
+        try:
+            _metrics.recall_latency_ms.observe(_elapsed_ms)
+        except Exception:
+            pass
+
+
+def _recall_impl(
+    store: Any,
+    query: str,
+    top_k: int = 5,
+    namespace: str = "default",
+) -> list[MemoryRecord]:
+    """Actual recall implementation, wrapped by recall() for metrics."""
     # ── Phase 2: Query Expansion ───────────────────────────────────
     from ..query_expansion import QueryExpander
 
