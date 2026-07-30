@@ -758,10 +758,22 @@ def build_recall_response(
 
     # ── Phase 2.4: Cross-encoder rerank (Phase 1 rerank_and_hyde.md) ──
     # Save pre-CE signal so Phase 3.5 can decide whether to fall back to
-    # vector search.  After CE normalisation all scores fall into [0,1],
-    # making threshold-based checks (score <= 0.1) semantically broken.
-    _had_meaningful_hits = bool(records) and not all(
-        r.score <= 0 for r in records)
+    # vector search.  M3 fix: instead of ``r.score > 0`` (which context
+    # boosts inflate — a memory with 0 base but +2.0 brand boost would
+    # falsely register as "meaningful"), check for real hit markers in
+    # match_reason strings: base term matches, FTS hits, entity matches,
+    # channel/CE/ColBERT rerank contributions.
+    _MEANINGFUL_MARKERS = (
+        "matched terms:", "fts trigram candidate",
+        "shared entities:", "matching person:",
+        "channel-boost", "rrf-fused",
+        "vector search (semantic)",
+        "cross-encoder", "colbert",
+    )
+    _had_meaningful_hits = bool(records) and any(
+        any(m in (r.match_reason or "") for m in _MEANINGFUL_MARKERS)
+        for r in records
+    )
     cross_encoder = getattr(store, 'cross_encoder', None)
     if cross_encoder and getattr(cross_encoder, "available", False) \
             and query and len(records) > 1:

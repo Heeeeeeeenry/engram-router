@@ -452,6 +452,38 @@ DEFAULT_CI_GATE_P1 = 0.8
 DEFAULT_CI_GATE_CONTAMINATION = 0.05
 DEFAULT_CI_GATE_REJECTION = 0.9
 
+# H14 fix: per-dataset thresholds because a single P@1>=0.8 gate doesn't fit
+# LongMemEval-scale corpora (500+ session distractor sets).  Recall-quality
+# targets naturally track corpus difficulty — a 15-turn hand-written scenario
+# should hit 80%+, but a 5000-turn distractor scenario should not be held to
+# the same standard.  Callers can look up by dataset id via CI_GATE_PROFILES.
+CI_GATE_PROFILES: dict[str, dict[str, float]] = {
+    # Toy 15-turn Chinese scenarios (semantic_audit + multi_angle)
+    "dev": {"p1": 0.8, "contamination": 0.05, "rejection": 0.9},
+    # LongMemEval oracle (~15 memory/case)
+    "longmemeval_oracle": {"p1": 0.75, "contamination": 0.10, "rejection": 0.85},
+    # LongMemEval _s (~250 memory/case, distractors)
+    "longmemeval_s": {"p1": 0.40, "contamination": 0.10, "rejection": 0.75},
+    # LongMemEval _m (~2500 memory/case, heavy distractors)
+    "longmemeval_m": {"p1": 0.25, "contamination": 0.15, "rejection": 0.60},
+    # Adversarial near-miss (harder than dev)
+    "adversarial": {"p1": 0.60, "contamination": 0.10, "rejection": 0.80},
+    # Multilingual (中英混合, ~30% harder than pure zh)
+    "multilingual": {"p1": 0.65, "contamination": 0.10, "rejection": 0.85},
+    # Agent traces (50-turn multi-person; isolation-heavy)
+    "agent_traces": {"p1": 0.50, "contamination": 0.10, "rejection": 0.80},
+}
+
+
+def get_ci_thresholds(dataset_id: str = "dev") -> tuple[float, float, float]:
+    """Return (p1, contamination, rejection) for the named dataset profile.
+
+    Unknown datasets fall back to 'dev' defaults. Callers can pass the
+    profile name explicitly via ``--ci-profile PROFILE`` on the CLI.
+    """
+    profile = CI_GATE_PROFILES.get(dataset_id, CI_GATE_PROFILES["dev"])
+    return profile["p1"], profile["contamination"], profile["rejection"]
+
 
 def check_ci_gates(
     report: dict[str, Any],
@@ -1085,6 +1117,12 @@ def main() -> int:
         "--ci-rejection", type=float, default=DEFAULT_CI_GATE_REJECTION,
         help=f"CI gate rejection accuracy threshold (default: {DEFAULT_CI_GATE_REJECTION}).",
     )
+    parser.add_argument(
+        "--ci-profile", type=str, default="dev",
+        choices=list(CI_GATE_PROFILES.keys()),
+        help="Named CI gate profile (per-dataset thresholds). "
+             "Explicit --ci-p1/--ci-contamination/--ci-rejection override profile values.",
+    )
     # PR shadow diff
     parser.add_argument(
         "--pr-shadow-diff-main", type=str, default=None,
@@ -1231,13 +1269,18 @@ def main() -> int:
 
     # ── CI gate ────────────────────────────────────────────────────────
     if args.ci:
+        # H14: pull profile defaults, then let explicit --ci-* args override.
+        _prof_p1, _prof_cont, _prof_rej = get_ci_thresholds(args.ci_profile)
+        _p1 = args.ci_p1 if args.ci_p1 != DEFAULT_CI_GATE_P1 else _prof_p1
+        _cont = args.ci_contamination if args.ci_contamination != DEFAULT_CI_GATE_CONTAMINATION else _prof_cont
+        _rej = args.ci_rejection if args.ci_rejection != DEFAULT_CI_GATE_REJECTION else _prof_rej
         gate_result = check_ci_gates(
             report,
-            p1_threshold=args.ci_p1,
-            contamination_threshold=args.ci_contamination,
-            rejection_threshold=args.ci_rejection,
+            p1_threshold=_p1,
+            contamination_threshold=_cont,
+            rejection_threshold=_rej,
         )
-        print("\n  CI Gate Check")
+        print(f"\n  CI Gate Check (profile: {args.ci_profile})")
         print("  =============")
         for gate_name, gate in gate_result["gates"].items():
             status = "PASS" if gate["passed"] else "FAIL"
