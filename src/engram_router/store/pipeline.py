@@ -267,13 +267,13 @@ _STANDARD_PIPELINE: list[RecallStage] = [
     ResponseStage(),
 ]
 
-_RRF_PIPELINE: list[RecallStage] = [
-    QueryPrepStage(),
-    FTSCandidateStage(),
-    EdgeExpansionStage(),
-    ScoringStage(),
-    ResponseStage(),
-]
+# _RRF_PIPELINE is intentionally identical to _STANDARD_PIPELINE at present:
+# the RRF fusion logic lives INSIDE build_recall_response(store, ...) rather
+# than as a separate stage.  The alias exists so callers can request an "rrf"
+# strategy explicitly (semantic hint) even though the current stage list is
+# the same.  A future refactor may extract a dedicated FusionStage; keeping
+# the alias reserves the name and avoids call-site churn later.
+_RRF_PIPELINE: list[RecallStage] = _STANDARD_PIPELINE
 
 _FALLBACK_PIPELINE: list[RecallStage] = [
     QueryPrepStage(),

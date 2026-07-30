@@ -387,6 +387,7 @@ def edge_expansion(
 
     activated: dict[str, tuple[float, str, int, list[str], float]] = {}
     queue: deque[tuple[str, float, int, float]] = deque()  # (eid, act, hop, relevance)
+    _edge_cache: dict[str, list[dict[str, Any]]] = {}  # M15: per-src edge cache
 
     # Seed entities start with relevance=1.0 (they directly match the query).
     for eid in seed_entity_ids:
@@ -398,12 +399,27 @@ def edge_expansion(
             continue
         next_hop = hop + 1
 
-        for src_col, dst_col in (("src_id", "dst_id"), ("dst_id", "src_id")):
-            for e in conn.execute(
-                f"SELECT {dst_col} AS nbr, relation, confidence "
-                f"FROM edges WHERE {src_col} = ?",
-                (src_eid,),
-            ).fetchall():
+        # M15: cache edges per src_eid to avoid re-querying if the same
+        # entity is revisited by a stronger path later in BFS.
+        # ``_edge_cache`` is populated lazily on first query for each eid.
+        if src_eid in _edge_cache:
+            _rows = _edge_cache[src_eid]
+        else:
+            _rows = []
+            for src_col, dst_col in (("src_id", "dst_id"), ("dst_id", "src_id")):
+                for e in conn.execute(
+                    f"SELECT {dst_col} AS nbr, relation, confidence "
+                    f"FROM edges WHERE {src_col} = ?",
+                    (src_eid,),
+                ).fetchall():
+                    _rows.append({
+                        "nbr": e["nbr"],
+                        "relation": e["relation"],
+                        "confidence": e["confidence"],
+                    })
+            _edge_cache[src_eid] = _rows
+
+        for e in _rows:
                 nbr = e["nbr"]
                 if nbr in seed_entity_ids:
                     continue  # never re-activate a seed entity

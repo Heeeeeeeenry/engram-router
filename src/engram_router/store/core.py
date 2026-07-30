@@ -364,21 +364,9 @@ class MemoryStore:
                 "ALTER TABLE memories ADD COLUMN forgotten INTEGER NOT NULL DEFAULT 0"
             )
 
-        # Phase 3: timed_events table for causal + timeline features.
-        self.conn.execute(
-            """CREATE TABLE IF NOT EXISTS timed_events (
-                id TEXT PRIMARY KEY,
-                time_entity_id TEXT NOT NULL,
-                time_name TEXT NOT NULL,
-                sort_order INTEGER NOT NULL DEFAULT 50,
-                memory_id TEXT NOT NULL,
-                raw_text TEXT NOT NULL DEFAULT '',
-                person_name TEXT,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY(time_entity_id) REFERENCES entities(id) ON DELETE CASCADE,
-                FOREIGN KEY(memory_id) REFERENCES memories(id) ON DELETE CASCADE
-            )"""
-        )
+        # Phase 3: timed_events table already created in _init_schema()
+        # above (line ~295). This block previously duplicated it — kept as
+        # a no-op reference for the migration comment location.
 
         # Phase 5: edges time range columns (valid_from / valid_to).
         edge_cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(edges)").fetchall()}

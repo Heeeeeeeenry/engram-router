@@ -75,10 +75,23 @@ def should_inject(query: str) -> bool:
 # ── Intent helper: use classifier when available, fall back to regex ──
 
 def _asks_identity(store: Any, query: str) -> bool:
-    """Check if query is an identity question, using classifier if available."""
+    """Check if query is an identity question, using classifier if available.
+
+    L1: cache classifier result per (store, query) so repeated calls in
+    recall_single + build_scored_candidates + build_recall_response don't
+    trigger multiple LLM invocations for the same query.
+    """
     classifier = getattr(store, 'intent_classifier', None)
     if classifier and classifier.available and store.weights.intent_classifier_enabled:
-        return classifier.classify(query).identity > 0.5
+        cache = getattr(store, '_intent_cache', None)
+        if cache is None:
+            cache = {}
+            setattr(store, '_intent_cache', cache)
+        if query in cache:
+            return cache[query].identity > 0.5
+        intent = classifier.classify(query)
+        cache[query] = intent
+        return intent.identity > 0.5
     return query_intent.asks_identity(query)
 
 
@@ -254,9 +267,18 @@ def build_scored_candidates(
 
     # Pre-compute query context once for the whole batch.
     # Use LLM intent classifier when available and enabled, fall back to regex.
+    # L1 cache: reuse the classifier result if already computed for this query.
     intent_classifier = getattr(store, 'intent_classifier', None)
     if intent_classifier and intent_classifier.available and store.weights.intent_classifier_enabled:
-        intent = intent_classifier.classify(query)
+        cache = getattr(store, '_intent_cache', None)
+        if cache is None:
+            cache = {}
+            setattr(store, '_intent_cache', cache)
+        if query in cache:
+            intent = cache[query]
+        else:
+            intent = intent_classifier.classify(query)
+            cache[query] = intent
         asks_brand = intent.brand > 0.5
         asks_identity = intent.identity > 0.5
         asks_eval = intent.eval > 0.5
@@ -631,10 +653,15 @@ def build_recall_response(
     embedding_engine = getattr(store, 'embedding_engine', None)
     vector_index = getattr(store, 'vector_index', None)
     if query and _vector_enabled and embedding_engine and vector_index:
-        try:
-            _query_vec = embedding_engine.encode(query)
-        except Exception:
-            _query_vec = None
+        # M13: reuse cached vector from multi-variant batch encode if present
+        _cache = getattr(store, '_query_vec_cache', None)
+        if _cache is not None and query in _cache:
+            _query_vec = _cache[query]
+        else:
+            try:
+                _query_vec = embedding_engine.encode(query)
+            except Exception:
+                _query_vec = None
 
     # Track hyde/vector ids for hyde-only de-weighting before CE.
     _hyde_ids: set[str] = set()
@@ -1107,6 +1134,25 @@ def recall(
         if all_variants:
             all_results: list[list[tuple[str, float]]] = []
 
+            # M13: pre-encode query + all variants in a single batch so
+            # the embedding backend can amortize model warmup / GPU dispatch.
+            # Individual recall_single() calls no longer trigger separate
+            # encode() invocations — they consume the pre-computed vectors.
+            embedding_engine = getattr(store, 'embedding_engine', None)
+            _prefetched_vecs: dict[str, Any] = {}
+            if embedding_engine is not None and getattr(embedding_engine, 'available', False):
+                _all_query_texts = [query] + all_variants
+                try:
+                    _batch = embedding_engine.encode_batch(_all_query_texts)
+                    if _batch is not None:
+                        for _q_text, _vec in zip(_all_query_texts, _batch):
+                            _prefetched_vecs[_q_text] = _vec
+                        # Cache on store so recall_single/build_recall_response
+                        # can pick them up without re-encoding.
+                        setattr(store, '_query_vec_cache', _prefetched_vecs)
+                except Exception as exc:
+                    logger.debug("Multi-variant batch encode skipped: %s", exc)
+
             # Primary: recall with original query + expanded terms/entities.
             primary_terms = list(dict.fromkeys(scoring.terms(query) + extra_terms))
             primary = recall_single(
@@ -1132,6 +1178,13 @@ def recall(
                     store, variant, v_terms, v_entities, namespace,
                 )
                 all_results.append([(r.id, r.score) for r in v_results])
+
+            # Clear the per-recall cache to avoid stale reuse across calls
+            if _prefetched_vecs:
+                try:
+                    delattr(store, '_query_vec_cache')
+                except AttributeError:
+                    pass
 
             # RRF fuse all recall paths.
             # Primary results get weight 1.0; variant results get lower weight.
