@@ -570,8 +570,8 @@ def pr_shadow_diff(
 # Driver
 # ─────────────────────────────────────────────────────────────────────────
 
-def default_judge(case: EvalCase, store: MemoryStore) -> list[MemoryRecord]:
-    return store.recall(case.query, top_k=10)
+def default_judge(case: EvalCase, store: MemoryStore, namespace: str = "default") -> list[MemoryRecord]:
+    return store.recall(case.query, top_k=10, namespace=namespace)
 
 
 def _legacy_contains_verdict(records: list[MemoryRecord], case: EvalCase) -> bool:
@@ -593,6 +593,7 @@ def run_eval_v2(
     judge_fn: Callable[[EvalCase, MemoryStore], list[MemoryRecord]] = default_judge,
     rejection_threshold: float = 1.0,
     hyde_enabled: bool | None = None,
+    shared_store: bool = True,
 ) -> dict[str, Any]:
     """Execute every case, compute per-case and aggregate metrics, return
     a report dict (also suitable for JSON serialisation).
@@ -601,25 +602,57 @@ def run_eval_v2(
     None keeps the default (currently off) — set True from the driver when
     doing an A/B against HyDE. Requires ENGRAM_ALLOW_CLOUD_LLM=1 in that
     case so the LLM path is unblocked.
+
+    ``shared_store`` (default True) shares a single MemoryStore across
+    scenarios, using scenario_id as the namespace for isolation. This avoids
+    rebuilding FAISS + reloading models per scenario (5-10x speedup for
+    long-tail evals with 100+ scenarios). Set False to preserve legacy
+    per-scenario store behavior (useful when memories should NOT persist).
     """
     from engram_router.store import RecallWeights
 
     tmp_root = Path(tempfile.mkdtemp(prefix="eval_v2_"))
     per_case_rows: list[dict[str, Any]] = []
 
-    for scen in scenarios:
-        db_path = tmp_root / f"{scen.id}.db"
+    # Shared store setup: one MemoryStore for all scenarios, namespace = scen.id
+    _shared_store = None
+    if shared_store:
+        db_path = tmp_root / "shared.db"
         if hyde_enabled is not None:
             weights = RecallWeights(hyde_enabled=hyde_enabled)
-            store = MemoryStore(path=db_path, weights=weights)
+            _shared_store = MemoryStore(path=db_path, weights=weights)
         else:
-            store = MemoryStore(path=db_path)
+            _shared_store = MemoryStore(path=db_path)
+
+    for scen in scenarios:
+        if shared_store:
+            store = _shared_store
+            ns = scen.id  # namespace-isolate scenarios within same store
+        else:
+            db_path = tmp_root / f"{scen.id}.db"
+            if hyde_enabled is not None:
+                weights = RecallWeights(hyde_enabled=hyde_enabled)
+                store = MemoryStore(path=db_path, weights=weights)
+            else:
+                store = MemoryStore(path=db_path)
+            ns = "default"
         try:
-            for mem in scen.memories:
-                store.save(mem)
+            # Batch save for shared store — leverage save_batch() perf gain
+            if shared_store and hasattr(store, "save_batch"):
+                store.save_batch(
+                    [(mem, "conversation", None) for mem in scen.memories],
+                    namespace=ns,
+                )
+            else:
+                for mem in scen.memories:
+                    store.save(mem, namespace=ns)
 
             for case in scen.cases:
-                records = judge_fn(case, store)
+                # judge_fn may or may not accept namespace kwarg
+                try:
+                    records = judge_fn(case, store, namespace=ns)
+                except TypeError:
+                    records = judge_fn(case, store)
                 top5 = [
                     {
                         "rank": i + 1,
@@ -679,7 +712,12 @@ def run_eval_v2(
                     "new_passed": new_pass,
                 })
         finally:
-            store.close()
+            if not shared_store:
+                store.close()
+
+    # Close shared store after all scenarios processed
+    if shared_store and _shared_store is not None:
+        _shared_store.close()
 
     # ── aggregate ────────────────────────────────────────────────────────
     def _avg(key: str, only_positive: bool = True) -> float:
