@@ -245,6 +245,26 @@ class MemoryStore:
                 FOREIGN KEY(memory_id) REFERENCES memories(id) ON DELETE CASCADE
             );
 
+            -- L2.1: Structured events extracted from memory text.
+            -- subject/verb/object is a simplified triple; time_expr is a
+            -- natural-language time reference (昨天/上周/2024年3月); the
+            -- memory_id FK ties each event back to its evidence source.
+            CREATE TABLE IF NOT EXISTS events (
+                id TEXT PRIMARY KEY,
+                memory_id TEXT NOT NULL,
+                subject TEXT NOT NULL DEFAULT '',
+                verb TEXT NOT NULL DEFAULT '',
+                object TEXT NOT NULL DEFAULT '',
+                time_expr TEXT NOT NULL DEFAULT '',
+                confidence REAL NOT NULL DEFAULT 0.8,
+                namespace TEXT NOT NULL DEFAULT 'default',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(memory_id) REFERENCES memories(id) ON DELETE CASCADE
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_events_memory ON events(memory_id);
+            CREATE INDEX IF NOT EXISTS idx_events_namespace ON events(namespace);
+
             CREATE TABLE IF NOT EXISTS entities (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
@@ -481,6 +501,7 @@ class MemoryStore:
             )
             self._index_entities(next_id, text, namespace=namespace)
             self._populate_timed_events_for_memory(next_id, namespace=namespace)
+            self._index_events(next_id, text, namespace=namespace)
             if self._fts_enabled:
                 self.conn.execute(
                     "INSERT INTO memories_fts (memory_id, content) VALUES (?, ?)",
@@ -766,6 +787,22 @@ class MemoryStore:
                     tr["created_at"],
                 ),
             )
+
+    def _index_events(self, memory_id: str, text: str, namespace: str = "default") -> None:
+        """L2.1: Extract structured events and write to events table."""
+        try:
+            from ..event_extractor import extract_events
+            events = extract_events(text, memory_id=memory_id, namespace=namespace)
+            for event in events:
+                event_id = self._next_id("events", "evt")
+                self.conn.execute(
+                    """INSERT INTO events
+                       (id, memory_id, subject, verb, object, time_expr, confidence, namespace)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    event.to_sql_row(event_id),
+                )
+        except (ImportError, ValueError, AttributeError) as exc:
+            logger.debug("_index_events skipped: %s", exc)
 
     def close(self) -> None:
         self.conn.close()
@@ -1161,6 +1198,7 @@ class MemoryStore:
         "raw_logs": "raw",
         "distilled_memories": "dst",
         "recall_snapshots": "snap",
+        "events": "evt",
     }
 
     def _next_id(self, table: str, prefix: str) -> str:
