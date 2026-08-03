@@ -497,6 +497,17 @@ class MemoryStore:
             ids.append(next_id)
 
         self.conn.commit()
+
+        # N6: Persist vector index exactly once after all vectors are added.
+        # Previously add() auto-saved on every call — O(n) writes that could
+        # leave a partially-written file on mid-batch crash.  Now we commit
+        # the SQL rows first, then persist the index once (atomic _save).
+        if batch_embs is not None and self._vector_enabled and self.vector_index:
+            try:
+                self.vector_index.save()
+            except Exception as exc:
+                logger.debug("Vector index save after batch skipped: %s", exc)
+
         # N1: save_dedup_ratio (dedup TBD — placeholder set to 1.0 = all unique)
         try:
             from . import metrics as _m

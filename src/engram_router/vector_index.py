@@ -27,6 +27,7 @@ import json
 import logging
 import os
 import threading
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -139,8 +140,9 @@ class VectorIndex:
             self._id_to_memory[faiss_id] = memory_id
             self._memory_to_id[memory_id] = faiss_id
 
-            if self._path:
-                self._save()
+            # NOTE: _save() is intentionally NOT called here; the caller
+            # (MemoryStore.save_batch) is responsible for persisting after
+            # all vectors are added, via VectorIndex.save() or ._save().
 
     def add_batch(
         self, ids_and_embs: list[tuple[str, "np.ndarray"]]  # type: ignore[type-arg]
@@ -178,8 +180,7 @@ class VectorIndex:
                 if len(self._buffer_ids) >= min_for_train:
                     self._train_from_buffer()
 
-            if self._path:
-                self._save()
+            # Commit deferred to caller — see note in add().
 
     def search(
         self, query_vec: "np.ndarray", k: int = 20  # type: ignore[type-arg]
@@ -316,26 +317,61 @@ class VectorIndex:
         del self._buffer_ids
 
     def _save(self) -> None:
+        """Persist index + idmap atomically.
+
+        Each file is written to a temp sibling then ``os.replace``'d, so a
+        crash mid-write leaves the previous consistent state intact.
+        """
         if not self._path or not self._trained:
             return
         import faiss
         self._path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Save FAISS index
         faiss_path = str(self._path.with_suffix(".faiss"))
-        faiss.write_index(self._index, faiss_path)
-
-        # Save ID mapping (JSON, not pickle)
         idmap_path = str(self._path.with_suffix(".idmap"))
+
+        # -- Write FAISS index to temp, then atomic rename --
+        fd_faiss, tmp_faiss = tempfile.mkstemp(
+            dir=self._path.parent, prefix=".tmp_faiss_"
+        )
+        try:
+            os.close(fd_faiss)
+            faiss.write_index(self._index, tmp_faiss)
+            os.replace(tmp_faiss, faiss_path)
+        except Exception:
+            try:
+                os.unlink(tmp_faiss)
+            except OSError:
+                pass
+            raise
+
+        # -- Write ID map to temp, then atomic rename --
         meta = {
             "id_to_memory": {str(k): v for k, v in self._id_to_memory.items()},
             "memory_to_id": {str(k): v for k, v in self._memory_to_id.items()},
             "next_id": self._next_id,
             "dim": self._dim,
-            "nlist": self._nlist,
+            "nlist": getattr(self, '_nlist', 8),
+            "hnsw_m": getattr(self, '_hnsw_m', 32),
+            "hnsw_mode": getattr(self, '_hnsw_mode', True),
+            "use_pq": getattr(self, '_use_pq', False),
+            "pq_m": getattr(self, '_pq_m', 64),
+            "pq_nbits": getattr(self, '_pq_nbits', 8),
         }
-        with open(idmap_path, "w") as f:
-            json.dump(meta, f)
+        fd_idm, tmp_idm = tempfile.mkstemp(
+            dir=self._path.parent, prefix=".tmp_idmap_"
+        )
+        try:
+            with os.fdopen(fd_idm, "w") as f:
+                json.dump(meta, f)
+            os.replace(tmp_idm, idmap_path)
+        except Exception:
+            os.close(fd_idm)
+            try:
+                os.unlink(tmp_idm)
+            except OSError:
+                pass
+            raise
 
     def _load(self) -> bool:
         faiss_path = str(self._path.with_suffix(".faiss"))  # type: ignore[union-attr]
@@ -351,8 +387,13 @@ class VectorIndex:
             self._id_to_memory = {int(k): v for k, v in meta["id_to_memory"].items()}
             self._memory_to_id = meta["memory_to_id"]
             self._next_id = meta["next_id"]
-            self._dim = meta.get("dim", self._dim)
-            self._nlist = meta.get("nlist", self._nlist)
+            self._dim = meta.get("dim", self._dim) if hasattr(self, '_dim') else meta.get("dim", 1024)
+            self._nlist = meta.get("nlist", self._nlist) if hasattr(self, '_nlist') else meta.get("nlist", 8)
+            self._hnsw_m = meta.get("hnsw_m", self._hnsw_m) if hasattr(self, '_hnsw_m') else meta.get("hnsw_m", 32)
+            self._hnsw_mode = self._trained and self._index is not None
+            self._use_pq = meta.get("use_pq", False)
+            self._pq_m = meta.get("pq_m", self._pq_m) if hasattr(self, '_pq_m') else meta.get("pq_m", 64)
+            self._pq_nbits = meta.get("pq_nbits", self._pq_nbits) if hasattr(self, '_pq_nbits') else meta.get("pq_nbits", 8)
             logger.info(
                 "FAISS loaded: %d vectors, %dd, nlist=%d",
                 len(self._id_to_memory), self._dim, self._nlist,
