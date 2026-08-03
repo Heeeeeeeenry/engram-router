@@ -46,7 +46,21 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # Chinese third-person pronouns that start a sentence (or clause).
-_PRONOUN_PATTERN = re.compile(r"^([他她它们])")
+# 它的/他的/她的 are possessive forms that should also trigger coref.
+_PRONOUN_PATTERN = re.compile(r"^([他她它们])(?:的)?")
+
+# Known false-positive "person" names that should never be a coref anchor.
+# These are common nouns/verbs that entity extractor picks up as persons
+# because they contain a surname character (e.g. 高铁 contains 高).
+_NON_PERSON_NAMES: set[str] = frozenset({
+    "高铁", "高兴", "高兴地", "马上", "小时", "今天", "昨天", "明天",
+    "中国", "日本", "美国", "英国", "法国", "德国",
+    "北京", "上海", "广州", "深圳", "杭州", "成都",
+    "一些", "这次", "上次", "下次", "每次", "多次", "很多", "许多",
+    "什么", "怎么", "为什么", "怎么样", "怎么办",
+    "可能", "可以", "还是", "如果", "因为", "所以", "虽然", "但是",
+    "东西", "大家", "自己", "别人",
+})
 
 
 class CorefTracker:
@@ -57,6 +71,16 @@ class CorefTracker:
         self._last_person: str | None = None
         self._distance: int = 0
         self._enabled = os.environ.get("ENGRAM_SKIP_COREF") != "1"
+
+    def _is_valid_person_name(self, name: str) -> bool:
+        """Filter out false-positive 'person' entities that aren't real names."""
+        if name in _NON_PERSON_NAMES:
+            return False
+        # Single CJK character that happens to be a surname char (e.g. 高 in 高铁)
+        # is almost never a standalone person reference.
+        if len(name) == 1 and re.match(r"[一-鿿]", name):
+            return False
+        return True
 
     def resolve(
         self,
@@ -75,6 +99,7 @@ class CorefTracker:
         persons = [e for e in entities if e.get("kind") == "person"]
         has_explicit_person = any(
             p["name"] not in ("他", "她", "它", "他们", "她们", "它们", "他之", "她之")
+            and self._is_valid_person_name(p["name"])
             for p in persons
         )
 

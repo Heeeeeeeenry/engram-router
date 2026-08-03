@@ -1003,4 +1003,53 @@
 - API SemVer stabilization requires 1.0.0 → 2.0.0 planning
 - Full README/CHANGELOG rewrite is N8 in the plan
 
-**Next execution**: N1 → N2 → N4 (fast wins: metrics wiring, dim gate, MCP clamping). N3 requires schema migration and 3-4 days, plan separately. N8 is 1-2 days docs, best done after N1/N2/N4 land so README numbers are trustworthy.
+**Next execution**: N1 → N2 → N4 → N5 (all fast wins done: metrics, dim gate, MCP clamping, prompt-injection defence). N3 requires schema migration and 3-4 days, plan separately. N8 is 1-2 days docs, best done after N6/N7 land so README numbers are trustworthy.
+
+### 2026-08-03 · N4 + N5 · MCP input clamping + Prompt-injection defence
+
+- **N4 commit**: 9fa264e
+  - `mcp_server.py`: `_clamp_top_k()` / `_validate_namespace()` / `_validate_memory_id()` / `_validate_text()` 校验函数 + 常量 MAX_TOP_K=100, MAX_TEXT_SIZE=65536 等
+  - `candidates.py`: FTS5 LIKE 通配符 escape（`%`/`_` → `\%`/`\_`）
+  - `test_mcp.py`: +6 测试 + 全局 `proc.terminate()` 修复
+  - 回归: 577 passed, 4 skipped, 12 xfailed
+
+- **N5 commit**: 4cafdad
+  - 新建 `prompt_guard.py`（60 行）：`wrap_user_content()` XML 标签包装所有用户文本
+  - 接线 4 个 LLM 攻击面：hyde.py / llm_extractor.py / query_expansion.py / intent_classifier.py
+  - 防御三类攻击：分隔符混淆（正则 strip）、指令劫持（XML 边界标记）、Token-bomb DoS（截断 3000 字符）
+  - +23 测试（test_prompt_guard.py）
+  - 回归: 577 passed, 4 skipped, 12 xfailed
+
+- **Fast wins 全部完成** ✅：N1 + N2 + N4 + N5 已落地
+
+**下一步建议**: N3（namespace-scope cross-tenant paths）是最高安全风险的遗留项，需 3-4 天。N8（README/CHANGELOG/docs rewrite）也值得优先考察。
+
+### 2026-08-03 · N6 · Atomic FAISS+idmap writes + deferred save
+
+- **N6 commit**: 36be74f
+  - `vector_index.py`: `_save()` 改为 temp file + `os.replace()` 原子写入，crash mid-write 保护好旧状态
+  - `add()` / `add_batch()`: 移除自动 `_save()` 调用，delay 到 caller 决定
+  - `core.py`: `save_batch()` 在所有 vectors 加入后执行一次 `vector_index.save()` —— 替代 O(n) 次 per-add save
+  - `_save()` idmap: 持久化所有 metadata（hnsw_m, hnsw_mode, use_pq, pq_m, pq_nbits）
+  - +12 测试（test_vector_index_n6.py）
+  - 回归: 589 passed, 4 skipped, 12 xfailed
+
+### 2026-08-03 · N7 · End-to-end query deadline in recall()
+
+- **N7 commit**: 746b5ce
+  - `scoring.py`: 新增 `RecallWeights.recall_deadline_ms`（默认 5000ms，0=不限制）
+  - `recall.py`: `_check_deadline()` guard 在 4 个昂贵阶段前检查：HyDE LLM / cross-encoder / ColBERT / LLM-reranker
+  - 超时时跳过昂贵阶段，返回已有最佳结果；轻量阶段（FTS/entity/extract/edge/scoring）永不被跳过
+  - 回归: 589 passed, 4 skipped, 12 xfailed
+
+**N1-N7 全部完成 ✅**（N8 是文档，N3 是 namespace 隔离所需的较大重构）
+
+### 2026-08-03 · N8 · README + CHANGELOG + docs/MCP.md + examples/quickstart.py
+
+- **N8 commit**: 2909509
+  - `README.md`: 完全重写 —— bge-m3 1024d、FAISS HNSW、cross-encoder、HyDE、13 个模块文档、多租户示例、正确的项目结构、600 passed 测试数
+  - `CHANGELOG.md`: 新建 —— 1.0.0 版本记录，按 Security/Reliability/Observability/Features 分组
+  - `docs/MCP.md`: 新建 —— 6 个 tools 的完整参数表、认证、错误码、Claude Code 接入指南、安全限制表
+  - `examples/quickstart.py`: 新建 —— 7 步 demo，经验证可运行
+
+**Near-term fix plan N1-N8 全部完成 ✅**
