@@ -97,16 +97,15 @@ class CorefTracker:
 
         # Check if this text explicitly names a person
         persons = [e for e in entities if e.get("kind") == "person"]
-        has_explicit_person = any(
-            p["name"] not in ("他", "她", "它", "他们", "她们", "它们", "他之", "她之")
+        valid_persons = [
+            p for p in persons
+            if p["name"] not in ("他", "她", "它", "他们", "她们", "它们", "他之", "她之")
             and self._is_valid_person_name(p["name"])
-            for p in persons
-        )
+        ]
 
-        if has_explicit_person:
-            # Update the tracker with the last named person
-            last = persons[-1]
-            self._last_person = last["name"]
+        if valid_persons:
+            # Update the tracker with the last named person.
+            self._last_person = valid_persons[-1]["name"]
             self._distance = 0
             return entities
 
