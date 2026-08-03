@@ -221,7 +221,12 @@ TOOLS = [
         "description": "合并重复实体名 (大小写/空白变体)、清理孤立边和重复边。返回清理统计。",
         "inputSchema": {
             "type": "object",
-            "properties": {},
+            "properties": {
+                "namespace": {
+                    "type": "string",
+                    "description": "Namespace (tenant) to scope the operation to. Defaults to 'default'.",
+                },
+            },
         },
     },
     {
@@ -233,6 +238,10 @@ TOOLS = [
                 "memory_id": {
                     "type": "string",
                     "description": "ID of the memory to delete.",
+                },
+                "namespace": {
+                    "type": "string",
+                    "description": "Namespace (tenant) of the memory. Defaults to 'default'.",
                 },
             },
             "required": ["memory_id"],
@@ -395,12 +404,14 @@ class JsonRpcHandler:
         return {"distilled_id": distilled_id}
 
     async def _tool_memory_consolidate(self, args: dict[str, Any]) -> dict[str, Any]:
-        result = self._store.consolidate()
+        namespace = _validate_namespace(args.get("namespace", "default"))
+        result = self._store.consolidate(namespace=namespace)
         return {"status": "ok", "stats": result}
 
     async def _tool_memory_delete(self, args: dict[str, Any]) -> dict[str, Any]:
         memory_id = _validate_memory_id(str(args.get("memory_id", "")))
-        deleted = self._store.delete(memory_id)
+        namespace = _validate_namespace(args.get("namespace", "default"))
+        deleted = self._store.delete(memory_id, namespace=namespace)
         return {"deleted": deleted}
 
 

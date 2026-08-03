@@ -249,7 +249,8 @@ class MemoryStore:
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
                 kind TEXT NOT NULL DEFAULT 'unknown',
-                salience_class TEXT NOT NULL DEFAULT 'event'
+                salience_class TEXT NOT NULL DEFAULT 'event',
+                namespace TEXT NOT NULL DEFAULT 'default'
             );
 
             CREATE TABLE IF NOT EXISTS memory_entities (
@@ -268,7 +269,8 @@ class MemoryStore:
                 dst_id TEXT NOT NULL,
                 relation TEXT NOT NULL,
                 confidence REAL NOT NULL DEFAULT 1.0,
-                evidence_ref TEXT NOT NULL DEFAULT ''
+                evidence_ref TEXT NOT NULL DEFAULT '',
+                namespace TEXT NOT NULL DEFAULT 'default'
             );
 
             CREATE INDEX IF NOT EXISTS idx_edges_src ON edges(src_id);
@@ -300,6 +302,7 @@ class MemoryStore:
                 memory_id TEXT NOT NULL,
                 raw_text TEXT NOT NULL DEFAULT '',
                 person_name TEXT,
+                namespace TEXT NOT NULL DEFAULT 'default',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(time_entity_id) REFERENCES entities(id) ON DELETE CASCADE,
                 FOREIGN KEY(memory_id) REFERENCES memories(id) ON DELETE CASCADE
@@ -348,6 +351,23 @@ class MemoryStore:
         if "namespace" not in mem_cols:
             self.conn.execute(
                 "ALTER TABLE memories ADD COLUMN namespace TEXT NOT NULL DEFAULT 'default'"
+            )
+
+        # N3: namespace-scoped entities / edges / timed_events.
+        ent_cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(entities)").fetchall()}
+        if "namespace" not in ent_cols:
+            self.conn.execute(
+                "ALTER TABLE entities ADD COLUMN namespace TEXT NOT NULL DEFAULT 'default'"
+            )
+        edge_cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(edges)").fetchall()}
+        if "namespace" not in edge_cols:
+            self.conn.execute(
+                "ALTER TABLE edges ADD COLUMN namespace TEXT NOT NULL DEFAULT 'default'"
+            )
+        te_cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(timed_events)").fetchall()}
+        if "namespace" not in te_cols:
+            self.conn.execute(
+                "ALTER TABLE timed_events ADD COLUMN namespace TEXT NOT NULL DEFAULT 'default'"
             )
 
         # Phase 3: forgetting / decay columns.
@@ -459,8 +479,8 @@ class MemoryStore:
                 "INSERT INTO evidence (id, memory_id, quote, source_location) VALUES (?, ?, ?, ?)",
                 (evidence_id, next_id, text, source),
             )
-            self._index_entities(next_id, text)
-            self._populate_timed_events_for_memory(next_id)
+            self._index_entities(next_id, text, namespace=namespace)
+            self._populate_timed_events_for_memory(next_id, namespace=namespace)
             if self._fts_enabled:
                 self.conn.execute(
                     "INSERT INTO memories_fts (memory_id, content) VALUES (?, ?)",
@@ -518,19 +538,29 @@ class MemoryStore:
         # Batch persona update
         for text in texts:
             try:
-                self._update_persona(text)
+                self._update_persona(text, namespace=namespace)
             except (ImportError, ValueError, AttributeError, KeyError):
                 logger.debug("_update_persona skipped", exc_info=True)
 
         return ids
 
-    def delete(self, memory_id: str) -> bool:
+    def delete(self, memory_id: str, namespace: str = "default") -> bool:
         """Delete a memory and all associated rows (evidence, entities, edges, FTS5).
 
         FK ON DELETE CASCADE cleans up evidence, distilled_memories, and
         memory_entities.  FTS5 is a virtual table outside FK scope and must
         be explicitly synced via _fts_remove.
+
+        N3: namespace-scoped — verifies ownership before touching FTS/vector
+        indexes so a caller in tenant A cannot mutate tenant B's index entries.
         """
+        # Verify ownership FIRST — before touching FTS or vector index.
+        row = self.conn.execute(
+            "SELECT namespace FROM memories WHERE id = ?", (memory_id,)
+        ).fetchone()
+        if row is None or row["namespace"] != namespace:
+            return False
+
         self._fts_remove(memory_id)
 
         # ── Phase 2: Remove from vector index ──
@@ -541,14 +571,15 @@ class MemoryStore:
                 logger.debug("vector_index.remove skipped for %s", memory_id)
 
         cursor = self.conn.execute(
-            "DELETE FROM memories WHERE id = ?", (memory_id,)
+            "DELETE FROM memories WHERE id = ? AND namespace = ?",
+            (memory_id, namespace),
         )
         self.conn.commit()
         return cursor.rowcount > 0
 
     # --- entity indexing -----------------------------------------------------
 
-    def _index_entities(self, memory_id: str, text: str) -> None:
+    def _index_entities(self, memory_id: str, text: str, namespace: str = "default") -> None:
         # 0. Pronoun coreference: backfill person entities for pronoun-starting
         #    texts ("她特别喜欢猫" → inject 小李 as person entity).
         raw_entities = extract_entities(text)
@@ -560,7 +591,7 @@ class MemoryStore:
 
         for ent in raw_entities:
             salience = classify_salience(ent, text)
-            entity_id = self._get_or_create_entity(ent["name"], ent["kind"], salience)
+            entity_id = self._get_or_create_entity(ent["name"], ent["kind"], salience, namespace=namespace)
             link_id = self._next_id("memory_entities", "me")
             self.conn.execute(
                 "INSERT INTO memory_entities (id, memory_id, entity_id, evidence, salience_class) VALUES (?, ?, ?, ?, ?)",
@@ -576,7 +607,7 @@ class MemoryStore:
                 if key in seen_names:
                     continue  # Rule-based already caught this one.
                 salience = ent.get("salience_class", "event")
-                entity_id = self._get_or_create_entity(ent["name"], ent["kind"], salience)
+                entity_id = self._get_or_create_entity(ent["name"], ent["kind"], salience, namespace=namespace)
                 link_id = self._next_id("memory_entities", "me")
                 self.conn.execute(
                     "INSERT INTO memory_entities (id, memory_id, entity_id, evidence, salience_class) VALUES (?, ?, ?, ?, ?)",
@@ -588,15 +619,16 @@ class MemoryStore:
                 })
                 seen_names.add(key)
 
-        self._index_edges(memory_id, indexed, text)
+        self._index_edges(memory_id, indexed, text, namespace=namespace)
 
     def _index_edges(self, memory_id: str, indexed: list[dict[str, Any]],
-                     text: str = "") -> None:
+                     text: str = "", namespace: str = "default") -> None:
         """Delegate to graph.index_edges."""
         graph.index_edges(
             self.conn, self._next_id,
             memory_id=memory_id, indexed=indexed, text=text,
             llm_extractor=self.llm_extractor,
+            namespace=namespace,
         )
 
 
@@ -637,7 +669,7 @@ class MemoryStore:
                     engine.forget(r.id)
         except (ImportError, ValueError, AttributeError):
             logger.debug("_apply_decay skipped", exc_info=True)
-    def _update_persona(self, text):
+    def _update_persona(self, text, namespace: str = "default"):
         try:
             from ..entities import extract_entities
             for ent in extract_entities(text):
@@ -650,29 +682,34 @@ class MemoryStore:
             logger.debug("_update_persona skipped", exc_info=True)
 
 
-    def _get_or_create_entity(self, name: str, kind: str, salience_class: str = "event") -> str:
+    def _get_or_create_entity(self, name: str, kind: str, salience_class: str = "event",
+                             namespace: str = "default") -> str:
         # Canonicalize: map aliases (老张 → 张伟) to the canonical entity.
         # Conservatively only does direct lookup; fuzzy suggestions are logged.
+        # N3: namespace-scoped — (name, kind, namespace) is the identity key.
         canonical = canonicalize_entity_name(self, name, kind)
 
         row = self.conn.execute(
-            "SELECT id FROM entities WHERE name = ? AND kind = ?", (canonical, kind)
+            "SELECT id FROM entities WHERE name = ? AND kind = ? AND namespace = ?",
+            (canonical, kind, namespace),
         ).fetchone()
         if row is not None:
             return str(row["id"])
         entity_id = self._next_id("entities", "ent")
         self.conn.execute(
-            "INSERT INTO entities (id, name, kind, salience_class) VALUES (?, ?, ?, ?)",
-            (entity_id, canonical, kind, salience_class),
+            "INSERT INTO entities (id, name, kind, salience_class, namespace) VALUES (?, ?, ?, ?, ?)",
+            (entity_id, canonical, kind, salience_class, namespace),
         )
         return entity_id
 
-    def _populate_timed_events_for_memory(self, memory_id: str) -> None:
+    def _populate_timed_events_for_memory(self, memory_id: str, namespace: str = "default") -> None:
         """Insert timed_events rows for any time-kind entities in this memory.
 
         Called automatically after entity indexing on every :meth:`save`.
         Extracts the first person entity (if any) from the same memory to
         attach as ``person_name``.
+
+        N3: namespace-scoped — stores namespace on each row.
         """
         from ..causal import _resolve_sort_order
 
@@ -715,8 +752,8 @@ class MemoryStore:
             self.conn.execute(
                 """INSERT INTO timed_events
                    (id, time_entity_id, time_name, sort_order, memory_id,
-                    raw_text, person_name, created_at)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    raw_text, person_name, namespace, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     event_id,
                     tr["entity_id"],
@@ -725,6 +762,7 @@ class MemoryStore:
                     memory_id,
                     tr["raw_text"],
                     person_name,
+                    namespace,
                     tr["created_at"],
                 ),
             )
@@ -1220,12 +1258,14 @@ class MemoryStore:
 
     # --- consolidate ----------------------------------------------------------
 
-    def consolidate(self) -> dict[str, Any]:
+    def consolidate(self, namespace: str = "default") -> dict[str, Any]:
         """合并重复实体名、清理孤立边，返回清理统计。
 
         合并规则：同名实体的大小写/空白变体会被合并到保留实体。
         孤立边：src_id 或 dst_id 不存在的边，以及 evidence_ref 指向不存在
         memory 的边均被删除。
+
+        N3: namespace-scoped — all operations constrained to one namespace.
 
         返回 ``{"merged_entities": N, "removed_edges": N, "removed_self_loops": N,
         "removed_duplicate_edges": N}``。
@@ -1239,7 +1279,8 @@ class MemoryStore:
 
         # ── 1. 合并重复实体名 (大小写/空白变体) ────────────────────────
         rows = self.conn.execute(
-            "SELECT id, name, kind FROM entities ORDER BY id"
+            "SELECT id, name, kind FROM entities WHERE namespace = ? ORDER BY id",
+            (namespace,),
         ).fetchall()
 
         # 按规范化键分组: norm_key -> [(id, original_name, kind)]
@@ -1261,45 +1302,58 @@ class MemoryStore:
                     "WHERE entity_id = ?",
                     (canonical_id, dup_id),
                 )
-                # 将 edges 中引用 dup 的改为 canonical
+                # 将 edges 中引用 dup 的改为 canonical (namespace-scoped)
                 self.conn.execute(
-                    "UPDATE edges SET src_id = ? WHERE src_id = ?",
-                    (canonical_id, dup_id),
+                    "UPDATE edges SET src_id = ? WHERE src_id = ? AND namespace = ?",
+                    (canonical_id, dup_id, namespace),
                 )
                 self.conn.execute(
-                    "UPDATE edges SET dst_id = ? WHERE dst_id = ?",
-                    (canonical_id, dup_id),
+                    "UPDATE edges SET dst_id = ? WHERE dst_id = ? AND namespace = ?",
+                    (canonical_id, dup_id, namespace),
                 )
                 # 删除 dup 实体 (FK CASCADE 已清理 memory_entities)
-                self.conn.execute("DELETE FROM entities WHERE id = ?", (dup_id,))
+                self.conn.execute(
+                    "DELETE FROM entities WHERE id = ? AND namespace = ?",
+                    (dup_id, namespace),
+                )
                 stats["merged_entities"] += 1
 
         # ── 清理合并后产生的自环边 ────────────────────────────────────
-        cur = self.conn.execute("DELETE FROM edges WHERE src_id = dst_id")
+        cur = self.conn.execute(
+            "DELETE FROM edges WHERE src_id = dst_id AND namespace = ?",
+            (namespace,),
+        )
         stats["removed_self_loops"] = cur.rowcount
 
         # ── 清理重复边 (同 src,dst,relation 只保留一条) ──────────────
         cur = self.conn.execute(
             "DELETE FROM edges WHERE id NOT IN ("
-            "SELECT MIN(id) FROM edges GROUP BY src_id, dst_id, relation"
-            ")"
+            "SELECT MIN(id) FROM edges WHERE namespace = ? "
+            "GROUP BY src_id, dst_id, relation"
+            ") AND namespace = ?",
+            (namespace, namespace),
         )
         stats["removed_duplicate_edges"] = cur.rowcount
 
         # ── 2. 清理孤立边 ─────────────────────────────────────────────
         # 2a. 源/目标实体已不存在的边
         cur = self.conn.execute(
-            "DELETE FROM edges WHERE src_id NOT IN (SELECT id FROM entities)"
+            "DELETE FROM edges WHERE namespace = ? "
+            "AND src_id NOT IN (SELECT id FROM entities WHERE namespace = ?)",
+            (namespace, namespace),
         )
         removed = cur.rowcount
         cur = self.conn.execute(
-            "DELETE FROM edges WHERE dst_id NOT IN (SELECT id FROM entities)"
+            "DELETE FROM edges WHERE namespace = ? "
+            "AND dst_id NOT IN (SELECT id FROM entities WHERE namespace = ?)",
+            (namespace, namespace),
         )
         removed += cur.rowcount
         # 2b. evidence_ref 指向不存在的 memory
         cur = self.conn.execute(
-            "DELETE FROM edges WHERE evidence_ref != '' "
-            "AND evidence_ref NOT IN (SELECT id FROM memories)"
+            "DELETE FROM edges WHERE evidence_ref != '' AND namespace = ? "
+            "AND evidence_ref NOT IN (SELECT id FROM memories WHERE namespace = ?)",
+            (namespace, namespace),
         )
         removed += cur.rowcount
         stats["removed_edges"] = removed

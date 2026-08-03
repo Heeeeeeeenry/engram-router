@@ -36,6 +36,7 @@ def index_edges(
     indexed: list[dict[str, Any]] | None = None,
     text: str = "",
     llm_extractor: Any = None,
+    namespace: str = "default",
 ) -> None:
     """Write typed relations between the entities co-occurring in one memory.
 
@@ -85,9 +86,9 @@ def index_edges(
         written.add(key)
         edge_id = _next_id("edges", "edge")
         conn.execute(
-            "INSERT INTO edges (id, src_id, dst_id, relation, confidence, evidence_ref) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (edge_id, src, dst, relation, confidence, memory_id),
+            "INSERT INTO edges (id, src_id, dst_id, relation, confidence, evidence_ref, namespace) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (edge_id, src, dst, relation, confidence, memory_id, namespace),
         )
 
     # CO_OCCURS_WITH: every unordered pair, written once as a directed edge
