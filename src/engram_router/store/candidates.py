@@ -152,11 +152,16 @@ def fts_candidates(
     # Runs always (not gated on raw_ids empty) so it can ADD to FTS results.
     short_terms = [t for t in terms if 1 <= len(t) < 3]
     if short_terms:
+        # Escape LIKE wildcards (% and _) that could be in the term,
+        # e.g. from the synonym/entity pipeline or unusual input tokens.
+        def _escape_like(s: str) -> str:
+            return s.replace("%", "\\%").replace("_", "\\_")
+
         like_clauses = []
         like_params = []
         for t in short_terms:
-            like_clauses.append("raw_text LIKE ?")
-            like_params.append(f"%{t}%")
+            like_clauses.append("raw_text LIKE ? ESCAPE '\\'")
+            like_params.append(f"%{_escape_like(t)}%")
         if like_clauses:
             try:
                 like_rows = conn.execute(
@@ -172,6 +177,7 @@ def fts_candidates(
     # doesn't contain the entity name. LIKE searches raw_text, so recover
     # these via the entity table. Always merges with existing raw_ids.
     if short_terms:
+        escaped = [_escape_like(t) for t in short_terms]
         try:
             entity_rows = conn.execute(
                 f"""SELECT DISTINCT me.memory_id
@@ -179,8 +185,8 @@ def fts_candidates(
                     JOIN entities e ON e.id = me.entity_id
                     JOIN memories m ON m.id = me.memory_id
                     WHERE m.namespace = ?
-                    AND ({" OR ".join("e.name LIKE ?" for _ in short_terms)})""",
-                (namespace,) + tuple(f"%{t}%" for t in short_terms),
+                    AND ({" OR ".join("e.name LIKE ? ESCAPE '\\'" for _ in short_terms)})""",
+                (namespace,) + tuple(f"%{t}%" for t in escaped),
             ).fetchall()
             raw_ids |= {r["memory_id"] for r in entity_rows}
         except sqlite3.OperationalError:

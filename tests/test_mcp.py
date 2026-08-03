@@ -118,7 +118,8 @@ class TestMcpServer:
                     assert "properties" in t["inputSchema"]
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_save_recall_round_trip(self):
         with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
@@ -185,7 +186,8 @@ class TestMcpServer:
                 assert matching[0]["raw_text"] == "我的机械键盘是HHKB Professional Hybrid Type-S"
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_invalid_tool_name_returns_error(self):
         with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
@@ -214,7 +216,8 @@ class TestMcpServer:
                 assert "Unknown tool" in resp["result"]["content"][0]["text"]
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_invalid_tool_name_returns_error_at_rpc_level(self):
         """Invalid tool name should return isError:true inside a normal JSON-RPC result."""
@@ -246,7 +249,8 @@ class TestMcpServer:
                 assert "Unknown tool" in resp["result"]["content"][0]["text"]
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_invalid_jsonrpc_method_returns_error(self):
         with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
@@ -270,7 +274,8 @@ class TestMcpServer:
                 assert resp["error"]["code"] == -32601
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_gap_check(self):
         with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
@@ -316,7 +321,8 @@ class TestMcpServer:
                 assert "missing" in gap_data
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_compact(self):
         with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
@@ -349,7 +355,8 @@ class TestMcpServer:
                 assert resp["result"]["isError"] is True
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_initialize(self):
         """initialize should return protocol version, capabilities, and server info."""
@@ -381,7 +388,8 @@ class TestMcpServer:
                 assert result["serverInfo"]["version"] == "0.1.0"
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_initialized_notification(self):
         """initialized notification should not return a response."""
@@ -432,7 +440,8 @@ class TestMcpServer:
                 assert "tools" in resp["result"]
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_notification_no_response_on_error(self):
         """Notification with an error should not leak a response to stdout."""
@@ -474,7 +483,8 @@ class TestMcpServer:
                 assert "tools" in resp["result"]
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_consolidate_stub(self):
         with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
@@ -505,7 +515,8 @@ class TestMcpServer:
                 assert "removed_edges" in data["stats"]
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     # --- New robustness tests ---
 
@@ -552,7 +563,8 @@ class TestMcpServer:
                 assert resp2["error"]["message"] == "Server not initialized"
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_ping(self):
         """ping method should return empty object {}."""
@@ -577,7 +589,8 @@ class TestMcpServer:
                 assert resp["result"] == {}
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     # --- Security / robustness tests ---
 
@@ -603,7 +616,8 @@ class TestMcpServer:
                 assert "ENGRAM_API_KEY" in resp["error"]["message"]
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_auth_missing_api_key_tools_call(self):
         """tools/call without ENGRAM_API_KEY must return -32001 error."""
@@ -630,7 +644,8 @@ class TestMcpServer:
                 assert resp["error"]["code"] == -32001, f"Expected -32001, got: {resp}"
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
 
     def test_line_too_long_returns_parse_error(self):
         """Request line exceeding 1MB must return PARSE_ERROR."""
@@ -654,4 +669,227 @@ class TestMcpServer:
                 assert resp["error"]["code"] == -32700, f"Expected PARSE_ERROR, got: {resp}"
             finally:
                 proc.stdin.close()
-                proc.wait(timeout=3)
+                proc.terminate()
+                proc.wait(timeout=5)
+
+
+def test_validation_clamp_top_k():
+    """Validate top_k clamping via _clamp_top_k."""
+    from engram_router.mcp_server import _clamp_top_k, MAX_TOP_K
+
+    assert _clamp_top_k(5) == 5
+    assert _clamp_top_k(0) == 1
+    assert _clamp_top_k(-1) == 1
+    assert _clamp_top_k(999999) == MAX_TOP_K
+    assert _clamp_top_k(None) == 5
+    assert _clamp_top_k("abc") == 5
+    assert _clamp_top_k(1) == 1
+    assert _clamp_top_k(MAX_TOP_K) == MAX_TOP_K
+
+
+def test_validation_namespace():
+    """Validate namespace coercion via _validate_namespace."""
+    from engram_router.mcp_server import _validate_namespace
+
+    assert _validate_namespace("default") == "default"
+    assert _validate_namespace("tenant_01") == "tenant_01"
+    assert _validate_namespace("my-namespace") == "my-namespace"
+    assert _validate_namespace("a.b.c") == "a.b.c"
+    assert _validate_namespace("") == "default"
+    assert _validate_namespace(None) == "default"
+    assert _validate_namespace("x" * 100) == "default"  # too long
+    assert _validate_namespace("foo;DROP TABLE") == "default"  # SQL injection
+    assert _validate_namespace("../etc/passwd") == "default"  # path traversal
+    assert _validate_namespace("ns with spaces") == "default"  # bad chars
+
+
+def test_validation_memory_id():
+    """Validate memory_id via _validate_memory_id."""
+    import pytest
+    from engram_router.mcp_server import _validate_memory_id, MAX_MEMORY_ID_LEN
+
+    assert _validate_memory_id("mem_123") == "mem_123"
+    assert _validate_memory_id("  mem_456  ") == "mem_456"  # stripped
+    with pytest.raises(ValueError, match="non-empty"):
+        _validate_memory_id("")
+    with pytest.raises(ValueError, match="non-empty"):
+        _validate_memory_id("   ")
+    with pytest.raises(ValueError, match="maximum length"):
+        _validate_memory_id("x" * (MAX_MEMORY_ID_LEN + 1))
+    with pytest.raises(ValueError, match="non-printable"):
+        _validate_memory_id("bad\x00char")
+
+
+def test_validation_text_size():
+    """Validate text size bounded by MAX_TEXT_SIZE."""
+    import pytest
+    from engram_router.mcp_server import _validate_text, MAX_TEXT_SIZE
+
+    assert _validate_text("hello") == "hello"
+    with pytest.raises(ValueError, match="non-empty"):
+        _validate_text("")
+    with pytest.raises(ValueError, match="exceeds maximum"):
+        _validate_text("x" * (MAX_TEXT_SIZE + 1))
+
+
+def test_mcp_memory_recall_top_k_clamped():
+    """Memory recall with out-of-range top_k should succeed with clamped value."""
+    with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
+        proc = _start_mcp(tmp.name)
+        try:
+            _init_mcp(proc)
+
+            # Save a memory first
+            proc.stdin.write(
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "memory.save",
+                            "arguments": {"text": "test memory for clamping"},
+                        },
+                    }
+                )
+            )
+            proc.stdin.flush()
+            resp = _recv(proc)
+            assert "result" in resp, f"Save failed: {resp}"
+
+            # Recall with huge top_k — should be clamped, not rejected
+            proc.stdin.write(
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 2,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "memory.recall",
+                            "arguments": {"query": "test", "top_k": 999999},
+                        },
+                    }
+                )
+            )
+            proc.stdin.flush()
+            resp = _recv(proc)
+            assert "result" in resp, f"Recall with huge top_k failed: {resp}"
+            content = json.loads(
+                resp["result"]["content"][0]["text"]
+            )
+            assert len(content["memories"]) <= 100, (
+                f"Expected ≤100 memories, got {len(content['memories'])}"
+            )
+        finally:
+            proc.stdin.close()
+            proc.terminate()
+            proc.wait(timeout=5)
+
+
+def test_mcp_memory_save_bad_namespace_coerced():
+    """Memory save with dangerous namespace should be coerced to 'default'."""
+    with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
+        proc = _start_mcp(tmp.name)
+        try:
+            _init_mcp(proc)
+
+            # Save with SQL injection namespace
+            proc.stdin.write(
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "memory.save",
+                            "arguments": {
+                                "text": "test",
+                                "namespace": "foo;DROP TABLE memories;--",
+                            },
+                        },
+                    }
+                )
+            )
+            proc.stdin.flush()
+            resp = _recv(proc)
+            # Should succeed — namespace coerced silently
+            assert "result" in resp, f"Save with bad namespace failed: {resp}"
+
+            # Now recall with same bad namespace — should also work (coerced)
+            proc.stdin.write(
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 2,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "memory.recall",
+                            "arguments": {
+                                "query": "test",
+                                "namespace": "../etc/passwd",
+                            },
+                        },
+                    }
+                )
+            )
+            proc.stdin.flush()
+            resp = _recv(proc)
+            assert "result" in resp, f"Recall with bad namespace failed: {resp}"
+        finally:
+            proc.stdin.close()
+            proc.terminate()
+            proc.wait(timeout=5)
+
+
+def test_mcp_delete_bad_memory_id_rejected():
+    """Memory delete with bad memory_id should return error."""
+    with tempfile.NamedTemporaryFile(suffix=".db") as tmp:
+        proc = _start_mcp(tmp.name)
+        try:
+            _init_mcp(proc)
+
+            # Delete with empty memory_id
+            proc.stdin.write(
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "memory.delete",
+                            "arguments": {"memory_id": ""},
+                        },
+                    }
+                )
+            )
+            proc.stdin.flush()
+            resp = _recv(proc)
+            assert "result" in resp, f"Delete returned no result: {resp}"
+            assert resp["result"].get("isError"), (
+                f"Expected isError for empty memory_id, got: {resp['result']}"
+            )
+
+            # Delete with overlong memory_id (>128 chars)
+            proc.stdin.write(
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 2,
+                        "method": "tools/call",
+                        "params": {
+                            "name": "memory.delete",
+                            "arguments": {"memory_id": "x" * 200},
+                        },
+                    }
+                )
+            )
+            proc.stdin.flush()
+            resp = _recv(proc)
+            assert "result" in resp, f"Delete returned no result: {resp}"
+            assert resp["result"].get("isError"), (
+                f"Expected isError for overlong memory_id, got: {resp['result']}"
+            )
+        finally:
+            proc.stdin.close()
+            proc.terminate()
+            proc.wait(timeout=5)

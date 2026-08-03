@@ -16,6 +16,7 @@ import argparse
 import asyncio
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -35,6 +36,61 @@ AUTH_ERROR = -32001
 
 MAX_LINE_LENGTH = 1_048_576  # 1 MB
 MAX_JSON_DEPTH = 100
+MAX_TOP_K = 100              # maximum results per recall
+MAX_TEXT_SIZE = 65_536       # 64 KB max per memory text
+MAX_NAMESPACE_LEN = 64       # namespace string length limit
+_NAMESPACE_RE = re.compile(r"^[a-zA-Z0-9_\-\.]+$")  # safe-characters guard
+MAX_MEMORY_ID_LEN = 128      # memory_id length limit
+
+
+def _clamp(value: int, min_val: int, max_val: int) -> int:
+    """Clamp numeric value to [min_val, max_val]."""
+    return max(min_val, min(value, max_val))
+
+
+def _validate_namespace(value: str) -> str:
+    """Validate/coerce namespace string. Defaults to 'default' on any issue."""
+    if not isinstance(value, str) or not value.strip():
+        return "default"
+    value = value.strip()
+    if len(value) > MAX_NAMESPACE_LEN:
+        return "default"
+    if not _NAMESPACE_RE.match(value):
+        return "default"
+    return value
+
+
+def _validate_memory_id(value: str) -> str:
+    """Validate memory_id: non-empty, length-bounded, printable chars only."""
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("memory_id must be a non-empty string")
+    value = value.strip()
+    if len(value) > MAX_MEMORY_ID_LEN:
+        raise ValueError(f"memory_id exceeds maximum length of {MAX_MEMORY_ID_LEN}")
+    if not value.isprintable():
+        raise ValueError("memory_id contains non-printable characters")
+    return value
+
+
+def _validate_text(value: str, field: str = "text") -> str:
+    """Validate text input: non-empty, size-bounded."""
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{field} must be a non-empty string")
+    if len(value) > MAX_TEXT_SIZE:
+        raise ValueError(
+            f"{field} exceeds maximum size of {MAX_TEXT_SIZE} bytes "
+            f"(received {len(value)} bytes)"
+        )
+    return value
+
+
+def _clamp_top_k(value: Any) -> int:
+    """Clamp top_k to [1, MAX_TOP_K], default 5."""
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return 5
+    return _clamp(value, 1, MAX_TOP_K)
 
 
 def _safe_json_loads(text: str) -> Any:
@@ -311,38 +367,30 @@ class JsonRpcHandler:
     # -- Tool implementations -------------------------------------------------
 
     async def _tool_memory_save(self, args: dict[str, Any]) -> dict[str, Any]:
-        text = args.get("text", "")
-        if not text:
-            raise ValueError("text is required")
-        source = args.get("source", "mcp")
-        namespace = args.get("namespace", "default")
+        text = _validate_text(args.get("text", ""), field="text")
+        source = str(args.get("source", "mcp"))[:128]
+        namespace = _validate_namespace(args.get("namespace", "default"))
         memory_id = self._store.save(text, source=source, namespace=namespace)
         return {"memory_id": memory_id}
 
     async def _tool_memory_recall(self, args: dict[str, Any]) -> dict[str, Any]:
-        query = args.get("query", "")
-        if not query:
-            raise ValueError("query is required")
-        top_k = args.get("top_k", 5)
-        namespace = args.get("namespace", "default")
+        query = _validate_text(args.get("query", ""), field="query")
+        top_k = _clamp_top_k(args.get("top_k", 5))
+        namespace = _validate_namespace(args.get("namespace", "default"))
         records = self._store.recall(query, top_k=top_k, namespace=namespace)
         memories = [r.to_dict() for r in records]
         return {"memories": memories}
 
     async def _tool_memory_gap_check(self, args: dict[str, Any]) -> dict[str, Any]:
-        query = args.get("query", "")
-        if not query:
-            raise ValueError("query is required")
-        namespace = args.get("namespace", "default")
-        scan_all = args.get("scan_all", False)
+        query = _validate_text(args.get("query", ""), field="query")
+        namespace = _validate_namespace(args.get("namespace", "default"))
+        scan_all = bool(args.get("scan_all", False))
         result = self._store.gap_check(query, namespace=namespace, scan_all=scan_all)
         return result
 
     async def _tool_memory_compact(self, args: dict[str, Any]) -> dict[str, Any]:
-        raw_log_id = args.get("raw_log_id", "")
-        distilled_text = args.get("distilled_text", "")
-        if not raw_log_id or not distilled_text:
-            raise ValueError("raw_log_id and distilled_text are required")
+        raw_log_id = _validate_memory_id(str(args.get("raw_log_id", "")))
+        distilled_text = _validate_text(args.get("distilled_text", ""), field="distilled_text")
         distilled_id = self._store.compact(raw_log_id, distilled_text)
         return {"distilled_id": distilled_id}
 
@@ -351,9 +399,7 @@ class JsonRpcHandler:
         return {"status": "ok", "stats": result}
 
     async def _tool_memory_delete(self, args: dict[str, Any]) -> dict[str, Any]:
-        memory_id = args.get("memory_id", "")
-        if not memory_id:
-            raise ValueError("memory_id is required")
+        memory_id = _validate_memory_id(str(args.get("memory_id", "")))
         deleted = self._store.delete(memory_id)
         return {"deleted": deleted}
 
