@@ -87,6 +87,23 @@ def _extract_persons(text: str) -> list[dict[str, Any]]:
             continue
         out.append({"name": name, "kind": "person", "evidence": m.group(0)})
     surname = cfg.entities.surname_chars
+    # Compound surnames ("欧阳" / "司马" / "诸葛") must be matched BEFORE
+    # the single-char surname regex, otherwise "欧" catches the first
+    # character and "阳锋" becomes a false-positive single-character name.
+    compound = getattr(cfg.entities, 'compound_surnames', [])
+    if compound:
+        _comp_pat = "|".join(re.escape(c) for c in sorted(compound, key=len, reverse=True))
+        for m in re.finditer(
+            rf"\b({_comp_pat})([一-鿿]{{1,2}})",
+            text,
+        ):
+            surname_part = m.group(1)
+            given = m.group(2)
+            name = surname_part + given
+            if any(name.endswith(s) for s in _NAME_STOP):
+                continue
+            out.append({"name": name, "kind": "person", "evidence": m.group(0)})
+
     # Surname-name: "张三" / "李四". Use a negative lookbehind (prev char is
     # neither another surname char nor 老/小) instead of requiring a leading
     # separator, so a name glued to a role/kinship word is still caught:

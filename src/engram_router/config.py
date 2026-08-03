@@ -47,7 +47,19 @@ class EntityConfig:
     role_words: list[str] = field(default_factory=lambda: [
         "同事", "前同事", "同学", "朋友", "老板", "领导", "客户", "老师",
     ])
-    surname_chars: str = "张李王赵刘陈杨黄周吴徐孙马朱胡林郭何高罗"
+    # ── Chinese surnames (百家姓 top 100 + common compound surnames)
+    surname_chars: str = (
+        "张李王赵刘陈杨黄周吴徐孙马朱胡林郭何高罗"
+        "郑梁谢宋唐许邓韩冯曹彭曾萧田董潘袁蔡蒋余"
+        "于杜叶程苏魏吕丁任卢姚沈钟姜崔谭陆范汪"
+        "廖石金韦贾夏付方邹熊孟秦邱江尹薛阎段雷"
+        "侯龙史陶黎贺顾毛郝龚邵万钱严覃武戴莫孔"
+        "汤"
+    )
+    compound_surnames: list[str] = field(default_factory=lambda: [
+        "欧阳", "上官", "司马", "诸葛", "独孤", "慕容", "宇文",
+        "东方", "皇甫", "令狐", "端木", "公孙", "夏侯", "轩辕",
+    ])
     name_breakers: str = (
         "前送是在的说现给最这那今昨明上下个把和与认识喜爱有过来去要会想做"
         "、，。！？ 和跟同当于到脾平每总很也已才就又都还便只"
