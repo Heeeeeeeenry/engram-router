@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from typing import Any
 
 from . import candidates
@@ -528,6 +529,7 @@ def build_recall_response(
     top_k: int,
     query: str = "",
     namespace: str = "default",
+    _deadline: float = float('inf'),
 ) -> list[MemoryRecord]:
     """Sort scored candidates, take top-k, and convert to MemoryRecords.
 
@@ -742,7 +744,8 @@ def build_recall_response(
                 hyde_skipped = False
                 hyde = getattr(store, 'hyde', None)
                 if hyde and getattr(hyde, "available", False) \
-                        and store.weights.hyde_rrf_weight > 0:
+                        and store.weights.hyde_rrf_weight > 0 \
+                        and not _check_deadline(_deadline, "HyDE"):
                     try:
                         hyde_list, hyde_result = hyde.expand_and_recall(
                             query, embedding_engine, vector_index,
@@ -845,7 +848,7 @@ def build_recall_response(
                 for r in records
             ]
 
-    # ── Phase 2.4: Cross-encoder rerank (Phase 1 rerank_and_hyde.md) ──
+    # ── Phase 2.4: Cross-encoder rerank (skip if deadline expired) ──
     # Save pre-CE signal so Phase 3.5 can decide whether to fall back to
     # vector search.  M3 fix: instead of ``r.score > 0`` (which context
     # boosts inflate — a memory with 0 base but +2.0 brand boost would
@@ -865,21 +868,24 @@ def build_recall_response(
     )
     cross_encoder = getattr(store, 'cross_encoder', None)
     if cross_encoder and getattr(cross_encoder, "available", False) \
-            and query and len(records) > 1:
+            and query and len(records) > 1 \
+            and not _check_deadline(_deadline, "cross-encoder"):
         records = _apply_reranker(
             records, query, cross_encoder, "cross-encoder", "ce_score",
         )
 
-    # ── Phase 2.45: ColBERT late-interaction rerank ──
+    # ── Phase 2.45: ColBERT late-interaction rerank (skip if deadline expired) ──
     colbert = getattr(store, 'colbert_reranker', None)
-    if colbert and getattr(colbert, "available", False) and records and len(records) > 1:
+    if colbert and getattr(colbert, "available", False) and records and len(records) > 1 \
+            and not _check_deadline(_deadline, "colbert"):
         records = _apply_reranker(
             records, query, colbert, "colbert", "colbert_score",
         )
 
-    # ── Phase 2.5: LLM reranker (semantic re-rank, optional) ──
+    # ── Phase 2.5: LLM reranker (semantic re-rank, skip if deadline expired) ──
     reranker = getattr(store, 'reranker', None)
-    if reranker and reranker.available and records and len(records) > 1:
+    if reranker and reranker.available and records and len(records) > 1 \
+            and not _check_deadline(_deadline, "LLM-reranker"):
         try:
             candidates_list = [{"text": r.raw_text, "score": r.score} for r in records]
             reranked = reranker.rerank(query, candidates_list)
@@ -1108,8 +1114,9 @@ def recall(
     import time as _time
     from . import metrics as _metrics
     _t0 = _time.perf_counter()
+    _deadline = _t0 + (store.weights.recall_deadline_ms / 1000.0) if store.weights.recall_deadline_ms > 0 else float('inf')
     try:
-        return _recall_impl(store, query, top_k, namespace)
+        return _recall_impl(store, query, top_k, namespace, _deadline)
     finally:
         _elapsed_ms = (_time.perf_counter() - _t0) * 1000.0
         try:
@@ -1118,11 +1125,20 @@ def recall(
             pass
 
 
+def _check_deadline(deadline: float, phase: str) -> bool:
+    """Return True if the deadline has passed. Log the skipped phase."""
+    if time.perf_counter() >= deadline:
+        logger.debug("Recall deadline exceeded, skipping phase: %s", phase)
+        return True
+    return False
+
+
 def _recall_impl(
     store: Any,
     query: str,
     top_k: int = 5,
     namespace: str = "default",
+    _deadline: float = float('inf'),
 ) -> list[MemoryRecord]:
     """Actual recall implementation, wrapped by recall() for metrics."""
     # ── Phase 2: Query Expansion ───────────────────────────────────

@@ -191,6 +191,17 @@ class RecallWeights:
     Snapshots record query/result_ids/trace for offline replay and debugging.
     Default 1% avoids storage bloat in production while still capturing samples."""
 
+    # ── Recall deadline (N7 SRE) ────────────────────────────────────────
+    recall_deadline_ms: int = 5000
+    """End-to-end wall-clock budget for recall() in milliseconds.
+
+    When the deadline is exceeded inside _recall_impl(), expensive phases
+    (HyDE LLM call, CE rerank, ColBERT, LLM-rerank) are skipped and the
+    best results so far are returned.  The cheaper phases (FTS token match,
+    entity extraction, edge expansion) always complete.
+
+    Set to 0 to disable the deadline (no budget limit)."""
+
     def __post_init__(self) -> None:
         """Validate weights on construction so misconfiguration is caught early."""
         if not (0 < self.recall_decay <= 1):
