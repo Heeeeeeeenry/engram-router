@@ -22,7 +22,16 @@ class RecallWeights:
     Every number that was previously a hard-coded literal lives here, with its
     current value as the default, so constructing ``RecallWeights()`` is
     behaviourally identical to the old hard-coded world.
+
+    **schema_version**: increment when fields are added, removed, or change
+    default semantics. Downstream consumers can check this to detect
+    incompatible configuration before it causes silent misbehavior.
     """
+
+    # ── Schema version (API audit) ─────────────────────────────────────────
+    schema_version: int = 1
+    """Bump on field additions, removals, or default-semantics changes.
+    Consumers should check this against their expected version at startup."""
 
     # ── token scoring (_term_weight) ──────────────────────────────────────
     ascii_base: float = 4.0

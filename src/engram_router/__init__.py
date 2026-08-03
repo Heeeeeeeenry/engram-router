@@ -26,6 +26,25 @@ from .forgetting import (
     ForgettingConfig,
 )
 
+
+# ── Exceptions (API audit) ───────────────────────────────────────────
+
+class EngramError(Exception):
+    """Base exception for all EngramRouter errors."""
+
+
+class ConfigError(EngramError):
+    """Configuration error — missing env var, invalid value, etc."""
+
+
+class ValidationError(EngramError):
+    """Input validation failed — bad namespace, oversized text, etc."""
+
+
+class NamespaceError(EngramError):
+    """Cross-namespace access denied."""
+
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -48,4 +67,9 @@ __all__ = [
     "AttrEvidence",
     "ForgettingEngine",
     "ForgettingConfig",
+    # Exceptions
+    "EngramError",
+    "ConfigError",
+    "ValidationError",
+    "NamespaceError",
 ]
