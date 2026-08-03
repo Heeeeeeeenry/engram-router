@@ -27,6 +27,11 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+try:
+    from .prompt_guard import wrap_user_content as _wrap
+except ImportError:  # pragma: no cover — defensive
+    _wrap = lambda s, _max=None: s
+
 # ---------------------------------------------------------------------------
 # IntentResult
 # ---------------------------------------------------------------------------
@@ -205,7 +210,7 @@ class IntentClassifier:
 
         messages = [
             {"role": "system", "content": _INTENT_SYSTEM_PROMPT},
-            {"role": "user", "content": _INTENT_USER_TEMPLATE.format(query=query)},
+            {"role": "user", "content": _INTENT_USER_TEMPLATE.format(query=_wrap(query))},
         ]
 
         try:

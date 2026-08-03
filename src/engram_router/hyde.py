@@ -44,6 +44,11 @@ from typing import Any, Callable, cast
 
 logger = logging.getLogger(__name__)
 
+try:
+    from .prompt_guard import wrap_user_content as _wrap
+except ImportError:  # pragma: no cover — defensive
+    _wrap = lambda s, _max=None: s
+
 
 _HYDE_SYSTEM_PROMPT = """\
 你是"记忆假想扩写"助手,任务是为个人记忆检索系统生成假想候选记忆。
@@ -389,7 +394,7 @@ class HyDEExpander:
             return ""
         messages = [
             {"role": "system", "content": _HYDE_SYSTEM_PROMPT},
-            {"role": "user", "content": _HYDE_USER_TEMPLATE.format(query=query)},
+            {"role": "user", "content": _HYDE_USER_TEMPLATE.format(query=_wrap(query))},
         ]
         try:
             return cast(str, self._client.chat(messages, temperature=0.0,

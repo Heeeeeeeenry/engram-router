@@ -24,6 +24,11 @@ from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
+try:
+    from .prompt_guard import wrap_user_content as _wrap
+except ImportError:  # pragma: no cover — defensive
+    _wrap = lambda s, _max=None: s
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Data structures
@@ -316,7 +321,7 @@ class LLMQueryRewriter:
 
         messages = [
             {"role": "system", "content": _QUERY_REWRITE_SYSTEM_PROMPT},
-            {"role": "user", "content": _QUERY_REWRITE_USER_TEMPLATE.format(query=query)},
+            {"role": "user", "content": _QUERY_REWRITE_USER_TEMPLATE.format(query=_wrap(query))},
         ]
 
         try:
@@ -550,7 +555,7 @@ class QueryExpander:
         messages = [
             {"role": "system", "content": _MULTI_QUERY_SYSTEM_PROMPT.format(
                 num_variants=num_variants)},
-            {"role": "user", "content": _MULTI_QUERY_USER_TEMPLATE.format(query=query)},
+            {"role": "user", "content": _MULTI_QUERY_USER_TEMPLATE.format(query=_wrap(query))},
         ]
 
         try:

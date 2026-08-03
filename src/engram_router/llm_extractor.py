@@ -35,6 +35,11 @@ from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
+try:
+    from .prompt_guard import wrap_user_content as _wrap
+except ImportError:  # pragma: no cover — defensive
+    _wrap = lambda s, _max=None: s
+
 # --- Configuration -----------------------------------------------------------
 
 # Default model: DeepSeek V3 (public API, no proxy issues).
@@ -738,7 +743,7 @@ class LLMExtractor:
         truncated = self._truncate(text)
         messages = [
             {"role": "system", "content": _EXTRACTION_SYSTEM_PROMPT},
-            {"role": "user", "content": _EXTRACTION_USER_TEMPLATE.format(text=truncated)},
+            {"role": "user", "content": _EXTRACTION_USER_TEMPLATE.format(text=_wrap(truncated))},
         ]
 
         try:
@@ -797,7 +802,7 @@ class LLMExtractor:
         # Phase 2: batch the uncached texts in groups of MAX_BATCH_SIZE.
         for start in range(0, len(uncached_indices), MAX_BATCH_SIZE):
             chunk_indices = uncached_indices[start:start + MAX_BATCH_SIZE]
-            chunk_texts = [texts[i] for i in chunk_indices]
+            chunk_texts = [_wrap(texts[i]) for i in chunk_indices]
 
             # Build batch prompt.
             messages = [
