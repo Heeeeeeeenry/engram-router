@@ -194,16 +194,25 @@ class CrossEncoderReranker:
         # discriminative signal we want CE to carry. Min-max keeps the
         # relative gaps intact (a 700x score ratio becomes a 1.0 vs 0.0
         # gap after normalisation).
+        #
+        # P0 ML audit fix: per-batch min-max collapses for single-candidate
+        # batches (range=0 → all get 0.5). Use fixed reference anchors so
+        # the scale is stable regardless of batch size.
+        # CE raw scores from bge-reranker-v2-m3 typically range from ~0.001
+        # (irrelevant) to ~0.95 (perfect match), with a typical floor of
+        # ~0.005 and ceiling of ~0.85. Using fixed anchors makes the
+        # normalized score comparable across batches.
+        _CE_FLOOR = 0.001   # approximate lower bound of CE raw scores
+        _CE_CEILING = 0.99  # approximate upper bound (models never output 1.0)
+        _CE_RANGE = _CE_CEILING - _CE_FLOOR
+
         fusion_scores = [float(c.get("score", 0.0)) for c in head]
         fs_max = max(fusion_scores) if fusion_scores else 1.0
         fs_min = min(fusion_scores) if fusion_scores else 0.0
         fs_range = fs_max - fs_min if fs_max != fs_min else 1.0
-        ce_max = max(ce_scores) if ce_scores else 1.0
-        ce_min = min(ce_scores) if ce_scores else 0.0
-        ce_range = ce_max - ce_min if ce_max != ce_min else 1.0
 
         for cand, ce_raw, fs in zip(head, ce_scores, fusion_scores):
-            ce_norm = (ce_raw - ce_min) / ce_range
+            ce_norm = max(0.0, min(1.0, (ce_raw - _CE_FLOOR) / _CE_RANGE))
             fs_norm = (fs - fs_min) / fs_range
             blended = self._ce_weight * ce_norm + (1.0 - self._ce_weight) * fs_norm
             cand["ce_score"] = round(float(ce_raw), 4)

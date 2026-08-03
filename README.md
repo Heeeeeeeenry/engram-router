@@ -120,20 +120,47 @@ engram-mcp --db ~/.engram/memory.db
 
 ## 环境变量
 
+### 功能开关
+
 | 变量 | 作用 |
 |------|------|
-| `DEEPSEEK_API_KEY` | LLM 功能（HyDE / LLM 抽取 / 查询改写 / intent classifier） |
 | `ENGRAM_SKIP_VECTOR=1` | 跳过向量模型加载（测试 / 纯 FTS 场景） |
 | `ENGRAM_SKIP_CE=1` | 跳过 cross-encoder 重排（低延迟场景） |
 | `ENGRAM_FORCE_CE=1` | 仅启用 CE 重排，跳过其他通道 |
+| `ENGRAM_SKIP_COLBERT=1` | 跳过 ColBERT late-interaction 重排 |
+| `ENGRAM_SKIP_COREF=1` | 跳过 Fastcoref 代词消解 |
+| `ENGRAM_SKIP_HANLP=1` | 跳过 HanLP NER 实体识别 |
+| `ENGRAM_SKIP_CANONICAL=1` | 跳过实体别名 canonicalization |
+
+### 云端控制
+
+| 变量 | 作用 |
+|------|------|
 | `ENGRAM_ALLOW_CLOUD=1` | 一次性打开所有云端调用 |
 | `ENGRAM_ALLOW_CLOUD_LLM=1` | 只允许 LLM 走云端 |
 | `ENGRAM_ALLOW_CLOUD_EMBEDDING=1` | 只允许 embedding 走云端 |
 | `ENGRAM_ALLOW_CLOUD_RERANKER=1` | 只允许重排走云端 |
+
+### LLM / API
+
+| 变量 | 作用 |
+|------|------|
+| `DEEPSEEK_API_KEY` | LLM API key（HyDE / LLM 抽取 / 查询改写 / intent classifier） |
+| `ENGRAM_LLM_BASE_URL` | 自定义 LLM API 地址（默认 DeepSeek 兼容 endpoint） |
+| `ENGRAM_LLM_MODEL` | 自定义 LLM 模型名（默认 deepseek-v4-pro） |
+| `ENGRAM_API_KEY` | MCP server 认证密钥 |
+| `ENGRAM_EMBEDDING_API_KEY` | 云端 embedding API key（替代本地模型） |
+| `ENGRAM_EMBEDDING_API_BASE` | 云端 embedding API 地址 |
+| `HF_TOKEN` | HuggingFace token（下载本地模型） |
+
+### 硬件 / 调试
+
+| 变量 | 作用 |
+|------|------|
+| `ENGRAM_CE_DEVICE` | Cross-encoder 设备（`cpu`/`mps`/`cuda`，默认自动检测） |
+| `ENGRAM_COLBERT_DEVICE` | ColBERT 设备（同上） |
 | `ENGRAM_SSL_VERIFY=0` | 跳过 SSL 验证（内部代理） |
-| `ENGRAM_LLM_BASE_URL` | 自定义 LLM API 地址 |
-| `ENGRAM_LLM_MODEL` | 自定义 LLM 模型名 |
-| `HF_TOKEN` | HuggingFace token（下载模型） |
+| `ENGRAM_CONFIG` | 自定义配置文件路径（默认 `~/.engram/config.yaml`） |
 
 默认情况下即便配置了 API key，云端调用也是关闭的（本地优先原则）。以上变量取值 `1 / true / yes / on`（大小写不敏感）才生效，其他值一律视为关闭。
 
