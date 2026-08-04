@@ -88,7 +88,10 @@ _VERB_MAP: dict[str, str] = {
     "辞职了": "辞职",
     "面试了": "面试",
     "住在": "住",
+    "住了": "住",
+    "住": "住",
     "工作了": "工作",
+    "工作": "工作",
     "取得了": "取得",
     "获得了": "获得",
     "赢得了": "赢得",
@@ -104,6 +107,8 @@ _VERB_MAP: dict[str, str] = {
     "发表了": "发表",
     "入职了": "入职",
     "离职了": "离职",
+    "上班": "工作",
+    "在": "在"
 }
 
 # Common object modifiers to strip for canonicalization.
@@ -196,33 +201,26 @@ def _extract_rule_based(
 
 def _extract_subject(before_verb: str) -> str:
     """Extract subject from text before the verb."""
-    # Clean trailing noise from the split
     before = before_verb.strip()
+    if not before:
+        return ""
 
-    # Best case: "张三" → find rightmost 2-3 CJK char sequence
     import re
-    # Drop preposition / location / time prefix ("昨天在北京" → keep "在北京")
-    # Find (surname_like)(1-2 chars) patterns — closest to verb wins
     surnames = "张李王赵刘陈杨黄周吴徐孙马朱胡林郭何高罗" \
                "郑梁谢宋唐许邓韩冯曹彭曾萧田董潘袁蔡蒋余" \
                "于杜叶程苏魏吕丁任卢姚沈钟姜崔谭陆范汪" \
                "廖石金韦贾夏付方邹熊孟秦邱江尹薛阎段雷" \
                "侯龙史陶黎贺顾毛郝龚邵万钱严覃武戴莫孔汤"
-    # Find surname-name: surname + 1-2 CJK chars
-    m = re.search(
-        rf"[{surnames}老小][一-鿿]{{1,2}}(?=\s*[{re.escape('，。,!.！在去来给送吃买到做开')}]|$)",
-        before,
-    )
+
+    # Find surname-name pair closest to verb: surname + 1-2 CJK chars
+    m = re.search(rf"[{surnames}老小][一-鿿]{{1,2}}$", before)
     if m:
         return m.group(0)
 
-    # Fallback: named company / team / 老/小 nickname
+    # Fallback: named entity (company, team, etc.)
     for marker in ("公司", "团队", "部门", "项目组"):
         if marker in before:
             return marker
-    m = re.search(rf"[老小][一-鿿]", before)
-    if m:
-        return m.group(0)
 
     return ""
 
