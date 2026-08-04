@@ -265,6 +265,27 @@ class MemoryStore:
             CREATE INDEX IF NOT EXISTS idx_events_memory ON events(memory_id);
             CREATE INDEX IF NOT EXISTS idx_events_namespace ON events(namespace);
 
+            -- L2: Aggregated fact votes from events.
+            -- Each row is one (subject, verb, object, namespace) fact with a
+            -- vote count.  When the same (subject, verb) has >1 object, the
+            -- votes reflect how many times each was mentioned (most-recent
+            -- object gets a recency boost).  Downstream consumers query this
+            -- table directly for the canonical answer to a fact question
+            -- without re-scanning raw events.
+            CREATE TABLE IF NOT EXISTS fact_votes (
+                id TEXT PRIMARY KEY,
+                subject TEXT NOT NULL,
+                verb TEXT NOT NULL,
+                object TEXT NOT NULL,
+                vote_count INTEGER NOT NULL DEFAULT 1,
+                last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                namespace TEXT NOT NULL DEFAULT 'default',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_fact_votes_sv
+                ON fact_votes(subject, verb, namespace);
+
             CREATE TABLE IF NOT EXISTS entities (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
@@ -789,7 +810,9 @@ class MemoryStore:
             )
 
     def _index_events(self, memory_id: str, text: str, namespace: str = "default") -> None:
-        """L2.1: Extract structured events and write to events table."""
+        """L2.1: Extract structured events and write to events table.
+        L2 fact_vote: also upsert into fact_votes for majority-vote aggregation.
+        """
         try:
             from ..event_extractor import extract_events
             events = extract_events(text, memory_id=memory_id, namespace=namespace)
@@ -801,6 +824,26 @@ class MemoryStore:
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                     event.to_sql_row(event_id),
                 )
+                # Upsert into fact_votes: increment vote count on conflict
+                if event.subject and event.verb and event.object:
+                    # Deterministic id = namespace:subject:verb:object
+                    fv_id = f"fv_{event.subject}_{event.verb}_{event.object}"
+                    existing = self.conn.execute(
+                        "SELECT id, vote_count FROM fact_votes WHERE id = ? AND namespace = ?",
+                        (fv_id, namespace),
+                    ).fetchone()
+                    if existing:
+                        self.conn.execute(
+                            """UPDATE fact_votes SET vote_count = ? + 1, last_seen_at = CURRENT_TIMESTAMP
+                               WHERE id = ?""",
+                            (existing["vote_count"], existing["id"]),
+                        )
+                    else:
+                        self.conn.execute(
+                            """INSERT INTO fact_votes (id, subject, verb, object, vote_count, namespace)
+                               VALUES (?, ?, ?, ?, 1, ?)""",
+                            (fv_id, event.subject, event.verb, event.object, namespace),
+                        )
         except (ImportError, ValueError, AttributeError) as exc:
             logger.debug("_index_events skipped: %s", exc)
 
@@ -1199,6 +1242,7 @@ class MemoryStore:
         "distilled_memories": "dst",
         "recall_snapshots": "snap",
         "events": "evt",
+        "fact_votes": "fv",
     }
 
     def _next_id(self, table: str, prefix: str) -> str:
@@ -1399,6 +1443,66 @@ class MemoryStore:
         self.conn.commit()
         self._fts_rebuild()
         return stats
+
+    # ── L2: fact_vote query API ────────────────────────────────────────
+
+    def get_fact(self, subject: str, verb: str, namespace: str = "default") -> dict[str, Any] | None:
+        """Return the majority-voted fact for a (subject, verb) pair.
+
+        Returns the fact with the highest vote_count, or None if no facts exist.
+        In case of a tie, the most recently seen fact wins (recency bias).
+        """
+        row = self.conn.execute(
+            """SELECT subject, verb, object, vote_count, last_seen_at
+               FROM fact_votes
+               WHERE subject = ? AND verb = ? AND namespace = ?
+               ORDER BY vote_count DESC, last_seen_at DESC
+               LIMIT 1""",
+            (subject, verb, namespace),
+        ).fetchone()
+        if row is None:
+            return None
+        return dict(row)
+
+    def get_all_facts(self, subject: str, namespace: str = "default") -> list[dict[str, Any]]:
+        """Return all voted facts for a subject, ranked by confidence."""
+        rows = self.conn.execute(
+            """SELECT subject, verb, object, vote_count, last_seen_at
+               FROM fact_votes
+               WHERE subject = ? AND namespace = ?
+               ORDER BY vote_count DESC""",
+            (subject, namespace),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def rebuild_fact_votes(self, namespace: str = "default") -> int:
+        """Recompute fact_votes from the events table.
+
+        Useful after bulk imports or when the fact_votes table drifts.
+        Returns the number of fact rows written.
+        """
+        # Clear existing votes for this namespace
+        self.conn.execute(
+            "DELETE FROM fact_votes WHERE namespace = ?", (namespace,)
+        )
+        # Re-aggregate from events
+        self.conn.execute(
+            """INSERT INTO fact_votes
+               (id, subject, verb, object, vote_count, namespace)
+               SELECT
+                   'fv_' || subject || '_' || verb || '_' || object || '_' || CAST(COUNT(*) AS TEXT),
+                   subject, verb, object, COUNT(*) as vote_count, namespace
+               FROM events
+               WHERE namespace = ? AND subject != '' AND verb != '' AND object != ''
+               GROUP BY subject, verb, object, namespace""",
+            (namespace,),
+        )
+        count = self.conn.execute(
+            "SELECT COUNT(*) as cnt FROM fact_votes WHERE namespace = ?",
+            (namespace,),
+        ).fetchone()
+        self.conn.commit()
+        return count["cnt"] if count else 0
 
     def _fts_rebuild(self) -> None:
         """Delegates to candidates.fts_rebuild."""
