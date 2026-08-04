@@ -37,6 +37,24 @@ CONSOLIDATE_SIMILARITY_THRESHOLD: float = 0.80
 # Salience classes that are immune to forgetting
 PROTECTED_SALIENCE: frozenset[str] = frozenset({"constraint", "decision"})
 
+# ── L3: Tiered decay windows ─────────────────────────────────────────────
+# Per-salience lifespan beyond which the forgetting engine considers the
+# memory stale. These are soft windows — the engine never hard-deletes,
+# only flags forgotten=1 after the window passes without access.
+# base_attr (age, height, blood type) → virtually permanent
+# event (one-time occurrence) → 30 days
+# sensory (taste, mood, opinion) → 7 days
+# opinion (subjective judgment) → 3 days
+TIERED_DECAY_DAYS: dict[str, float] = {
+    "base_attr": 365.0,
+    "constraint": 365.0,
+    "decision": 90.0,
+    "event": 30.0,
+    "sensory": 7.0,
+    "opinion": 3.0,
+}
+DEFAULT_DECAY_DAYS: float = 30.0  # fallback for unknown salience classes
+
 
 # ---------------------------------------------------------------------------
 # Public API

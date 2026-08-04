@@ -496,20 +496,64 @@ class MemoryStore:
         texts = [t for t, _, _ in items]
         summaries = [self._summarize(t) for t in texts]
 
-        # Pre-encode all vectors in one batch
-        batch_embs = None
+        # ── L3: Save dedup ──
+        # If vector is enabled, pre-encode all texts and check whether any
+        # are near-duplicates (cosine > 0.95) of existing memories in the
+        # same namespace.  Duplicates get an extra evidence record rather
+        # than a new memory row.
+        duplicate_for: dict[int, str] = {}  # idx → existing memory_id
+        pre_embs = None
         if self._vector_enabled and self.embedding_engine and self.vector_index:
+            try:
+                pre_embs = self.embedding_engine.encode_batch(texts)
+                if pre_embs is not None:
+                    import numpy as np
+                    for idx, vec in enumerate(pre_embs):
+                        if idx in duplicate_for:
+                            continue
+                        hits = self.vector_index.search(vec, k=3)
+                        for mid, sim in hits:
+                            if sim > 0.95:
+                                # Verify same namespace
+                                ns_row = self.conn.execute(
+                                    "SELECT namespace FROM memories WHERE id = ?",
+                                    (mid,),
+                                ).fetchone()
+                                if ns_row and ns_row["namespace"] == namespace:
+                                    duplicate_for[idx] = mid
+                                    break
+            except Exception as exc:
+                logger.debug("Save dedup check skipped: %s", exc)
+
+        # Pre-encode all vectors in one batch (L3: reused for both dedup and indexing)
+        batch_embs = pre_embs if pre_embs else None
+        if batch_embs is None and self._vector_enabled and self.embedding_engine and self.vector_index:
             try:
                 batch_embs = self.embedding_engine.encode_batch(texts)
             except Exception as exc:
                 logger.debug("Batch vector encode skipped: %s", exc)
 
         ids: list[str] = []
+        dedup_count = 0
         for idx, (text, source, metadata) in enumerate(items):
             if not text or not text.strip():
                 raise ValueError("text must not be empty")
             if len(text.encode("utf-8")) > self.MAX_TEXT_BYTES:
                 raise ValueError(f"text exceeds {self.MAX_TEXT_BYTES} bytes")
+
+            # ── L3: Save dedup — merge near-duplicates into existing memory ──
+            existing_id = duplicate_for.get(idx)
+            if existing_id:
+                # Append evidence only; the existing memory row stays.
+                evidence_id = self._next_id("evidence", "evi")
+                self.conn.execute(
+                    "INSERT INTO evidence (id, memory_id, quote, source_location) VALUES (?, ?, ?, ?)",
+                    (evidence_id, existing_id, text, source),
+                )
+                ids.append(existing_id)
+                dedup_count += 1
+                continue
+
             next_id = self._next_id("memories", "mem")
             self.conn.execute(
                 "INSERT INTO memories (id, raw_text, summary, source, confidence, metadata, namespace) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -570,10 +614,13 @@ class MemoryStore:
             except Exception as exc:
                 logger.debug("Vector index save after batch skipped: %s", exc)
 
-        # N1: save_dedup_ratio (dedup TBD — placeholder set to 1.0 = all unique)
+        # N1: save_dedup_ratio (L3: now reflects actual dedup, no longer placeholder 1.0)
+        total_items = len(items)
+        unique_items = total_items - dedup_count
+        dedup_ratio = unique_items / total_items if total_items > 0 else 1.0
         try:
             from . import metrics as _m
-            _m.save_dedup_ratio.set(1.0)
+            _m.save_dedup_ratio.set(dedup_ratio)
         except Exception:
             pass
 
