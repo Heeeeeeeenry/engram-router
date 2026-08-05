@@ -247,6 +247,19 @@ TOOLS = [
             "required": ["memory_id"],
         },
     },
+    {
+        "name": "memory.maintenance",
+        "description": "Run all housekeeping: forgetting decay + consolidate + contradiction scan + fact_vote rebuild. Returns per-step counts.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "namespace": {
+                    "type": "string",
+                    "description": "Namespace (tenant) to scope maintenance to. Defaults to 'default'.",
+                },
+            },
+        },
+    },
 ]
 
 
@@ -273,6 +286,7 @@ class JsonRpcHandler:
             "memory.gap_check": self._tool_memory_gap_check,
             "memory.compact": self._tool_memory_compact,
             "memory.consolidate": self._tool_memory_consolidate,
+            "memory.maintenance": self._tool_memory_maintenance,
             "memory.delete": self._tool_memory_delete,
         }
 
@@ -413,6 +427,11 @@ class JsonRpcHandler:
         namespace = _validate_namespace(args.get("namespace", "default"))
         deleted = self._store.delete(memory_id, namespace=namespace)
         return {"deleted": deleted}
+
+    async def _tool_memory_maintenance(self, args: dict[str, Any]) -> dict[str, Any]:
+        namespace = _validate_namespace(args.get("namespace", "default"))
+        result = self._store.run_maintenance(namespace=namespace)
+        return {"status": "ok", "stats": result}
 
 
 # ---------------------------------------------------------------------------

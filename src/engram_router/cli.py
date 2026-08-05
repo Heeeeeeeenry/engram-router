@@ -34,6 +34,10 @@ def main() -> None:
 
     del_p = sub.add_parser("delete", help="Delete a memory by ID")
     del_p.add_argument("memory_id", help="ID of the memory to delete")
+    del_p.add_argument("--namespace", default="default", help="Tenant namespace")
+
+    maint_p = sub.add_parser("maintenance", help="Run housekeeping: forgetting + consolidate + contradiction scan + fact_vote rebuild")
+    maint_p.add_argument("--namespace", default="default", help="Tenant namespace")
 
     raw_p = sub.add_parser("save-raw-log", help="Save a raw log entry")
     raw_p.add_argument("text", help="Raw log text")
@@ -105,8 +109,11 @@ def main() -> None:
                 _print(store.gap_check(args.query, records, namespace=args.namespace,
                        scan_all=args.scan_all))
             elif args.command == "delete":
-                deleted = store.delete(args.memory_id)
+                deleted = store.delete(args.memory_id, namespace=args.namespace)
                 _print({"deleted": deleted, "memory_id": args.memory_id})
+            elif args.command == "maintenance":
+                stats = store.run_maintenance(namespace=args.namespace)
+                _print({"status": "ok", "stats": stats})
             elif args.command == "save-raw-log":
                 raw_id = store.save_raw_log(args.text, kind=args.kind)
                 _print({"raw_log_id": raw_id})
