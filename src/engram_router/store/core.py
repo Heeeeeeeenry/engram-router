@@ -326,6 +326,21 @@ class MemoryStore:
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
 
+            -- L2: GDPR compliance audit log.  Every mutating operation
+            -- (save/delete/consolidate/forget) appends one row.  The audit
+            -- trail is append-only — rows are never updated or deleted.
+            CREATE TABLE IF NOT EXISTS audit_log (
+                id TEXT PRIMARY KEY,
+                operation TEXT NOT NULL,
+                memory_id TEXT NOT NULL DEFAULT '',
+                namespace TEXT NOT NULL DEFAULT 'default',
+                details TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_audit_log_memory ON audit_log(memory_id);
+            CREATE INDEX IF NOT EXISTS idx_audit_log_ns ON audit_log(namespace);
+
             -- Monotonic id allocator. One row per logical table; next_val only
             -- ever climbs, so deleting rows can never make _next_id hand back an
             -- id that already exists (the old COUNT(*)+1 scheme did exactly that
@@ -624,6 +639,9 @@ class MemoryStore:
         except Exception:
             pass
 
+        # Audit: log save batch
+        self._audit("save", "", namespace, f"batch_count={len(ids)}")
+
         # Batch persona update
         for text in texts:
             try:
@@ -663,8 +681,11 @@ class MemoryStore:
             "DELETE FROM memories WHERE id = ? AND namespace = ?",
             (memory_id, namespace),
         )
+        deleted = cursor.rowcount > 0
+        if deleted:
+            self._audit("delete", memory_id, namespace)
         self.conn.commit()
-        return cursor.rowcount > 0
+        return deleted
 
     # --- entity indexing -----------------------------------------------------
 
@@ -1004,12 +1025,20 @@ class MemoryStore:
         return _recall.should_inject(query)
 
     def recall(self, query: str, top_k: int = 5,
-               namespace: str = "default") -> list[MemoryRecord]:
-        """Delegate to recall.recall, with optional snapshot sampling (L4.3)."""
+               namespace: str = "default",
+               include_forgotten: bool = False) -> list[MemoryRecord]:
+        """Delegate to recall.recall, with optional snapshot sampling (L4.3).
+
+        L3: include_forgotten=True surfaces cold-stored (forgotten=1) memories
+        alongside active ones.  Default False to filter them out.
+        """
         import time as _time
 
         t0 = _time.perf_counter()
         results = _recall.recall(self, query, top_k=top_k, namespace=namespace)
+        # L3 cold storage: filter or keep forgotten based on include_forgotten
+        if not include_forgotten:
+            results = [r for r in results if not (r.metadata or {}).get('forgotten')]
         elapsed = (_time.perf_counter() - t0) * 1000
         # Capture any trace from the pipeline tracer for snapshot retention.
         trace = getattr(self, '_tracer', None)
@@ -1290,6 +1319,7 @@ class MemoryStore:
         "recall_snapshots": "snap",
         "events": "evt",
         "fact_votes": "fv",
+        "audit_log": "audit",
     }
 
     def _next_id(self, table: str, prefix: str) -> str:
@@ -1488,8 +1518,21 @@ class MemoryStore:
         stats["removed_edges"] = removed
 
         self.conn.commit()
+        self._audit("consolidate", "", namespace, str(stats))
         self._fts_rebuild()
         return stats
+
+    def _audit(self, operation: str, memory_id: str, namespace: str, details: str = "") -> None:
+        """Append one row to the audit_log (fire-and-forget, never fails)."""
+        try:
+            audit_id = self._next_id("audit_log", "audit")
+            self.conn.execute(
+                """INSERT INTO audit_log (id, operation, memory_id, namespace, details)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (audit_id, operation, memory_id, namespace, details[:2000]),
+            )
+        except Exception as exc:
+            logger.debug("_audit write skipped: %s", exc)
 
     # ── L2: fact_vote query API ────────────────────────────────────────
 
