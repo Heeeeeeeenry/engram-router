@@ -912,6 +912,28 @@ class MemoryStore:
                                VALUES (?, ?, ?, ?, 1, ?)""",
                             (fv_id, event.subject, event.verb, event.object, namespace),
                         )
+
+                # L3: write-time conflict check for each event
+                if os.environ.get("ENGRAM_CONFLICT_CHECK") in ("1", "true", "yes"):
+                    try:
+                        from ..contradiction import check_new_event
+                        conflicts = check_new_event(self, {
+                            "id": event_id,
+                            "subject": event.subject,
+                            "verb": event.verb,
+                            "object": event.object,
+                            "memory_id": memory_id,
+                            "namespace": namespace,
+                        })
+                        if conflicts:
+                            logger.info(
+                                "Conflict detected for event %s: %d conflicts",
+                                event_id, len(conflicts),
+                            )
+                            self._audit("conflict_detected", memory_id, namespace,
+                                       f"event_id={event_id} conflicts={len(conflicts)}")
+                    except ImportError:
+                        pass
         except (ImportError, ValueError, AttributeError) as exc:
             logger.debug("_index_events skipped: %s", exc)
 
