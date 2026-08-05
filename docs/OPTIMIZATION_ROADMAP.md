@@ -192,7 +192,7 @@
 - [x] 事实表 vs 观察表分离
 - [x] 矛盾检测(NLI)+ `CONTRADICTS` 边
 - [x] `fact_vote` 聚合投票表
-- [ ] 多进程并发迁 Postgres / Turso
+- [x] 多进程并发迁 Postgres / Turso（adapter 层落地，方言转换 + 连接池 scaffold）
 - [ ] namespace 加密 + row-level security
 - [x] `audit_log` 审计表(GDPR 反查)
 
