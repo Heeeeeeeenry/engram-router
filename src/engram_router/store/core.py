@@ -1552,7 +1552,22 @@ class MemoryStore:
         ).fetchone()
         if row is None:
             return None
-        return dict(row)
+        result = dict(row)
+        # L2: tag fact vs observation based on vote count
+        result["is_fact"] = row["vote_count"] >= 2
+        result["is_observation"] = row["vote_count"] == 1
+        return result
+
+    def get_confirmed_facts(self, namespace: str = "default") -> list[dict[str, Any]]:
+        """Return only confirmed facts (vote_count >= 2), excluding observations."""
+        rows = self.conn.execute(
+            """SELECT subject, verb, object, vote_count, last_seen_at
+               FROM fact_votes
+               WHERE namespace = ? AND vote_count >= 2
+               ORDER BY vote_count DESC""",
+            (namespace,),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
     def get_all_facts(self, subject: str, namespace: str = "default") -> list[dict[str, Any]]:
         """Return all voted facts for a subject, ranked by confidence."""
