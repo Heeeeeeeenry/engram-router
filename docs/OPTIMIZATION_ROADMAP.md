@@ -189,7 +189,7 @@
 
 ### L2 数据/存储
 - [x] L1 event 表(主语 + 动词 + 宾语 + 时间 + confidence)
-- [ ] 事实表 vs 观察表分离
+- [x] 事实表 vs 观察表分离
 - [x] 矛盾检测(NLI)+ `CONTRADICTS` 边
 - [x] `fact_vote` 聚合投票表
 - [ ] 多进程并发迁 Postgres / Turso
@@ -198,7 +198,7 @@
 
 ### L3 记忆生命周期
 - [x] save 去重(cosine > 0.95 合并成一条,只追 evidence)
-- [ ] 写时冲突 LLM 校验
+- [x] 写时冲突 LLM 校验
 - [x] 离线巩固 job(每日扫 raw_logs → event 表)
 - [x] 分级衰减:`base_attr` 1yr / `event` 30d / `sensory` 7d / `opinion` 3d
 - [x] 冷存储 + `include_forgotten=True` 显式恢复
@@ -207,9 +207,9 @@
 
 ### L4 其他工程
 - [x] `pytest-benchmark` microbench
-- [ ] soak test:100 万 memory + 1 万 query,记 P50/P99/内存
-- [ ] YAML profile(production/dev/experiment_a)
-- [ ] A/B 双跑 recall(主 + 影子 profile)
+- [x] soak test:100 万 memory + 1 万 query,记 P50/P99/内存
+- [x] YAML profile(production/dev/experiment_a)
+- [x] A/B 双跑 recall(主 + 影子 profile)
 
 ---
 
