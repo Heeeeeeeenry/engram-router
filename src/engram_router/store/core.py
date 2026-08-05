@@ -1663,6 +1663,17 @@ class MemoryStore:
         self.conn.commit()
         return stats
 
+    # ── L3: reflection ────────────────────────────────────────────────
+
+    def reflect(self, namespace: str = "default", num_recent: int = 50) -> list[str]:
+        """Run reflection on recent memories; return focus areas.
+
+        Calls the LLM (if available) to summarise recent memories into
+        3-5 broad themes/directions.  Safe to call periodically.
+        """
+        from ..reflection import run_reflection
+        return run_reflection(self, namespace=namespace, num_recent=num_recent)
+
     def _fts_rebuild(self) -> None:
         """Delegates to candidates.fts_rebuild."""
         candidates.fts_rebuild(self.conn)
