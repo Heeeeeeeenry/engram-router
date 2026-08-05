@@ -236,6 +236,7 @@ class PersonaStore:
                 evidence_json TEXT NOT NULL DEFAULT '[]',
                 conflict INTEGER NOT NULL DEFAULT 0,
                 conflicting_values TEXT NOT NULL DEFAULT '[]',
+                namespace TEXT NOT NULL DEFAULT 'default',
                 last_updated TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -244,6 +245,23 @@ class PersonaStore:
 
             CREATE INDEX IF NOT EXISTS idx_pa_key
                 ON persona_attrs(person_name, attr_key);
+
+            CREATE INDEX IF NOT EXISTS idx_pa_namespace
+                ON persona_attrs(namespace);
+
+            -- L3: versioned persona history (one row per save)
+            CREATE TABLE IF NOT EXISTS persona_history (
+                id TEXT PRIMARY KEY,
+                person_name TEXT NOT NULL,
+                attr_key TEXT NOT NULL,
+                attr_value TEXT NOT NULL,
+                confidence REAL NOT NULL DEFAULT 0.0,
+                namespace TEXT NOT NULL DEFAULT 'default',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_ph_person
+                ON persona_history(person_name, namespace);
             """
         )
         self._conn.commit()
