@@ -62,7 +62,26 @@ class MemoryStore:
         vector_index: Any | None = None,
         query_expander: QueryExpander | None = None,
         enable_vector: bool = True,  # set False to skip embedding model loading (useful for tests)
+        _adapter: Any = None,  # StorageAdapter (internal — use create_adapter() to construct)
     ) -> None:
+        # ── Postgres/Turso adapter layer ──
+        if _adapter is not None:
+            self.adapter = _adapter
+        elif path is not None and str(path).startswith(("postgresql://", "postgres://", "libsql://")):
+            from .adapters import create_adapter
+            self.adapter = create_adapter(str(path))
+        else:
+            import sqlite3
+            from .adapters import SqliteAdapter
+            db_path = str(path) if path is not None else ":memory:"
+            self.adapter = SqliteAdapter(sqlite3.connect(db_path))
+        self.conn = self.adapter.conn
+        # Detect backend dialect (used to gate sqlite-specific features)
+        try:
+            self._dialect = getattr(self.adapter, 'dialect', 'sqlite')
+        except Exception:
+            self._dialect = 'sqlite'
+        self._is_sqlite = self._dialect == 'sqlite'
         self.weights = weights if weights is not None else _default_weights()
         self.path = str(path) if path is not None else ":memory:"
         self.max_recall_hops = (
@@ -177,22 +196,26 @@ class MemoryStore:
                 self.embedding_engine.available
                 and self.vector_index is not None
             )
-        if path is not None:
+        # ── Postgres/Turso adapter layer (N9) ──
+        if path is not None and Path(path).parent != Path('.'):
             Path(path).parent.mkdir(parents=True, exist_ok=True)
-        if sqlite3.sqlite_version_info < (3, 35, 0):
-            raise RuntimeError(
-                "EngramRouter requires SQLite >= 3.35.0 for atomic id allocation "
-                f"(found {sqlite3.sqlite_version})"
-            )
-        self.conn = sqlite3.connect(self.path, timeout=5.0)
-        self.conn.row_factory = sqlite3.Row
-        self.conn.execute("PRAGMA busy_timeout = 5000")
-        self.conn.execute("PRAGMA foreign_keys = ON")
-        if self.path != ":memory:":
-            try:
-                self.conn.execute("PRAGMA journal_mode = WAL")
-            except sqlite3.OperationalError:
-                pass
+        if not self._is_sqlite:
+            pass  # Postgres/Turso — no PRAGMA needed
+        else:
+            if sqlite3.sqlite_version_info < (3, 35, 0):
+                raise RuntimeError(
+                    "EngramRouter requires SQLite >= 3.35.0 for atomic id allocation "
+                    f"(found {sqlite3.sqlite_version})"
+                )
+            conn = self.conn  # already set by adapter above
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA busy_timeout = 5000")
+            conn.execute("PRAGMA foreign_keys = ON")
+            if self.path != ":memory:":
+                try:
+                    conn.execute("PRAGMA journal_mode = WAL")
+                except sqlite3.OperationalError:
+                    pass
         self._init_schema()
 
         # ── Phase 3: Persona / Causal / Forgetting (lazy-init) ──
