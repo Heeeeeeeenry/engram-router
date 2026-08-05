@@ -1066,7 +1066,60 @@ class MemoryStore:
         trace = getattr(self, '_tracer', None)
         self._write_snapshot(query, results, trace=trace, latency_ms=elapsed,
                              namespace=namespace, top_k=top_k)
+
+        # L4: A/B shadow recall — run a second recall with different weights
+        # and log deltas without affecting the primary result.
+        if self._shadow_weights is not None:
+            self._run_shadow_recall(query, top_k, namespace, include_forgotten)
+
         return results
+
+    # ── L4: A/B shadow recall ─────────────────────────────────────────
+
+    _shadow_weights: object | None = None  # RecallWeights for shadow profile
+
+    def set_shadow_profile(self, weights: object) -> None:
+        """Enable an A/B shadow recall profile.
+
+        On every subsequent recall(), the primary result is returned unchanged,
+        but a second recall() runs in the background with *weights* (e.g. from
+        profiles.EXPERIMENT_A).  Differences are logged via debug at the end.
+
+        Set to None to disable.
+        """
+        self._shadow_weights = weights
+
+    def _run_shadow_recall(
+        self, query: str, top_k: int, namespace: str, include_forgotten: bool,
+    ) -> None:
+        """Run shadow recall with different weights; log deltas to debug."""
+        try:
+            import time as _time2
+            t_s = _time2.perf_counter()
+
+            # Save primary weights, install shadow weights
+            primary_weights = self.weights
+            object.__setattr__(self, 'weights', self._shadow_weights)
+            try:
+                shadow_results = _recall.recall(self, query, top_k=top_k, namespace=namespace)
+                if not include_forgotten:
+                    shadow_results = [
+                        r for r in shadow_results
+                        if not (r.metadata or {}).get('forgotten')
+                    ]
+            finally:
+                object.__setattr__(self, 'weights', primary_weights)
+            shadow_elapsed = (_time2.perf_counter() - t_s) * 1000
+
+            shadow_ids = [r.id for r in shadow_results]
+            shadow_top1 = shadow_ids[0] if shadow_ids else None
+
+            logger.info(
+                "Shadow recall: %d results, top1=%s, %dms (ns=%s)",
+                len(shadow_results), shadow_top1, round(shadow_elapsed, 1), namespace,
+            )
+        except Exception as exc:
+            logger.debug("Shadow recall failed: %s", exc)
 
     def _build_scored_candidates(
         self,
