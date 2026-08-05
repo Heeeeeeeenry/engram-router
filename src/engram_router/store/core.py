@@ -1594,6 +1594,75 @@ class MemoryStore:
         self.conn.commit()
         return count["cnt"] if count else 0
 
+    # ── L3: maintenance job ───────────────────────────────────────────
+
+    def run_maintenance(self, namespace: str = "default") -> dict[str, int]:
+        """Run all housekeeping operations: consolidate + contradiction scan +
+        fact_vote rebuild + persona update.  Returns per-step counts.
+
+        Designed to be called periodically (cron / scheduler) rather than
+        on every user interaction.
+        """
+        stats: dict[str, int] = {}
+        from datetime import datetime, timezone
+
+        # 1. Forgetting: apply decay to all active memories
+        forgetting = getattr(self, 'forgetting', None)
+        if forgetting:
+            rows = self.conn.execute(
+                "SELECT id, raw_text, summary, confidence, access_count, "
+                "accessed_at, forgotten FROM memories "
+                "WHERE namespace = ? AND forgotten = 0",
+                (namespace,),
+            ).fetchall()
+            forgotten_count = 0
+            for row in rows:
+                # Create a minimal record object for should_forget
+                class _Row:
+                    pass
+                r = _Row()
+                r.id = row["id"]
+                r.raw_text = row["raw_text"]
+                r.summary = row["summary"]
+                r.confidence = row["confidence"]
+                r.metadata = {"accessed_at": row["accessed_at"], "access_count": row["access_count"]}
+                r.forgotten = row["forgotten"]
+
+                if forgetting.should_forget(r):
+                    forgetting.forget(r.id)
+                    forgotten_count += 1
+            stats["forgotten"] = forgotten_count
+
+        # 2. Consolidate entities
+        cons_result = self.consolidate(namespace=namespace)
+        stats.update(cons_result)
+
+        # 3. Contradiction scan
+        try:
+            from ..contradiction import detect_contradictions
+            contra_result = detect_contradictions(self, namespace=namespace)
+            stats["contradictions_found"] = contra_result["contradictions"]
+            stats["contradiction_edges"] = contra_result["edges_written"]
+        except ImportError:
+            pass
+
+        # 4. Rebuild fact votes
+        stats["facts_rebuilt"] = self.rebuild_fact_votes(namespace=namespace)
+
+        # 5. Record maintenance timestamp
+        try:
+            audit_id = self._next_id("audit_log", "audit")
+            self.conn.execute(
+                "INSERT INTO audit_log (id, operation, memory_id, namespace, details) "
+                "VALUES (?, 'maintenance', '', ?, '{}')",
+                (audit_id, namespace),
+            )
+        except Exception:
+            pass
+
+        self.conn.commit()
+        return stats
+
     def _fts_rebuild(self) -> None:
         """Delegates to candidates.fts_rebuild."""
         candidates.fts_rebuild(self.conn)
