@@ -29,6 +29,9 @@ def classify_salience(entity: dict[str, Any], source_text: str) -> str:
     if kind == "attribute":
         return "base_attr"
 
+    if kind == "code_symbol":
+        return "event"  # code symbols: event-level salience (mutability-dependent)
+
     for pat in cfg.salience.base_attr_name_patterns:
         if re.search(pat, name):
             return "base_attr"
@@ -246,4 +249,7 @@ def extract_entities(text: str) -> list[dict[str, Any]]:
     # (person names, locations, organisations, etc.)
     from .hanlp_ner import enrich_entities as _enrich
     entities = _enrich(text, entities)
+    # Code symbol extraction (L5): tree-sitter for Python code blocks
+    from .code_symbols import enrich_entities as _enrich_code
+    entities = _enrich_code(text, entities)
     return _dedup(entities)
