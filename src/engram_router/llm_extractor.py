@@ -62,12 +62,26 @@ MAX_BATCH_SIZE = 10
 CACHE_CAPACITY = 4096
 
 
+def _is_local_llm() -> bool:
+    """Return True if ENGRAM_LOCAL_LLM=1 — use local llama.cpp-compatible server."""
+    return os.environ.get("ENGRAM_LOCAL_LLM", "").strip().lower() in ("1", "true", "yes", "on")
+
+
 def _get_api_key() -> str | None:
-    """Return the API key from environment, or None if unavailable."""
+    """Return the API key from environment, or None if unavailable.
+
+    When ENGRAM_LOCAL_LLM=1, a dummy key is returned so that LLMClient.available
+    is True even without an upstream API key.  Local llama.cpp servers typically
+    don't require authentication; the dummy key satisfies the availability check.
+    """
+    if _is_local_llm():
+        return "local"
     return os.environ.get(DEFAULT_API_KEY_ENV)
 
 
 def _get_base_url() -> str:
+    if _is_local_llm():
+        return os.environ.get("ENGRA_LLM_BASE_URL", "http://localhost:8080/v1")
     return os.environ.get("ENGRA_LLM_BASE_URL", DEFAULT_API_BASE)
 
 
