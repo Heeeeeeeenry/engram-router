@@ -216,11 +216,11 @@
 ## 长期 / 探索
 
 ### L5 前沿能力
-- [ ] 多模态记忆(CLIP image embedding)
-- [ ] 代码记忆(tree-sitter symbol 抽取)
-- [ ] 主动记忆(每轮预测下轮所需,提前 warm cache)
-- [ ] 全本地推理(llama.cpp GGUF,cloud 变纯可选)
-- [ ] 反馈闭环 + LoRA 微调 reranker
+- [ ] 多模态记忆(CLIP image embedding) — 已评估：需要并行 FAISS 索引 + RRF 融合，建议独立立项
+- [x] 代码记忆(tree-sitter symbol 抽取)
+- [ ] 主动记忆(每轮预测下轮所需,提前 warm cache) — 已评估：需要全新后台调度子系统，建议独立立项
+- [x] 全本地推理(llama.cpp GGUF,cloud 变纯可选)
+- [ ] 反馈闭环 + LoRA 微调 reranker — 已评估：feedback 采集点 + 训练管线 + adapter 管理，建议独立立项
 
 ---
 
