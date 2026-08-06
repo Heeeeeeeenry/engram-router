@@ -854,7 +854,7 @@
 - **L0 评估总结**:
   - L0.1 全部打勾 ✅(P@1/MRR/nDCG/Recall/Contamination/Rejection/Stability)
   - L0.2 faithfulness judge ✅ / cross-encoder GT ✅ / judge 模型解耦 [~](DeepSeek vs GPT-5.5 95% 一致)
-  - L0.3 held-out ✅ / adversarial ✅ / multilingual ✅ / agent traces [ ] / long-tail [ ]
+  - L0.3 held-out ✅ / adversarial ✅ / multilingual ✅ / agent traces [x] / long-tail [x]
   - L0.4 naive/long-context/mem0/矩阵 ✅ / letta/zep [ ]
   - L0.5 CI gate ✅ / isolation gate ✅ / PR shadow diff ✅
 
