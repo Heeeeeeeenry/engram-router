@@ -43,15 +43,47 @@ _ALIAS_PREFIXES = ("老", "小", "阿")
 
 
 def _migrate_alias_table(conn: sqlite3.Connection) -> None:
-    """Ensure the entity_aliases table exists."""
+    """Ensure the entity_aliases table exists, including namespace column.
+
+    The original schema (v1) had (alias TEXT PRIMARY KEY) with no namespace.
+    v2 adds a namespace column and changes the PK to (alias, namespace).
+    """
+    # First ensure the table exists.
     conn.execute("""
         CREATE TABLE IF NOT EXISTS entity_aliases (
-            alias TEXT PRIMARY KEY,
+            alias TEXT NOT NULL,
             canonical TEXT NOT NULL,
+            namespace TEXT NOT NULL DEFAULT 'default',
             source TEXT NOT NULL DEFAULT 'heuristic',
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (alias, namespace)
         )
     """)
+    # Migration: if the old schema exists (single-col PK on alias, no namespace
+    # column), rebuild the table to add namespace.
+    try:
+        cols = {row[1] for row in conn.execute("PRAGMA table_info('entity_aliases')").fetchall()}
+    except Exception:
+        return
+    if "namespace" not in cols:
+        # Rebuild: rename old, create new, copy data, drop old.
+        conn.execute("ALTER TABLE entity_aliases RENAME TO entity_aliases_old")
+        conn.execute("""
+            CREATE TABLE entity_aliases (
+                alias TEXT NOT NULL,
+                canonical TEXT NOT NULL,
+                namespace TEXT NOT NULL DEFAULT 'default',
+                source TEXT NOT NULL DEFAULT 'heuristic',
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (alias, namespace)
+            )
+        """)
+        conn.execute("""
+            INSERT INTO entity_aliases (alias, canonical, source, created_at)
+            SELECT alias, canonical, source, created_at FROM entity_aliases_old
+        """)
+        conn.execute("DROP TABLE entity_aliases_old")
+        conn.commit()
 
 
 def register_alias(
@@ -59,12 +91,14 @@ def register_alias(
     alias: str,
     canonical: str,
     source: str = "heuristic",
+    namespace: str = "default",
 ) -> bool:
-    """Register *alias* → *canonical* in the alias table."""
+    """Register *alias* → *canonical* in the alias table, scoped to *namespace*."""
     try:
         conn.execute(
-            "INSERT OR REPLACE INTO entity_aliases (alias, canonical, source) VALUES (?, ?, ?)",
-            (alias, canonical, source),
+            "INSERT OR REPLACE INTO entity_aliases (alias, canonical, source, namespace) "
+            "VALUES (?, ?, ?, ?)",
+            (alias, canonical, source, namespace),
         )
         return True
     except Exception as exc:
@@ -72,11 +106,11 @@ def register_alias(
         return False
 
 
-def canonicalize(conn: sqlite3.Connection, name: str) -> str:
-    """Return the canonical form of *name*, or *name* itself if no alias exists."""
+def canonicalize(conn: sqlite3.Connection, name: str, namespace: str = "default") -> str:
+    """Return the canonical form of *name* within *namespace*, or *name* itself if no alias exists."""
     row = conn.execute(
-        "SELECT canonical FROM entity_aliases WHERE alias = ?",
-        (name,),
+        "SELECT canonical FROM entity_aliases WHERE alias = ? AND namespace = ?",
+        (name, namespace),
     ).fetchone()
     return row["canonical"] if row else name
 
@@ -140,26 +174,28 @@ def canonicalize_entity_name(
     store: Any,  # MemoryStore instance
     name: str,
     kind: str,
+    namespace: str = "default",
 ) -> str:
     """Canonicalize *name* within *store*'s DB + suggest new aliases.
 
-    Returns the canonical name (may be *name* itself).
+    Returns the canonical name (may be *name* itself).  All operations are
+    scoped to *namespace*.
     """
     if os.environ.get("ENGRAM_SKIP_CANONICAL") == "1":
         return name
 
     _migrate_alias_table(store.conn)
 
-    # 1. Direct lookup
-    canonical = canonicalize(store.conn, name)
+    # 1. Direct lookup (namespace-scoped)
+    canonical = canonicalize(store.conn, name, namespace)
 
     # 2. If no alias found, suggest candidates against existing entities
     if canonical == name and kind == "person":
         existing = [
             row[0] for row in
             store.conn.execute(
-                "SELECT DISTINCT name FROM entities WHERE kind = ? ORDER BY name",
-                (kind,),
+                "SELECT DISTINCT name FROM entities WHERE kind = ? AND namespace = ? ORDER BY name",
+                (kind, namespace),
             ).fetchall()
         ]
         if len(existing) >= 2:  # Need ≥2 entities to compare for aliases
@@ -171,7 +207,7 @@ def canonicalize_entity_name(
                 )
                 # Conservative: log only, don't auto-apply.
                 # To auto-apply, uncomment:
-                # register_alias(store.conn, name, target, "heuristic:" + reason)
+                # register_alias(store.conn, name, target, "heuristic:" + reason, namespace)
                 # canonical = target
                 # break
 

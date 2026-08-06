@@ -179,18 +179,20 @@ class ForgettingEngine:
 
     # -- forget ---------------------------------------------------------------
 
-    def forget(self, memory_id: str) -> bool:
+    def forget(self, memory_id: str, namespace: str = "default") -> bool:
         """Mark a memory as forgotten (soft delete — confidence dropped near 0).
 
         The memory row is **never** hard-deleted.  Instead:
         * ``forgotten`` is set to 1.
         * ``confidence`` is reduced to a near-zero value (1e-6).
 
+        N3: namespace-scoped — verifies ownership before mutating.
+
         Returns ``True`` if the memory was actually updated, ``False`` if it
         was already forgotten or doesn't exist.
         """
         row = self.store.conn.execute(
-            "SELECT id, forgotten FROM memories WHERE id = ?",
+            "SELECT id, forgotten, namespace FROM memories WHERE id = ?",
             (memory_id,),
         ).fetchone()
 
@@ -198,31 +200,42 @@ class ForgettingEngine:
             logger.debug("forget(%r): memory not found", memory_id)
             return False
 
+        if row["namespace"] != namespace:
+            logger.debug("forget(%r): namespace mismatch", memory_id)
+            return False
+
         if row["forgotten"]:
             logger.debug("forget(%r): already forgotten", memory_id)
             return False
 
         self.store.conn.execute(
-            "UPDATE memories SET forgotten = 1, confidence = ? WHERE id = ?",
-            (1e-6, memory_id),
+            "UPDATE memories SET forgotten = 1, confidence = ? WHERE id = ? AND namespace = ?",
+            (1e-6, memory_id, namespace),
         )
         self.store.conn.commit()
         logger.info("forget(%r): marked as forgotten", memory_id)
         return True
 
-    def unmark_forgotten(self, memory_id: str, confidence: float = 1.0) -> bool:
-        """Reverse a soft forget, restoring the original confidence."""
+    def unmark_forgotten(self, memory_id: str, confidence: float = 1.0,
+                         namespace: str = "default") -> bool:
+        """Reverse a soft forget, restoring the original confidence.
+
+        N3: namespace-scoped — verifies ownership before mutating.
+        """
         row = self.store.conn.execute(
-            "SELECT id, forgotten FROM memories WHERE id = ?",
+            "SELECT id, forgotten, namespace FROM memories WHERE id = ?",
             (memory_id,),
         ).fetchone()
 
         if row is None:
             return False
 
+        if row["namespace"] != namespace:
+            return False
+
         self.store.conn.execute(
-            "UPDATE memories SET forgotten = 0, confidence = ? WHERE id = ?",
-            (confidence, memory_id),
+            "UPDATE memories SET forgotten = 0, confidence = ? WHERE id = ? AND namespace = ?",
+            (confidence, memory_id, namespace),
         )
         self.store.conn.commit()
         return True
@@ -267,7 +280,7 @@ class ForgettingEngine:
                 if similarity >= self.config.consolidate_similarity_threshold:
                     pairs_found += 1
                     # Keep the earlier one (i), forget the later (j).
-                    self.forget(str(rows[j]["id"]))
+                    self.forget(str(rows[j]["id"]), namespace)
                     merged += 1
                     rows[j] = {**rows[j], "id": None}  # skip further
 
@@ -394,7 +407,7 @@ class ForgettingEngine:
         forgotten_count = 0
         if not dry_run:
             for mid in candidates:
-                if self.forget(mid):
+                if self.forget(mid, namespace):
                     forgotten_count += 1
 
         cons_stats = {"pairs_found": 0, "merged": 0}

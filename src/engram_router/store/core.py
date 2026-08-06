@@ -808,7 +808,7 @@ class MemoryStore:
             for ent in extract_entities(text):
                 name = ent.get("name", "")
                 if ent.get("kind") == "person" and name not in ("我", "你", "他", "她", "它"):
-                    persona = self.persona.aggregate(name)
+                    persona = self.persona.aggregate(name, namespace)
                     if persona is not None:
                         self.persona.update(persona)
         except (ImportError, ValueError, AttributeError, KeyError):
@@ -820,7 +820,7 @@ class MemoryStore:
         # Canonicalize: map aliases (老张 → 张伟) to the canonical entity.
         # Conservatively only does direct lookup; fuzzy suggestions are logged.
         # N3: namespace-scoped — (name, kind, namespace) is the identity key.
-        canonical = canonicalize_entity_name(self, name, kind)
+        canonical = canonicalize_entity_name(self, name, kind, namespace)
 
         row = self.conn.execute(
             "SELECT id FROM entities WHERE name = ? AND kind = ? AND namespace = ?",

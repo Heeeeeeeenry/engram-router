@@ -77,8 +77,9 @@ class CausalChain:
         conn: A ``sqlite3.Connection`` with ``row_factory = sqlite3.Row``.
     """
 
-    def __init__(self, conn: sqlite3.Connection) -> None:
+    def __init__(self, conn: sqlite3.Connection, namespace: str = "default") -> None:
         self.conn = conn
+        self.namespace = namespace
 
     # -- helpers ---------------------------------------------------------------
 
@@ -91,7 +92,8 @@ class CausalChain:
     def _load_edges(self) -> list[CausalEdge]:
         rows = self.conn.execute(
             """SELECT e.id, e.src_id, e.dst_id, e.relation, e.confidence, e.evidence_ref
-               FROM edges e"""
+               FROM edges e WHERE e.namespace = ?""",
+            (self.namespace,),
         ).fetchall()
         edges: list[CausalEdge] = []
         for r in rows:
@@ -342,8 +344,9 @@ class Timeline:
         conn: A ``sqlite3.Connection`` with ``row_factory = sqlite3.Row``.
     """
 
-    def __init__(self, conn: sqlite3.Connection) -> None:
+    def __init__(self, conn: sqlite3.Connection, namespace: str = "default") -> None:
         self.conn = conn
+        self.namespace = namespace
 
     def get_timeline(
         self,
@@ -366,19 +369,20 @@ class Timeline:
                 """SELECT te.id, te.time_entity_id, te.time_name, te.memory_id,
                           te.raw_text, te.person_name, te.created_at
                    FROM timed_events te
-                   WHERE te.person_name = ?
+                   WHERE te.person_name = ? AND te.namespace = ?
                    ORDER BY te.sort_order ASC, te.created_at DESC
                    LIMIT ? OFFSET ?""",
-                (person, limit, offset),
+                (person, self.namespace, limit, offset),
             ).fetchall()
         else:
             rows = self.conn.execute(
                 """SELECT te.id, te.time_entity_id, te.time_name, te.memory_id,
                           te.raw_text, te.person_name, te.created_at
                    FROM timed_events te
+                   WHERE te.namespace = ?
                    ORDER BY te.sort_order ASC, te.created_at DESC
                    LIMIT ? OFFSET ?""",
-                (limit, offset),
+                (self.namespace, limit, offset),
             ).fetchall()
 
         return [
@@ -422,10 +426,10 @@ class Timeline:
                 """SELECT te.id, te.time_entity_id, te.time_name, te.memory_id,
                           te.raw_text, te.person_name, te.created_at
                    FROM timed_events te
-                   WHERE te.time_name >= ? AND te.time_name <= ?
+                   WHERE te.time_name >= ? AND te.time_name <= ? AND te.namespace = ?
                    ORDER BY te.sort_order ASC, te.created_at DESC
                    LIMIT ?""",
-                (start, end, limit),
+                (start, end, self.namespace, limit),
             ).fetchall()
         else:
             lo = min(start_order, end_order)
@@ -434,10 +438,10 @@ class Timeline:
                 """SELECT te.id, te.time_entity_id, te.time_name, te.memory_id,
                           te.raw_text, te.person_name, te.created_at
                    FROM timed_events te
-                   WHERE te.sort_order BETWEEN ? AND ?
+                   WHERE te.sort_order BETWEEN ? AND ? AND te.namespace = ?
                    ORDER BY te.sort_order ASC, te.created_at DESC
                    LIMIT ?""",
-                (lo, hi, limit),
+                (lo, hi, self.namespace, limit),
             ).fetchall()
 
         return [
@@ -459,8 +463,8 @@ class Timeline:
         Returns -1 if the time name is unknown.
         """
         row = self.conn.execute(
-            "SELECT sort_order FROM timed_events WHERE time_name = ? LIMIT 1",
-            (time_name,),
+            "SELECT sort_order FROM timed_events WHERE time_name = ? AND namespace = ? LIMIT 1",
+            (time_name, self.namespace),
         ).fetchone()
         return cast(int, row["sort_order"]) if row else -1
 

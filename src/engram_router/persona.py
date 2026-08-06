@@ -208,6 +208,7 @@ class PersonaStore:
         self,
         store: Any,  # MemoryStore (avoid circular import)
         llm_extractor: Any | None = None,
+        namespace: str = "default",
     ) -> None:
         self._store = store
         self._conn: sqlite3.Connection = store.conn
@@ -215,6 +216,7 @@ class PersonaStore:
         self._llm_available = (
             llm_extractor is not None and getattr(llm_extractor, "available", False)
         )
+        self._namespace = namespace
         self._init_table()
 
     # ── schema ────────────────────────────────────────────────────────────
@@ -296,8 +298,8 @@ class PersonaStore:
 
     # ── aggregation ───────────────────────────────────────────────────────
 
-    def aggregate(self, person_name: str) -> Persona:
-        """Aggregate all known attributes for *person_name* across all sessions.
+    def aggregate(self, person_name: str, namespace: str | None = None) -> Persona:
+        """Aggregate all known attributes for *person_name* within a namespace.
 
         The pipeline:
           1. Find the entity entry for *person_name*.
@@ -309,12 +311,13 @@ class PersonaStore:
 
         Returns a ``Persona`` dataclass.
         """
+        ns = namespace if namespace is not None else self._namespace
         persona = Persona(name=person_name)
 
         # 1. Locate the entity(ies) for this person.
         entity_rows = self._conn.execute(
-            "SELECT id, name, kind FROM entities WHERE name = ?",
-            (person_name,),
+            "SELECT id, name, kind FROM entities WHERE name = ? AND namespace = ?",
+            (person_name, ns),
         ).fetchall()
         if not entity_rows:
             return persona  # No entity → empty persona.
@@ -332,12 +335,12 @@ class PersonaStore:
         if not memory_ids:
             return persona  # No memories → empty persona.
 
-        # 3. Fetch the actual memory text.
+        # 3. Fetch the actual memory text (namespace-scoped for defense-in-depth).
         mem_placeholders = ",".join("?" for _ in memory_ids)
         mem_rows = self._conn.execute(
             f"SELECT id, raw_text, summary, confidence FROM memories "
-            f"WHERE id IN ({mem_placeholders})",
-            memory_ids,
+            f"WHERE id IN ({mem_placeholders}) AND namespace = ?",
+            memory_ids + [ns],
         ).fetchall()
         memory_map: dict[str, sqlite3.Row] = {r["id"]: r for r in mem_rows}
 
@@ -363,7 +366,7 @@ class PersonaStore:
                 evidence_by_key.setdefault(key, []).append(ev)
 
         # 5. Collect edge-based evidence.
-        edge_evidence_by_key = self._collect_edge_evidence(entity_ids, memory_map)
+        edge_evidence_by_key = self._collect_edge_evidence(entity_ids, memory_map, ns)
         for key, ev_list in edge_evidence_by_key.items():
             evidence_by_key.setdefault(key, []).extend(ev_list)
 
@@ -375,7 +378,7 @@ class PersonaStore:
             evidence_by_key.setdefault("personality", []).extend(trait_evidence)
 
         # 7. Collect preference evidence.
-        pref_evidence = self._collect_preference_evidence(entity_ids, memory_map)
+        pref_evidence = self._collect_preference_evidence(entity_ids, memory_map, ns)
         if pref_evidence:
             evidence_by_key.setdefault("preference", []).extend(pref_evidence)
 
@@ -385,7 +388,7 @@ class PersonaStore:
             persona.attrs[key] = attr
 
         # 9. Collect owned objects.
-        persona.objects = self._collect_objects(entity_ids, memory_map)
+        persona.objects = self._collect_objects(entity_ids, memory_map, ns)
 
         # 10. Optional LLM enhancement.
         if self._llm_available:
@@ -404,6 +407,7 @@ class PersonaStore:
         self,
         entity_ids: list[str],
         memory_map: dict[str, sqlite3.Row],
+        namespace: str = "default",
     ) -> dict[str, list[AttrEvidence]]:
         """Collect attribute-like evidence from edges where this person is
         the source or destination.
@@ -421,8 +425,9 @@ class PersonaStore:
             f"SELECT e.id, e.src_id, e.dst_id, e.relation, e.confidence, e.evidence_ref "
             f"FROM edges e "
             f"WHERE (e.src_id IN ({id_placeholders}) OR e.dst_id IN ({id_placeholders})) "
-            f"AND e.relation IN ('HAS_ATTRIBUTE', 'PREFERS', 'KNOWS', 'IS_A')",
-            entity_ids + entity_ids,
+            f"AND e.relation IN ('HAS_ATTRIBUTE', 'PREFERS', 'KNOWS', 'IS_A') "
+            f"AND e.namespace = ?",
+            entity_ids + entity_ids + [namespace],
         ).fetchall()
 
         for edge in edge_rows:
@@ -511,6 +516,7 @@ class PersonaStore:
         self,
         entity_ids: list[str],
         memory_map: dict[str, sqlite3.Row],
+        namespace: str = "default",
     ) -> list[AttrEvidence]:
         """Extract preference signals from memory texts."""
         import re
@@ -595,6 +601,7 @@ class PersonaStore:
         self,
         entity_ids: list[str],
         memory_map: dict[str, sqlite3.Row],
+        namespace: str = "default",
     ) -> list[dict[str, Any]]:
         """Collect objects that belong to / are associated with this person.
 
@@ -630,8 +637,9 @@ class PersonaStore:
             f"  OR (ed.dst_id IN ({id_placeholders}) AND ed.src_id = e.id)"
             f") "
             f"WHERE e.kind = 'object' "
-            f"AND ed.relation IN ('CO_OCCURS_WITH', 'DESCRIBES', 'OWNS')",
-            entity_ids + entity_ids,
+            f"AND ed.relation IN ('CO_OCCURS_WITH', 'DESCRIBES', 'OWNS') "
+            f"AND ed.namespace = ?",
+            entity_ids + entity_ids + [namespace],
         ).fetchall()
 
         # Merge by object name with evidence and confidence.
