@@ -99,7 +99,7 @@ class TestMcpServer:
                 assert resp["id"] == 1
                 assert "result" in resp
                 tools = resp["result"]["tools"]
-                assert len(tools) == 6
+                assert len(tools) == 7
 
                 names = {t["name"] for t in tools}
                 assert names == {
@@ -109,6 +109,7 @@ class TestMcpServer:
                     "memory.compact",
                     "memory.consolidate",
                     "memory.delete",
+                    "memory.maintenance",
                 }
 
                 # Verify each tool has inputSchema with type object

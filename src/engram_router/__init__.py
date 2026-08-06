@@ -25,6 +25,18 @@ from .forgetting import (
     ForgettingEngine,
     ForgettingConfig,
 )
+from .event_extractor import (
+    extract_events,
+    Event,
+)
+from .contradiction import (
+    detect_contradictions,
+    check_new_event,
+)
+from .reflection import (
+    run_reflection,
+    store_reflection,
+)
 
 
 # ── Exceptions (API audit) ───────────────────────────────────────────
@@ -72,4 +84,12 @@ __all__ = [
     "ConfigError",
     "ValidationError",
     "NamespaceError",
+    # L2 data layer
+    "Event",
+    "extract_events",
+    "detect_contradictions",
+    "check_new_event",
+    # L3 lifecycle
+    "run_reflection",
+    "store_reflection",
 ]
