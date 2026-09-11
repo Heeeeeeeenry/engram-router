@@ -224,6 +224,7 @@ class MemoryStore:
         self._coref = CorefTracker()
         self._timeline: Any = None
         self._forgetting: Any = None
+        self._intent_classifier: Any = None
 
     def _init_schema(self) -> None:
         self.conn.executescript(
@@ -564,7 +565,9 @@ class MemoryStore:
                 logger.debug("Save dedup check skipped: %s", exc)
 
         # Pre-encode all vectors in one batch (L3: reused for both dedup and indexing)
-        batch_embs = pre_embs if pre_embs else None
+        # NOTE: use `is not None` — pre_embs is a numpy (N, dim) array whose
+        # boolean truth value is ambiguous and would raise ValueError.
+        batch_embs = pre_embs if pre_embs is not None else None
         if batch_embs is None and self._vector_enabled and self.embedding_engine and self.vector_index:
             try:
                 batch_embs = self.embedding_engine.encode_batch(texts)
@@ -794,6 +797,29 @@ class MemoryStore:
             from ..forgetting import ForgettingEngine, ForgettingConfig
             self._forgetting = ForgettingEngine(self, ForgettingConfig())
         return self._forgetting
+
+    @property
+    def intent_classifier(self):
+        """Lazy-init LLM query intent classifier (falls back to regex internally).
+
+        Wired so recall.build_scored_candidates can honour it via
+        ``getattr(store, 'intent_classifier', None)``.  The classifier degrades
+        to regex when the LLM/cloud is unavailable, so it is always safe to
+        instantiate.
+        """
+        if self._intent_classifier is None:
+            from ..intent_classifier import IntentClassifier
+            # Reuse the shared LLM client so the classifier honours the same
+            # cloud opt-in + API key as the extractor, without a second client.
+            _client = self.llm_extractor._client if self.llm_extractor is not None else None
+            self._intent_classifier = IntentClassifier(client=_client)
+        return self._intent_classifier
+
+    @intent_classifier.setter
+    def intent_classifier(self, classifier):
+        """Allow callers/tests to inject a custom intent classifier."""
+        self._intent_classifier = classifier
+
     def _apply_decay(self, records):
         try:
             engine = self.forgetting

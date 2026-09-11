@@ -1037,6 +1037,7 @@ def recall_single(
     terms: list[str],
     query_entity_objs: list[dict[str, Any]],
     namespace: str = "default",
+    _deadline: float = float('inf'),
 ) -> list[MemoryRecord]:
     """Run the standard recall pipeline for a single query variant.
 
@@ -1088,7 +1089,8 @@ def recall_single(
     )
     # Return a larger top-k for RRF to fuse; the final truncation happens
     # after fusion in the caller.
-    return build_recall_response(store, scored, max(50, len(scored)), query, namespace=namespace)
+    return build_recall_response(store, scored, max(50, len(scored)), query, namespace=namespace,
+                                 _deadline=_deadline)
 
 
 # ---------------------------------------------------------------------------
@@ -1210,6 +1212,7 @@ def _recall_impl(
             primary_terms = list(dict.fromkeys(scoring.terms(query) + extra_terms))
             primary = recall_single(
                 store, query, primary_terms, query_entity_objs, namespace,
+                _deadline=_deadline,
             )
             all_results.append([(r.id, r.score) for r in primary])
 
@@ -1229,6 +1232,7 @@ def _recall_impl(
                         v_existing.add(key)
                 v_results = recall_single(
                     store, variant, v_terms, v_entities, namespace,
+                    _deadline=_deadline,
                 )
                 all_results.append([(r.id, r.score) for r in v_results])
 
@@ -1257,7 +1261,8 @@ def _recall_impl(
                     scored.append((rrf_score * 10, "rrf-fused", row))
 
             scored.sort(key=lambda x: x[0], reverse=True)
-            return build_recall_response(store, scored, top_k, query, namespace=namespace)
+            return build_recall_response(store, scored, top_k, query, namespace=namespace,
+                                         _deadline=_deadline)
         else:
             # No variants: use expanded terms/entities with standard pipeline.
             terms = list(dict.fromkeys(scoring.terms(query) + extra_terms))
@@ -1342,7 +1347,8 @@ def _recall_impl(
         query_identity_subjects=query_identity_subjects,
         query_entity_objs=query_entity_objs,
     )
-    return build_recall_response(store, scored, top_k, query, namespace=namespace)
+    return build_recall_response(store, scored, top_k, query, namespace=namespace,
+                                 _deadline=_deadline)
 
 
 # ---------------------------------------------------------------------------
