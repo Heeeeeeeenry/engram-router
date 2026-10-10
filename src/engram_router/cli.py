@@ -4,18 +4,47 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
 
 from .benchmark import format_report, load_cases, load_conversation, run_benchmark
+from .config import has_llm_key, load_env_defaults, resolve_db_path
 from .store import MemoryStore
 
 
 def main() -> None:
+    # 模型加载会打进度条/告警：CLI 的 stdout 是 JSON 结果通道，必须保持干净
+    os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     parser = argparse.ArgumentParser(prog="engram", description="EngramRouter CLI")
-    parser.add_argument("--db", default="memory.db", help="SQLite database path")
+    parser.add_argument(
+        "--db",
+        default=resolve_db_path(None),
+        help="SQLite database path (--db > ENGRAM_DB > ./memory.db)",
+    )
     sub = parser.add_subparsers(dest="command", required=True)
+    if not os.environ.get("ENGRAM_DB"):
+        print(
+            "[engram] WARNING: no --db and no ENGRAM_DB; "
+            f"using cwd-relative path -> {Path('memory.db').resolve()}",
+            file=sys.stderr,
+        )
+    # 父进程（如 Hermes）可能不透传 provider 密钥 → 这里补上；补不到就明确告警，
+    # 不让"降级为纯关键词模式"继续静默发生（实测踩过）。
+    _env_file = load_env_defaults()
+    if _env_file:
+        print(f"[engram] loaded LLM keys from {_env_file}", file=sys.stderr)
+    elif not has_llm_key():
+        print(
+            "[engram] WARNING: no LLM API key (ENGRAM_LLM_API_KEY / DEEPSEEK_API_KEY / "
+            "ONEAPI_API_KEY / OPENAI_API_KEY) — semantic rerank and LLM extraction are "
+            "DISABLED, retrieval falls back to keyword-only. Fix: export the key, set "
+            "ENGRAM_ENV_FILE, or add it to ~/.engram/.env or ~/.hermes/.env.",
+            file=sys.stderr,
+        )
 
     save_p = sub.add_parser("save", help="Save a memory text")
     save_p.add_argument("text", help="Memory text to save")

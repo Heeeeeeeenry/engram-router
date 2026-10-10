@@ -27,6 +27,77 @@ def _default_config_path() -> Path:
     return Path.home() / ".engram" / "config.yaml"
 
 
+def resolve_db_path(cli_value: str | None = None) -> str:
+    """Resolve the SQLite DB path. Priority: ``--db`` > ``ENGRAM_DB`` > ``./memory.db``.
+
+    历史坑（2026-09-21 实测）：``--db`` 曾默认字面量 ``"memory.db"``（**cwd 相对**），
+    且 ``ENGRAM_DB`` 环境变量完全不生效 —— 调用方设了环境变量却静默写进当前目录，
+    测试数据曾落到 cwd 而非目标库。此函数让环境变量生效，并让调用方得以在
+    回退到相对路径时告警。
+    """
+    if cli_value:
+        return cli_value
+    env = os.environ.get("ENGRAM_DB")
+    if env:
+        return env
+    return "memory.db"
+
+
+#: 任一存在即可启用 LLM 抽取 / 语义重排（顺序即优先级）
+LLM_KEY_VARS = (
+    "ENGRAM_LLM_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "ONEAPI_API_KEY",
+    "OPENAI_API_KEY",
+)
+
+#: 进程环境里没有 key 时，依次尝试的 .env 位置
+_DEFAULT_ENV_FILES = ("~/.engram/.env", "~/.hermes/.env")
+
+
+def has_llm_key() -> bool:
+    """Whether any LLM API key is visible in the process environment."""
+    return any(os.environ.get(v) for v in LLM_KEY_VARS)
+
+
+def load_env_defaults(extra_files: tuple[str, ...] = ()) -> str | None:
+    """Populate LLM keys from a .env file **only if the env has none**. Returns the file used.
+
+    背景（2026-09-21 实测）：调用方（如 Hermes）拉起 MCP 子进程时**不透传 provider 密钥**，
+    而 ``llm_extractor._get_api_key()`` 只读 ``os.environ`` —— 结果是 engram
+    **长期以纯关键词模式运行**（语义重排、LLM 抽取全部失效）**且没有任何告警**。
+
+    优先级：``ENGRAM_ENV_FILE`` / 显式传入 > ``~/.engram/.env`` > ``~/.hermes/.env``。
+    已存在的环境变量一律不覆盖（``setdefault``），密钥值不打印。
+    """
+    if has_llm_key():
+        return None
+    candidates: list[str] = [*extra_files, os.environ.get("ENGRAM_ENV_FILE", ""), *_DEFAULT_ENV_FILES]
+    for raw in candidates:
+        if not raw:
+            continue
+        path = Path(os.path.expanduser(raw))
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        for line in text.splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            if key.startswith("export "):
+                key = key[len("export ") :].strip()
+            if key:
+                os.environ.setdefault(key, value.strip().strip('"').strip("'"))
+        if has_llm_key():
+            return str(path)
+    return None
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Data classes
 # ═══════════════════════════════════════════════════════════════════════════

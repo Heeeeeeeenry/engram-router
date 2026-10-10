@@ -48,6 +48,11 @@ DEFAULT_LLM_MODEL = "deepseek-v4-pro"
 DEFAULT_API_BASE = "https://oneapi-comate.baidu-int.com/v1"
 DEFAULT_API_KEY_ENV = "DEEPSEEK_API_KEY"
 
+# 内网 OneAPI 代理的 host 标记。端点与凭证必须匹配：官方端点配内网 key
+# （或反之）是必然 401 的组合，所以按 base_url 选凭证。
+ONEAPI_HOST_MARKERS = ("oneapi", "baidu-int")
+ONEAPI_API_KEY_ENV = "ONEAPI_API_KEY"
+
 # Confidence for LLM-annotated entities / edges.
 # Lower than rule-based (1.0) because LLM can hallucinate.
 LLM_CONFIDENCE = 0.8
@@ -67,22 +72,53 @@ def _is_local_llm() -> bool:
     return os.environ.get("ENGRAM_LOCAL_LLM", "").strip().lower() in ("1", "true", "yes", "on")
 
 
+def _is_oneapi_endpoint(base_url: str) -> bool:
+    """Return True if *base_url* points at the Baidu-internal OneAPI proxy."""
+    b = (base_url or "").lower()
+    return any(marker in b for marker in ONEAPI_HOST_MARKERS)
+
+
 def _get_api_key() -> str | None:
     """Return the API key from environment, or None if unavailable.
 
     When ENGRAM_LOCAL_LLM=1, a dummy key is returned so that LLMClient.available
     is True even without an upstream API key.  Local llama.cpp servers typically
     don't require authentication; the dummy key satisfies the availability check.
+
+    Key selection follows the endpoint (mirrors ai-company's ``resolve_api_key``):
+    an OneAPI proxy endpoint needs ``ONEAPI_API_KEY``, a direct DeepSeek endpoint
+    needs ``DEEPSEEK_API_KEY``.  Both fall back to the other name so configs that
+    packed the proxy key into ``DEEPSEEK_API_KEY`` (the historical zshrc setup)
+    keep working.
     """
     if _is_local_llm():
         return "local"
-    return os.environ.get(DEFAULT_API_KEY_ENV)
+    base = _get_base_url()
+    if _is_oneapi_endpoint(base):
+        candidates = (ONEAPI_API_KEY_ENV, DEFAULT_API_KEY_ENV)
+    else:
+        candidates = (DEFAULT_API_KEY_ENV, ONEAPI_API_KEY_ENV)
+    for var in candidates:
+        value = os.environ.get(var)
+        if value:
+            return value
+    return None
 
 
 def _get_base_url() -> str:
+    """Resolve the LLM endpoint. ``ENGRA_LLM_BASE_URL`` is canonical
+    (what zshrc / ai-company set); ``ENGRAM_LLM_BASE_URL`` is a legacy alias."""
     if _is_local_llm():
-        return os.environ.get("ENGRA_LLM_BASE_URL", "http://localhost:8080/v1")
-    return os.environ.get("ENGRA_LLM_BASE_URL", DEFAULT_API_BASE)
+        return (
+            os.environ.get("ENGRA_LLM_BASE_URL")
+            or os.environ.get("ENGRAM_LLM_BASE_URL")
+            or "http://localhost:8080/v1"
+        )
+    return (
+        os.environ.get("ENGRA_LLM_BASE_URL")
+        or os.environ.get("ENGRAM_LLM_BASE_URL")
+        or DEFAULT_API_BASE
+    )
 
 
 def _get_llm_model() -> str:

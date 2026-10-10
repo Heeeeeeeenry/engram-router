@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any
 
 from .store import MemoryStore
+from .config import has_llm_key, load_env_defaults, resolve_db_path
 
 # ---------------------------------------------------------------------------
 # JSON-RPC 2.0 error codes
@@ -535,16 +536,36 @@ def _error(rid: Any, code: int, message: str) -> dict[str, Any]:
 # CLI entry point
 # ---------------------------------------------------------------------------
 def main() -> None:
+    # stdout 是 JSON-RPC 通道：任何进度条/告警都必须走 stderr，否则污染协议流
+    # （实测：模型加载进度输出曾导致 "Failed to parse JSONRPC message from server"
+    #   与 "MCP server 'engram' initial connection failed"）。
+    os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     parser = argparse.ArgumentParser(
         prog="engram-mcp",
         description="EngramRouter MCP Server (stdio JSON-RPC 2.0)",
     )
     parser.add_argument(
         "--db",
-        default="memory.db",
-        help="SQLite database path (default: memory.db)",
+        default=resolve_db_path(None),
+        help="SQLite database path (--db > ENGRAM_DB > ./memory.db)",
     )
     args = parser.parse_args()
+    if not os.environ.get("ENGRAM_DB"):
+        print(f"[engram-mcp] db -> {Path(args.db).resolve()}", file=sys.stderr)
+    # LLMClient 是运行时按需构造的（llm_extractor:454 / hyde:256），所以在这里补 env 来得及。
+    # 父进程不透传密钥时必须有声可闻，否则 engram 会静默退化成纯关键词模式。
+    _env_file = load_env_defaults()
+    if _env_file:
+        print(f"[engram-mcp] loaded LLM keys from {_env_file}", file=sys.stderr)
+    elif not has_llm_key():
+        print(
+            "[engram-mcp] WARNING: no LLM API key — semantic rerank and LLM extraction are "
+            "DISABLED (keyword-only retrieval). Fix: set ENGRAM_ENV_FILE or put keys in "
+            "~/.engram/.env / ~/.hermes/.env.",
+            file=sys.stderr,
+        )
     try:
         asyncio.run(run_server(args.db))
     except KeyboardInterrupt:

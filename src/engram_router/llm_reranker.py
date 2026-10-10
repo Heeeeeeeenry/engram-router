@@ -7,7 +7,13 @@ Usage:
     from engram_router.llm_reranker import LLMReranker
     store = MemoryStore(..., reranker=LLMReranker(api_key="..."))
 
-Requires: ENGRAM_LLM_API_KEY env var.
+Requires an LLM endpoint. Configure via env vars:
+
+    ENGRA_LLM_BASE_URL   — override API base URL (legacy alias: ENGRAM_LLM_BASE_URL)
+    ENGRA_LLM_MODEL      — model name (legacy alias: ENGRAM_LLM_MODEL)
+    (API key is resolved by llm_extractor._get_api_key — endpoint-aware:
+     ONEAPI_API_KEY for the proxy endpoint, DEEPSEEK_API_KEY for the official one.)
+
 Fallback: if LLM is unavailable, returns original ranking unchanged.
 """
 
@@ -19,16 +25,18 @@ import os
 import re
 from typing import Any, cast
 
+from .llm_extractor import _get_api_key, _get_base_url
+
 logger = logging.getLogger(__name__)
 
 
 class LLMReranker:
     """Re-rank candidates using LLM semantic scoring.
 
-    Config via env:
-        ENGRAM_LLM_BASE_URL  — override API base URL
-        ENGRAM_LLM_MODEL     — model name (default: gpt-4o-mini)
-        ENGRAM_LLM_API_KEY   — API key (required)
+    Config via env (与 llm_extractor 保持一致):
+        ENGRA_LLM_BASE_URL   — endpoint (legacy alias: ENGRAM_LLM_BASE_URL)
+        ENGRA_LLM_MODEL      — model name (legacy alias: ENGRAM_LLM_MODEL)
+        (key 由 llm_extractor._get_api_key 按端点解析)
     """
 
     def __init__(
@@ -41,9 +49,18 @@ class LLMReranker:
         weight_rule: float = 0.6,
         allow_cloud: bool | None = None,
     ):
-        self.api_key = api_key or os.environ.get("ENGRAM_LLM_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
-        self.base_url = base_url or os.environ.get("ENGRAM_LLM_BASE_URL")
-        self.model = model or os.environ.get("ENGRA_LLM_MODEL", "deepseek-v4-pro")
+        # 端点解析复用 llm_extractor._get_base_url()（单一真值来源，含 legacy 别名与默认代理端点）
+        self.base_url = base_url or _get_base_url()
+        # 端点与凭证必须匹配：委托 llm_extractor._get_api_key()（单一真值来源 ——
+        # 按 base_url 选 ONEAPI_API_KEY / DEEPSEEK_API_KEY，并处理 ENGRAM_LOCAL_LLM）。
+        # 不要在这里内联复制一套逻辑：历史上正是这种复制导致了变量名漂移。
+        self.api_key = api_key or _get_api_key()
+        self.model = (
+            model
+            or os.environ.get("ENGRA_LLM_MODEL")
+            or os.environ.get("ENGRAM_LLM_MODEL")
+            or "deepseek-v4-pro"
+        )
         self.max_candidates = max_candidates
         self.weight_llm = weight_llm
         self.weight_rule = weight_rule
