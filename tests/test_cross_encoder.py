@@ -63,9 +63,9 @@ def test_rerank_missing_model_returns_input_unchanged():
     assert out[0]["text"] == "a"
 
 
-def test_recall_weights_carry_ce_fields_with_backwards_compatible_defaults():
+def test_recall_weights_ce_disabled_by_default():
     w = RecallWeights()
-    assert w.ce_enabled is True
+    assert w.ce_enabled is False  # 精排默认关（2026-09-22 消融零收益 + 12x 延迟）
     assert w.ce_model == "bge-v2-m3"
     assert w.ce_max_candidates == 20
     assert 0.0 <= w.ce_weight <= 1.0
@@ -101,6 +101,12 @@ def test_store_ce_off_when_weights_disable(monkeypatch, tmp_path):
     w = RecallWeights(ce_enabled=False)
     s = MemoryStore(path=tmp_path / "ce.db", weights=w, enable_vector=False)
     assert s.cross_encoder is None
+
+
+def test_production_profile_disables_ce():
+    from engram_router.profiles import PRODUCTION
+
+    assert PRODUCTION["ce_enabled"] is False
 
 
 def test_store_ce_injected_directly(monkeypatch, tmp_path):

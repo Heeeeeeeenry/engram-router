@@ -22,7 +22,7 @@ from typing import Any
 # ── Built-in profiles ────────────────────────────────────────────────────
 
 PRODUCTION: dict[str, Any] = {
-    "ce_enabled": True,
+    "ce_enabled": False,
     "ce_weight": 0.6,
     "ce_max_candidates": 20,
     "hyde_enabled": False,

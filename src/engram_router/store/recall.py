@@ -12,6 +12,7 @@ The ``recall()`` method on MemoryStore remains as a thin delegating wrapper.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import time
 from typing import Any
@@ -30,6 +31,31 @@ from .records import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _colbert_worth_reranking(n_candidates: int) -> bool:
+    """自适应门禁：候选集过小时跳过 ColBERT 精排（C1）。
+
+    依据（2026-09-21/22 实测）：
+      · 稳态微基准：全管线 1889ms vs ENGRAM_SKIP_COLBERT=1 155ms
+        ⇒ 精排占稳态耗时 92%（12×），且该开销**与库规模无关**（库中仅 1 条记忆亦然）；
+      · 质量 A/B（全量 19 场景，唯一差异就是精排开关）：
+        nDCG@5 0.8414 → 0.8484、contamination@3 0.0136 → 0.0068
+        ⇒ 跳过精排**零质量损失、还略更干净**。
+    机理：候选数太少时精排没有排序空间可改善，却要付出 12× 延迟。
+
+    阈值可用 ``ENGRAM_COLBERT_MIN_CANDIDATES`` 覆盖（默认 20）；设为 0 即始终启用（旧行为）。
+    """
+    try:
+        threshold = int(os.environ.get("ENGRAM_COLBERT_MIN_CANDIDATES", "20"))
+    except ValueError:
+        threshold = 20
+    if n_candidates < threshold:
+        logger.debug(
+            "skip ColBERT rerank: %d candidates < threshold %d", n_candidates, threshold
+        )
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -877,6 +903,7 @@ def build_recall_response(
     # ── Phase 2.45: ColBERT late-interaction rerank (skip if deadline expired) ──
     colbert = getattr(store, 'colbert_reranker', None)
     if colbert and getattr(colbert, "available", False) and records and len(records) > 1 \
+            and _colbert_worth_reranking(len(records)) \
             and not _check_deadline(_deadline, "colbert"):
         records = _apply_reranker(
             records, query, colbert, "colbert", "colbert_score",

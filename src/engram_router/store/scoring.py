@@ -121,10 +121,16 @@ class RecallWeights:
     budget for the Python ranker to find top_k from."""
 
     # ── cross-encoder reranker (Phase 1 of rerank_and_hyde.md) ────────────
-    ce_enabled: bool = True
-    """Enable cross-encoder reranking after fusion, before context boosts.
-    Falls back gracefully if sentence-transformers is missing or the model
-    can't be loaded — recall() continues without CE."""
+    ce_enabled: bool = False
+    """Enable cross-encoder + ColBERT late-interaction reranking after fusion.
+
+    Default OFF (2026-09-22 ablation): skipping rerank shows ZERO quality loss
+    (nDCG@5 0.8414 -> 0.8484, contamination@3 -50%) while steady-state latency
+    drops ~12x (1,889 ms -> 121 ms) and cold start skips the CE/ColBERT model
+    load. Re-enable with ``RecallWeights(ce_enabled=True)`` or a profile that
+    sets it, for workloads where the candidate set is large enough to benefit.
+    Falls back gracefully if sentence-transformers is missing — recall()
+    continues without CE."""
     ce_model: str = "bge-v2-m3"
     """CrossEncoderReranker model key. See cross_encoder._LOCAL_MODELS."""
     ce_max_candidates: int = 20
