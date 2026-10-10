@@ -37,6 +37,11 @@ from .reflection import (
     run_reflection,
     store_reflection,
 )
+from .consolidate import (
+    consolidate_observation,
+    reflect,
+    extract_lesson,
+)
 
 
 # ── Exceptions (API audit) ───────────────────────────────────────────
@@ -92,4 +97,8 @@ __all__ = [
     # L3 lifecycle
     "run_reflection",
     "store_reflection",
+    # L3.5 observation consolidation + reflect + lesson (借鉴 Hindsight/ECC)
+    "consolidate_observation",
+    "reflect",
+    "extract_lesson",
 ]
