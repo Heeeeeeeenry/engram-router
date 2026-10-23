@@ -172,3 +172,19 @@ def test_extract_lesson_returns_none_when_no_lesson(tmp_path, monkeypatch):
     s.save("张三养了一只猫")
 
     assert extract_lesson(s, "张三的猫", top_k=5) is None
+
+
+def test_extract_lesson_is_idempotent(tmp_path, monkeypatch):
+    monkeypatch.setenv("ENGRAM_CONSOLIDATE_LLM", "1")
+    monkeypatch.setattr(
+        "engram_router.llm_extractor.LLMClient", lambda *a, **k: _LessonLLM()
+    )
+    s = _store(tmp_path)
+    s.save("张三的猫抓坏了皮沙发")
+
+    mid1 = extract_lesson(s, "张三的猫抓沙发", top_k=5)
+    assert mid1 is not None
+
+    # 第二次对同一批 experience 提取，应该跳过（幂等，不产生重复 lesson）
+    mid2 = extract_lesson(s, "张三的猫抓沙发", top_k=5)
+    assert mid2 is None

@@ -238,6 +238,29 @@ def extract_lesson(
     if not sources:
         return None
 
+    # 幂等检查：同一批 experience 已被提取过 lesson 就跳过，避免反复调用产生重复教训。
+    source_ids = {r.id for r in sources}
+    try:
+        import json as _json
+
+        existing = store.conn.execute(
+            "SELECT metadata FROM memories WHERE namespace = ? AND source = 'lesson'",
+            (namespace,),
+        ).fetchall()
+        for row in existing:
+            try:
+                meta = _json.loads(row["metadata"])
+            except (TypeError, ValueError):
+                continue
+            refs = set(meta.get("evidence_refs", []))
+            if source_ids.issubset(refs):
+                logger.debug(
+                    "extract_lesson skipped: these experiences already yielded a lesson"
+                )
+                return None
+    except Exception as exc:  # noqa: BLE001 — idempotency check is best-effort
+        logger.debug("extract_lesson idempotency check failed: %s", exc)
+
     lines = "\n".join(f"- {r.raw_text[:200]}" for r in sources)
     evidence_refs = [r.id for r in sources]
 
